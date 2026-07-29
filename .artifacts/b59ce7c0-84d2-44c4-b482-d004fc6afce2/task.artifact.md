@@ -1,26 +1,16 @@
-# Phase 5: Profile & Full-Stack Integration - Task List
+# Phase 6: Home Dashboard - Task List
 
-- [x] Backend: Authentication & Security
-    - [x] Add `FirebaseAdmin` and `JwtBearer` NuGet packages
-    - [x] Configure Firebase Authentication in `Program.cs`
-    - [x] Create `IUserContext` and `UserContext` to resolve current user and synchronize records
-- [x] Backend: Profile API
-    - [x] Create `SkinProfileDto.cs` and request models
-    - [x] Implement `ProfileController.cs` (Get, Create, Update) with User Isolation
-- [x] Android: Network Layer
-    - [x] Add Retrofit & OkHttp to `libs.versions.toml` and `build.gradle.kts`
-    - [x] Create `AuthInterceptor.kt` for Firebase ID Token injection
-    - [x] Create `NetworkModule.kt` for Retrofit & OkHttpClient provisioning
-    - [x] Create `ProfileApiService.kt`
-- [x] Android: Domain & Data
-    - [x] Create `SkinProfile`, `SkinType`, `SensitivityLevel` domain models
-    - [x] Create `ProfileRepository` interface and `ProfileRepositoryImpl`
-    - [x] Create `GetProfileUseCase` and `SaveProfileUseCase`
-    - [x] Create `ProfileMapper.kt` and `SkinProfileDto.kt`
-- [x] Android: Presentation Layer
-    - [x] Create `ProfileViewModel.kt` with state management
-    - [x] Create full-featured `ProfileScreen.kt` (Material 3) with chips and validation
-- [x] Verification & Build
-    - [x] `dotnet build` successful
-    - [x] `gradlew assembleDebug` successful
-    - [x] Verify full end-to-end flow
+- [x] Navigation Updates
+    - [x] Update `Screen.kt` with all app destinations and bottom bar list
+    - [x] Create placeholder screens in `presentation/` subfolders
+    - [x] Update `NavGraph.kt` with all routes
+- [x] Implement Home Feature
+    - [x] Create `HomeUiState.kt`
+    - [x] Create `HomeViewModel.kt` with greeting and name logic
+    - [x] Implement `HomeScreen.kt` with dashboard layout
+- [x] Main UI Integration
+    - [x] Add Bottom Navigation Bar to `MainActivity.kt`
+    - [x] Handle Bottom Bar visibility logic
+- [x] Build and Verify
+    - [x] Successful `gradlew assembleDebug`
+    - [x] Manual test of navigation paths

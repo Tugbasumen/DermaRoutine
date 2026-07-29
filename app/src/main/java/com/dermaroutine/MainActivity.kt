@@ -4,13 +4,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dermaroutine.core.designsystem.DermaRoutineTheme
 import com.dermaroutine.core.navigation.NavGraph
 import com.dermaroutine.core.navigation.Screen
+import com.dermaroutine.core.navigation.bottomNavItems
 import com.dermaroutine.core.util.OnboardingDataStore
 import com.dermaroutine.domain.usecase.GetCurrentUserUseCase
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,17 +58,52 @@ class MainActivity : ComponentActivity() {
             DermaRoutineTheme {
                 isOnboardingCompleted?.let { onboardingDone ->
                     val navController = rememberNavController()
-                    
-                    val startDestination = when {
-                        currentUser != null -> Screen.Profile
-                        onboardingDone -> Screen.Login
-                        else -> Screen.Onboarding
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+
+                    val showBottomBar = bottomNavItems.any { item ->
+                        currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
                     }
 
-                    NavGraph(
-                        navController = navController,
-                        startDestination = startDestination
-                    )
+                    Scaffold(
+                        bottomBar = {
+                            if (showBottomBar) {
+                                NavigationBar {
+                                    bottomNavItems.forEach { item ->
+                                        NavigationBarItem(
+                                            icon = { Icon(item.icon, contentDescription = item.label) },
+                                            label = { Text(item.label) },
+                                            selected = currentDestination?.hierarchy?.any { 
+                                                it.hasRoute(item.route::class) 
+                                            } == true,
+                                            onClick = {
+                                                navController.navigate(item.route) {
+                                                    popUpTo(navController.graph.findStartDestination().id) {
+                                                        saveState = true
+                                                    }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    ) { padding ->
+                        Box(modifier = Modifier.padding(padding)) {
+                            val startDestination = when {
+                                currentUser != null -> Screen.Home
+                                onboardingDone -> Screen.Login
+                                else -> Screen.Onboarding
+                            }
+
+                            NavGraph(
+                                navController = navController,
+                                startDestination = startDestination
+                            )
+                        }
+                    }
                 }
             }
         }

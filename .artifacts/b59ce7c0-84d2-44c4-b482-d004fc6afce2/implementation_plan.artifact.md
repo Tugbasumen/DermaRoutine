@@ -1,69 +1,66 @@
-# Phase 5: Profile & Full-Stack Integration Plan
+# Phase 6: Home Dashboard Implementation Plan
 
-This phase connects the Android app to the ASP.NET Core backend to manage the User Profile. We will implement secure authentication, user synchronization, and a full-featured Profile UI.
+This phase implements the central hub of the DermaRoutine application: the Home Dashboard. We will also establish the main navigation structure with a Bottom Navigation Bar and placeholder screens for upcoming features.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> **Firebase Admin SDK Setup**:
-> 1. You need to generate a **Service Account Key** (JSON) from the Firebase Console (**Project Settings > Service accounts**).
-> 2. **DO NOT** share this file or commit it to Git.
-> 3. For local development, I will show you how to point to this file using an environment variable or .NET User Secrets.
+> [!NOTE]
+> **Navigation Structure**: The Bottom Bar will feature Home, Routine, Products, Progress, and Profile. Screens like the AI Assistant and Skin Journal will be accessible via Quick Actions on the Home screen.
 >
-> **Backend URL**: In development, Android needs to connect to the backend. If using an emulator, `http://10.0.2.2:5222` is typically used. For physical devices, you'll need your local IP.
+> **Mock Data**: Since Routine and Streak features are not yet implemented on the backend, the Home screen will show appropriate "Empty States" with Call-to-Action (CTA) buttons as specified.
 
 ## Proposed Changes
 
-### 1. Backend (DermaRoutine.Api)
+### 1. Navigation & Routing
 
-#### [MODIFY] NuGet Packages
-- Add `FirebaseAdmin` for token verification.
-- Add `Microsoft.AspNetCore.Authentication.JwtBearer` for standard authentication middleware.
+#### [MODIFY] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
+- Add missing destinations: `Journal`, `Assistant`.
+- Add a list of bottom navigation items.
 
-#### [NEW] [FirebaseAuthenticationHandler](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Middleware/FirebaseAuthenticationHandler.cs)
-- A custom authentication handler or standard JWT config to verify Firebase tokens.
+#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
+- Add composable routes for all new screens.
+- Implement placeholders for `Routine`, `Products`, `Progress`, `Journal`, and `Assistant`.
 
-#### [NEW] [IUserContext](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/IUserContext.cs)
-- A service to get the current user's UID and database ID from the security context.
+#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
+- Wrap the `NavGraph` in a `Scaffold`.
+- Implement a `BottomNavigationBar` that only appears on main app screens (Home, Routine, Products, Progress, Profile).
+- Update the authenticated start destination to `Screen.Home`.
 
-#### [MODIFY] [ProfileController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/ProfileController.cs)
-- `GET /api/profile`: Returns `SkinProfileDto`.
-- `POST /api/profile`: Creates a new profile.
-- `PUT /api/profile`: Updates existing profile.
-- **Security**: All endpoints will use `[Authorize]` and derive the `userId` from the token.
+### 2. Presentation Layer (Home)
 
-### 2. Android (app)
+#### [NEW] [HomeUiState.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeUiState.kt)
+- State for greeting, user name, date, and routine summary placeholders.
 
-#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add versions for `Retrofit`, `OkHttp`, and `Kotlin Serialization Converter`.
+#### [NEW] [HomeViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeViewModel.kt)
+- Logic for time-aware greetings ("Good morning", etc.).
+- Retrieving display name from the currently authenticated user.
+- Managing placeholder states for routines and streaks.
 
-#### [NEW] [AuthInterceptor.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/network/AuthInterceptor.kt)
-- Fetches the Firebase ID Token using `user.getIdToken(forceRefresh = false).await()` and adds it to the headers.
+#### [MODIFY] [HomeScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeScreen.kt)
+- Build the scrollable dashboard UI:
+    - **Header**: Time-aware greeting and dynamic date.
+    - **Routine Cards**: Morning and Evening summary cards with "Create Routine" CTAs.
+    - **Streak Card**: Visual 🔥 icon and current streak status (initially 0).
+    - **Skin Photo Card**: CTA for adding today's photo.
+    - **Quick Actions**: "Add Product", "Add Photo", "Ask AI" navigation buttons.
 
-#### [NEW] [ProfileApiService.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/ProfileApiService.kt)
-- Retrofit interface for profile endpoints.
-
-#### [NEW] Domain Layer
-- `SkinProfile` (Domain Model).
-- `ProfileRepository` (Interface).
-- `GetProfileUseCase`, `SaveProfileUseCase`.
-
-#### [NEW] [ProfileScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/profile/ProfileScreen.kt)
-- Comprehensive UI with:
-    - Selection for **Skin Type** (Dry, Oily, etc.).
-    - Selection for **Sensitivity** (Low, Medium, High).
-    - Multi-selection for **Concerns** (Redness, Dullness, etc.).
-    - Notes text field.
+### 3. Placeholder Screens
+Create basic themed placeholder screens in:
+- `presentation/routine/RoutineScreen.kt`
+- `presentation/products/ProductsScreen.kt`
+- `presentation/progress/ProgressScreen.kt`
+- `presentation/journal/JournalScreen.kt`
+- `presentation/assistant/AssistantScreen.kt`
 
 ## Verification Plan
 
 ### Automated Tests
-- `dotnet build` and `gradlew assembleDebug`.
-- Verify user isolation: Attempt to access `/api/profile` with an invalid token (should return 401).
+- Run `gradlew assembleDebug` to ensure all new navigation paths and components compile correctly.
 
 ### Manual Verification
-1. Register/Login on Android.
-2. Navigate to Profile.
-3. Fill out the profile and click "Save".
-4. Check PostgreSQL to verify the user and profile records are created.
-5. Restart the app and verify the profile loads correctly.
+1. **Authenticated Launch**: Verify the user lands on the Home screen after login.
+2. **Greeting & Date**: Verify the greeting matches the current time and the date is correct.
+3. **Bottom Navigation**: Test switching between Home, Routine, Products, Progress, and Profile.
+4. **Quick Actions**: Verify buttons on the Home screen navigate to the correct placeholder screens.
+5. **UI Consistency**: Ensure all cards and buttons follow the Pastel Green / Sage / Cream design system.
+6. **No Fake Data**: Verify that empty states are shown instead of hardcoded fake numbers for routines/streaks.

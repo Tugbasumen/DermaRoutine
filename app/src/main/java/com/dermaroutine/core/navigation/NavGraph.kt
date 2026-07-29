@@ -4,11 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.dermaroutine.presentation.assistant.AssistantScreen
 import com.dermaroutine.presentation.auth.LoginScreen
 import com.dermaroutine.presentation.auth.RegisterScreen
 import com.dermaroutine.presentation.home.HomeScreen
+import com.dermaroutine.presentation.journal.JournalScreen
 import com.dermaroutine.presentation.onboarding.OnboardingScreen
+import com.dermaroutine.presentation.products.ProductsScreen
 import com.dermaroutine.presentation.profile.ProfileScreen
+import com.dermaroutine.presentation.progress.ProgressScreen
+import com.dermaroutine.presentation.routine.RoutineScreen
 
 @Composable
 fun NavGraph(
@@ -32,7 +37,7 @@ fun NavGraph(
         composable<Screen.Login> {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(Screen.Profile) {
+                    navController.navigate(Screen.Home) { // Redirect to Home now
                         popUpTo(Screen.Login) { inclusive = true }
                     }
                 },
@@ -45,7 +50,7 @@ fun NavGraph(
         composable<Screen.Register> {
             RegisterScreen(
                 onRegisterSuccess = {
-                    navController.navigate(Screen.Profile) {
+                    navController.navigate(Screen.Home) { // Redirect to Home now
                         popUpTo(Screen.Register) { inclusive = true }
                     }
                 },
@@ -56,11 +61,36 @@ fun NavGraph(
         }
         
         composable<Screen.Home> {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToRoutine = { navController.navigate(Screen.Routine) },
+                onNavigateToProducts = { navController.navigate(Screen.Products) },
+                onNavigateToJournal = { navController.navigate(Screen.Journal) },
+                onNavigateToAssistant = { navController.navigate(Screen.Assistant) }
+            )
+        }
+
+        composable<Screen.Routine> {
+            RoutineScreen()
+        }
+
+        composable<Screen.Products> {
+            ProductsScreen()
+        }
+
+        composable<Screen.Progress> {
+            ProgressScreen()
         }
         
         composable<Screen.Profile> {
             ProfileScreen()
+        }
+
+        composable<Screen.Journal> {
+            JournalScreen()
+        }
+
+        composable<Screen.Assistant> {
+            AssistantScreen()
         }
     }
 }

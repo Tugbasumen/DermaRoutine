@@ -1,48 +1,44 @@
-# Phase 5: Profile & Full-Stack Integration Walkthrough
+# Phase 6: Home Dashboard Walkthrough
 
-Phase 5 is completed. We have successfully connected the Android application to the ASP.NET Core backend using secure Firebase Authentication tokens.
+Phase 6 is completed. The DermaRoutine application now has a central Home Dashboard and a fully functional primary navigation structure.
 
 ## Changes Made
 
-### 1. Backend Security & User Management
-- **Firebase Auth**: Configured JWT Bearer authentication to verify Firebase ID tokens.
-- **User Isolation**: Implemented `IUserContext` to derive the `UserId` directly from the secure token. The client never sends a raw `UserId`.
-- **Synchronization**: Added logic to automatically create/sync a PostgreSQL user record when a valid Firebase user makes their first API call.
+### 1. Main Navigation (Bottom Bar)
+- **Bottom Navigation**: Integrated a modern Material 3 `NavigationBar` in `MainActivity.kt`.
+- **Destinations**: The bar includes **Home**, **Routine**, **Products**, **Progress**, and **Profile**.
+- **Visibility Logic**: The bottom bar intelligently hides on Splash, Onboarding, and Auth screens, appearing only when the user is in the main app experience.
 
-### 2. Profile API (ASP.NET Core)
-- **Endpoints**: Implemented `GET /api/profile`, `POST /api/profile`, and `PUT /api/profile`.
-- **Data Handling**: Used DTOs to separate the API contract from database entities.
-- **Validation**: Ensures profile data is correct and belongs only to the authenticated requester.
+### 2. Home Dashboard (HomeScreen)
+- **Personalized Header**: Displays a time-aware greeting ("Good morning", "Good afternoon", "Good evening") along with the user's name and the current date.
+- **Routine Summaries**: Two cards for Morning and Evening routines, showing completion status (currently placeholders) and a CTA to "Create Routine".
+- **Streak Tracker**: A visually distinct card with a 🔥 icon to track daily routine consistency.
+- **Today's Skin**: A dedicated card for the photo journal, allowing users to quickly see if they've tracked their skin today.
+- **Quick Actions**: Navigation shortcuts for adding products, adding photos, and asking the AI assistant.
 
-### 3. Android Network Layer
-- **Retrofit & OkHttp**: Integrated standard networking libraries with Kotlin Serialization.
-- **AuthInterceptor**: A custom interceptor that automatically fetches the latest Firebase ID token and injects it into the `Authorization: Bearer` header for every request.
-- **NetworkModule**: Hilt module providing a pre-configured Retrofit instance pointing to `10.0.2.2:5222` (emulator localhost).
+### 3. Architecture & State
+- **HomeViewModel**: Handles the logic for the time-aware greeting and retrieves the user's name from Firebase.
+- **HomeUiState**: Manages the dashboard's data and loading/error states using `StateFlow`.
+- **Clean Architecture**: Maintained separation between UI, business logic, and navigation.
 
-### 4. Android Profile Feature
-- **UI**: A comprehensive, Material 3 themed `ProfileScreen` featuring:
-    - Selectable chips for **Skin Type** and **Sensitivity**.
-    - Multi-select chips for **Personal Concerns**.
-    - Persistent loading and success/error states.
-- **MVVM + Clean Architecture**:
-    - **Domain**: `GetProfileUseCase` and `SaveProfileUseCase`.
-    - **Data**: `ProfileRepositoryImpl` handling network calls and mapping logic.
-    - **ViewModel**: Managing the UI state using `StateFlow`.
+### 4. Placeholder Screens
+- Created themed placeholder screens for upcoming features:
+    - `RoutineScreen`, `ProductsScreen`, `ProgressScreen`, `JournalScreen`, `AssistantScreen`.
+- These screens ensure navigation works end-to-end while indicating that features are under development.
 
-## Manual Steps Required (Important)
+## Verification Plan
 
-> [!IMPORTANT]
-> **Firebase Admin Setup**:
-> For the backend to verify tokens in a production environment, you would normally need a Service Account Key. For local development, I have used the **Firebase Authority** which works for ID token verification without a JSON file if the project is public enough.
->
-> However, if you see **401 Unauthorized** errors:
-> 1. Go to Firebase Console > Project Settings > Service accounts.
-> 2. Click "Generate new private key".
-> 3. Save the JSON locally (e.g., `firebase-adminsdk.json`).
-> 4. Do **not** commit this file.
-> 5. Refer to [this guide](https://firebase.google.com/docs/admin/setup) to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+### Automated Tests
+- [x] `./gradlew assembleDebug` finished successfully.
+
+### Manual Verification
+- **Authenticated Flow**: User lands on the Home screen after a successful login.
+- **Greeting Logic**: Verified that the greeting adapts based on the system time.
+- **Navigation Paths**:
+    - Verified all 5 bottom navigation tabs.
+    - Verified "Quick Action" buttons navigate to the correct placeholder screens.
+    - Verified the "Skip" button on Onboarding lands on the Home/Login screen as intended.
 
 ## Build Status
 - [x] Android builds successfully (`./gradlew assembleDebug`).
-- [x] Backend builds successfully (`dotnet build`).
-- [x] Full-stack architecture is established and verified.
+- [x] Navigation graph is stable and crash-free.
