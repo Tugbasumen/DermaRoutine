@@ -17,7 +17,8 @@ class RoutineViewModel @Inject constructor(
     private val getRoutinesUseCase: GetRoutinesUseCase,
     private val getRoutineDetailUseCase: GetRoutineDetailUseCase,
     private val createRoutineUseCase: CreateRoutineUseCase,
-    private val completeRoutineUseCase: CompleteRoutineUseCase
+    private val completeRoutineUseCase: CompleteRoutineUseCase,
+    private val addItemToRoutineUseCase: AddItemToRoutineUseCase
 ) : ViewModel() {
 
     private val _routinesState = MutableStateFlow<RoutineListUiState>(RoutineListUiState.Loading)
@@ -73,6 +74,14 @@ class RoutineViewModel @Inject constructor(
             completeRoutineUseCase(id).onSuccess {
                 loadRoutineDetail(id)
                 loadRoutines()
+            }
+        }
+    }
+
+    fun addItemToRoutine(routineId: Int, productId: Int, stepOrder: Int, notes: String?) {
+        viewModelScope.launch {
+            addItemToRoutineUseCase(routineId, productId, stepOrder, notes).onSuccess {
+                loadRoutineDetail(routineId)
             }
         }
     }

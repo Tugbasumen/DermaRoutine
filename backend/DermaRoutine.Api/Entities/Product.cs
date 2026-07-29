@@ -1,3 +1,5 @@
+using DermaRoutine.Api.Enums;
+
 namespace DermaRoutine.Api.Entities
 {
     public class Product
@@ -8,7 +10,7 @@ namespace DermaRoutine.Api.Entities
         public string Name { get; set; } = string.Empty;
         public string Brand { get; set; } = string.Empty;
         public string? Barcode { get; set; }
-        public string? Category { get; set; }
+        public ProductCategory Category { get; set; }
         public string? ImageUrl { get; set; }
         public string? Notes { get; set; }
 

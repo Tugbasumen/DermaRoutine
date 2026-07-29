@@ -2,6 +2,7 @@ package com.dermaroutine.data.repository
 
 import com.dermaroutine.data.mapper.toDomain
 import com.dermaroutine.data.remote.RoutineApiService
+import com.dermaroutine.data.remote.dto.AddRoutineItemRequest
 import com.dermaroutine.data.remote.dto.CreateRoutineRequest
 import com.dermaroutine.domain.model.*
 import com.dermaroutine.domain.repository.RoutineRepository
@@ -72,6 +73,27 @@ class RoutineRepositoryImpl @Inject constructor(
             } else {
                 Result.failure(Exception("Failed to load streak"))
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun addItemToRoutine(routineId: Int, productId: Int, stepOrder: Int, notes: String?): Result<Unit> {
+        return try {
+            val request = AddRoutineItemRequest(productId, stepOrder, notes)
+            val response = apiService.addItemToRoutine(routineId, request)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception("Failed to add product to routine"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun removeItemFromRoutine(routineId: Int, itemId: Int): Result<Unit> {
+        return try {
+            val response = apiService.removeItemFromRoutine(routineId, itemId)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception("Failed to remove product from routine"))
         } catch (e: Exception) {
             Result.failure(e)
         }

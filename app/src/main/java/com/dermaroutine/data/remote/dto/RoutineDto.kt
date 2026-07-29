@@ -44,3 +44,10 @@ data class StreakDto(
     val currentStreak: Int,
     val todayCompleted: Boolean
 )
+
+@Serializable
+data class AddRoutineItemRequest(
+    val productId: Int,
+    val stepOrder: Int,
+    val notes: String? = null
+)

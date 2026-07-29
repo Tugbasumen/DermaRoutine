@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
@@ -31,12 +32,27 @@ import com.dermaroutine.domain.model.RoutineItem
 fun RoutineDetailScreen(
     routineId: Int,
     onNavigateBack: () -> Unit,
+    onNavigateToAddProduct: () -> Unit,
+    selectedProductId: Int? = null,
+    onProductHandled: () -> Unit = {},
     viewModel: RoutineViewModel = hiltViewModel()
 ) {
     val state by viewModel.detailState.collectAsState()
 
     LaunchedEffect(routineId) {
         viewModel.loadRoutineDetail(routineId)
+    }
+
+    LaunchedEffect(selectedProductId) {
+        if (selectedProductId != null) {
+            viewModel.addItemToRoutine(
+                routineId, 
+                selectedProductId, 
+                (state as? RoutineDetailUiState.Success)?.detail?.items?.size ?: 0,
+                null
+            )
+            onProductHandled()
+        }
     }
 
     Scaffold(
@@ -53,6 +69,9 @@ fun RoutineDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToAddProduct) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Product")
+                    }
                     IconButton(onClick = { /* Edit action */ }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More")
                     }

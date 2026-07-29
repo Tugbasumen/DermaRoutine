@@ -19,4 +19,10 @@ interface RoutineApiService {
 
     @GET("api/routine/streak")
     suspend fun getStreak(): Response<StreakDto>
+
+    @POST("api/routine/{id}/items")
+    suspend fun addItemToRoutine(@Path("id") routineId: Int, @Body request: AddRoutineItemRequest): Response<Unit>
+
+    @DELETE("api/routine/{id}/items/{itemId}")
+    suspend fun removeItemFromRoutine(@Path("id") routineId: Int, @Path("itemId") itemId: Int): Response<Unit>
 }

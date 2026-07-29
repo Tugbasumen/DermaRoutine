@@ -33,6 +33,18 @@ sealed class Screen {
     
     @Serializable
     data object Products : Screen()
+
+    @Serializable
+    data object AddProduct : Screen()
+
+    @Serializable
+    data class EditProduct(val id: Int) : Screen()
+
+    @Serializable
+    data class ProductDetail(val id: Int) : Screen()
+
+    @Serializable
+    data class ProductSelector(val routineId: Int) : Screen()
     
     @Serializable
     data object Progress : Screen()

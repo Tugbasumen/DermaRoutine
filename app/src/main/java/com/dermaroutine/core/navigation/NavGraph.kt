@@ -1,6 +1,8 @@
 package com.dermaroutine.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,7 +13,7 @@ import com.dermaroutine.presentation.auth.RegisterScreen
 import com.dermaroutine.presentation.home.HomeScreen
 import com.dermaroutine.presentation.journal.JournalScreen
 import com.dermaroutine.presentation.onboarding.OnboardingScreen
-import com.dermaroutine.presentation.products.ProductsScreen
+import com.dermaroutine.presentation.products.*
 import com.dermaroutine.presentation.profile.ProfileScreen
 import com.dermaroutine.presentation.progress.ProgressScreen
 import com.dermaroutine.presentation.routine.CreateRoutineScreen
@@ -81,9 +83,14 @@ fun NavGraph(
 
         composable<Screen.RoutineDetail> { backStackEntry ->
             val detail: Screen.RoutineDetail = backStackEntry.toRoute()
+            val selectedProductId by backStackEntry.savedStateHandle.getStateFlow<Int?>("selected_product_id", null).collectAsState()
+            
             RoutineDetailScreen(
                 routineId = detail.id,
-                onNavigateBack = { navController.popBackStack() }
+                selectedProductId = selectedProductId,
+                onProductHandled = { backStackEntry.savedStateHandle.set("selected_product_id", null) },
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToAddProduct = { navController.navigate(Screen.ProductSelector(detail.id)) }
             )
         }
 
@@ -95,7 +102,47 @@ fun NavGraph(
         }
 
         composable<Screen.Products> {
-            ProductsScreen()
+            ProductListScreen(
+                onNavigateToAdd = { navController.navigate(Screen.AddProduct) },
+                onNavigateToDetail = { id -> navController.navigate(Screen.ProductDetail(id)) }
+            )
+        }
+
+        composable<Screen.AddProduct> {
+            AddEditProductScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onProductSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.EditProduct> { backStackEntry ->
+            val edit: Screen.EditProduct = backStackEntry.toRoute()
+            AddEditProductScreen(
+                productId = edit.id,
+                onNavigateBack = { navController.popBackStack() },
+                onProductSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.ProductDetail> { backStackEntry ->
+            val detail: Screen.ProductDetail = backStackEntry.toRoute()
+            ProductDetailScreen(
+                productId = detail.id,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToEdit = { id -> navController.navigate(Screen.EditProduct(id)) }
+            )
+        }
+
+        composable<Screen.ProductSelector> {
+            ProductSelectorScreen(
+                onProductSelected = { product ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selected_product_id", product.id)
+                    navController.popBackStack()
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable<Screen.Progress> {

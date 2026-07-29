@@ -1,25 +1,29 @@
-# Phase 7: Routine Management & Streak Walkthrough
+# Phase 8: Product Management Walkthrough
 
-Phase 7 is completed. The DermaRoutine application now features a fully functional skincare routine management system, including completion tracking and consistency streaks.
+Phase 8 is completed. The DermaRoutine application now has a robust Product Management system that integrates seamlessly with the Skincare Routines feature.
 
 ## Changes Made
 
 ### 1. Backend (ASP.NET Core)
-- **Routine API**: Created `RoutineController` with endpoints for listing, creating, and fetching routine details.
-- **Completion Tracking**: Implemented a completion endpoint that records daily routine usage with server-side timestamps.
-- **Streak Algorithm**: Implemented `RoutineStreakService` which calculates the user's current streak. A day is marked as completed only when **all active routines** are finished.
-- **User Isolation**: All endpoints strictly enforce user isolation by deriving the user identity from the verified Firebase token.
+- **Product API**: Created `ProductController` with full CRUD support for personal skincare products and their ingredients.
+- **Search & Filter**: Added search (by name/brand) and category filtering functionality directly in the API.
+- **Safety Features**: Implemented a deletion check. A product cannot be deleted if it is currently part of any routine, preventing broken data.
+- **Database Schema**: Updated the `Product` entity with a strongly-typed `ProductCategory` enum and generated the `ImproveProductManagement` migration.
 
 ### 2. Android Domain & Data Layer
-- **Domain Models**: Defined `Routine`, `RoutineDetail`, `RoutineItem`, and `StreakInfo`.
-- **Use Cases**: Implemented a full set of use cases for routines and streaks (`GetRoutinesUseCase`, `CompleteRoutineUseCase`, `CreateRoutineUseCase`, etc.).
-- **Repository**: `RoutineRepositoryImpl` handles the authenticated network communication using Retrofit.
+- **Domain Models**: Defined `Product`, `ProductDetail`, `ProductIngredient`, and `ProductCategory`.
+- **Use Cases**: Implemented a comprehensive set of use cases for product operations (`GetProductsUseCase`, `CreateProductUseCase`, `UpdateProductUseCase`, `DeleteProductUseCase`, etc.).
+- **Data Layer**: `ProductRepositoryImpl` manages network communication, and `ProductMapper.kt` handles DTO-to-Domain conversions.
 
-### 3. Android Presentation Layer
-- **Routine List**: A modern view showing Morning and Evening routines with progress indicators.
-- **Routine Details**: Displays the steps within a routine and allows the user to mark it as completed.
-- **Create Routine**: A clean form to start new skincare routines.
-- **Home Integration**: The dashboard now displays real, live data for routine progress and streaks.
+### 3. Android Presentation Layer (Material 3)
+- **Product Library**: A main screen to list all products with a search bar and category filter chips.
+- **Product Details**: A detailed view showing product info, notes, and the full ingredient list.
+- **Add/Edit Form**: A dynamic form using Material 3 `ExposedDropdownMenuBox` for category selection and validation.
+- **Product Selector**: A specialized search screen used when adding products to a routine.
+
+### 4. Routine Integration
+- **Add Product to Routine**: Updated the `RoutineDetailScreen` with an "Add" action.
+- **Navigation Result Handling**: Used Compose Navigation's `SavedStateHandle` to safely pass selected products back to the routine detail view and trigger the update API.
 
 ## Verification Plan
 
@@ -28,12 +32,15 @@ Phase 7 is completed. The DermaRoutine application now features a fully function
 - [x] `./gradlew assembleDebug` finished successfully.
 
 ### Manual Verification
-- **Creation**: Successfully created a "Morning Glow" routine.
-- **Completion**: Tapped "Complete Routine" and saw the status update on both the detail and home screens.
-- **Streak**: Verified that the streak incremented after completing required routines.
-- **Security**: Verified that routines are private and secure using different test accounts.
+- **Search**: Verified that searching for "Serum" correctly filters the list.
+- **Validation**: Confirmed that products cannot be saved without a name.
+- **End-to-End**:
+    1. Added a new "Cleanser".
+    2. Navigated to a "Morning Routine".
+    3. Selected the new cleanser from the selector.
+    4. Verified it appeared in the routine steps.
+- **Delete Protection**: Attempted to delete the cleanser and verified the `409 Conflict` error was handled.
 
 ## Build Status
-- [x] Backend builds successfully.
-- [x] Android app builds successfully.
-- [x] End-to-end integration is verified.
+- [x] Backend and Android projects are fully synced and buildable.
+- [x] Full product lifecycle (Add -> Edit -> Search -> Routine -> Delete) is verified.

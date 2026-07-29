@@ -149,5 +149,50 @@ namespace DermaRoutine.Api.Controllers
             var streak = await _streakService.GetCurrentStreakAsync(userId.Value);
             return Ok(streak);
         }
+
+        [HttpPost("{id}/items")]
+        public async Task<IActionResult> AddItemToRoutine(int id, AddRoutineItemRequest request)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            if (userId == null) return Unauthorized();
+
+            var routine = await _context.Routines.FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+            if (routine == null) return NotFound("Routine not found.");
+
+            // Verify product ownership
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == request.ProductId && p.UserId == userId);
+            if (product == null) return BadRequest("Product not found or access denied.");
+
+            var item = new RoutineItem
+            {
+                RoutineId = id,
+                ProductId = request.ProductId,
+                StepOrder = request.StepOrder,
+                Notes = request.Notes
+            };
+
+            _context.RoutineItems.Add(item);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}/items/{itemId}")]
+        public async Task<IActionResult> RemoveItemFromRoutine(int id, int itemId)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            if (userId == null) return Unauthorized();
+
+            var item = await _context.RoutineItems
+                .Include(ri => ri.Routine)
+                .FirstOrDefaultAsync(ri => ri.Id == itemId && ri.RoutineId == id && ri.Routine.UserId == userId);
+
+            if (item == null) return NotFound();
+
+            _context.RoutineItems.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

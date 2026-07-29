@@ -1,23 +1,26 @@
-# Phase 7: Routine Management & Streak - Task List
+# Phase 8: Product Management - Task List
 
 - [x] Backend Implementation
-    - [x] Create `RoutineDto.cs`, `RoutineItemDto.cs`
-    - [x] Implement `IRoutineStreakService` and `RoutineStreakService.cs`
-    - [x] Implement `RoutineController.cs` with CRUD, items, and completion
-    - [x] Register services in `Program.cs`
+    - [x] Create `ProductCategory.cs` enum
+    - [x] Update `Product.cs` entity and create migration
+    - [x] Create `ProductDto.cs`
+    - [x] Implement `ProductController.cs` (CRUD + Ingredients)
+    - [x] Added `AddItemToRoutine` and `RemoveItemFromRoutine` to `RoutineController.cs`
 - [x] Android: Domain & Data
-    - [x] Create `Routine`, `RoutineItem`, `StreakInfo` domain models
-    - [x] Create `RoutineRepository` and `RoutineRepositoryImpl`
-    - [x] Implement UseCases: `GetRoutinesUseCase`, `CompleteRoutineUseCase`, etc.
-    - [x] Create `RoutineApiService.kt` and DTOs
+    - [x] Create `Product`, `ProductCategory`, `ProductIngredient` domain models
+    - [x] Create `ProductRepository` and `ProductRepositoryImpl`
+    - [x] Implement UseCases: `GetProductsUseCase`, `CreateProductUseCase`, `UpdateProductUseCase`, `DeleteProductUseCase`
+    - [x] Create `ProductApiService.kt` and DTOs
+    - [x] Create `ProductMapper.kt`
 - [x] Android: Presentation Layer
-    - [x] Create `RoutineViewModel.kt`
-    - [x] Create `RoutineListScreen.kt`
-    - [x] Create `RoutineDetailScreen.kt`
-    - [x] Create `CreateRoutineScreen.kt`
-- [x] Integration & Home Update
-    - [x] Update `HomeViewModel` to fetch real streak/completion
-    - [x] Update `HomeScreen` UI with real data
+    - [x] Create `ProductViewModel.kt`
+    - [x] Create `ProductListScreen.kt` (with search & filter)
+    - [x] Create `ProductDetailScreen.kt`
+    - [x] Create `AddEditProductScreen.kt`
+- [x] Routine Integration
+    - [x] Update `RoutineDetailScreen` with "Add Product" logic
+    - [x] Create `ProductSelectorScreen.kt`
+    - [x] Handle cross-screen navigation results using `SavedStateHandle`
 - [x] Build and Verify
     - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
