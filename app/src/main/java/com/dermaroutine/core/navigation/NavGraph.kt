@@ -5,19 +5,34 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.dermaroutine.presentation.home.HomeScreen
+import com.dermaroutine.presentation.onboarding.OnboardingScreen
+import com.dermaroutine.presentation.profile.ProfileScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    startDestination: Screen = Screen.Home
+    startDestination: Screen
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable<Screen.Onboarding> {
+            OnboardingScreen(
+                onFinished = {
+                    navController.navigate(Screen.Profile) {
+                        popUpTo(Screen.Onboarding) { inclusive = true }
+                    }
+                }
+            )
+        }
+        
         composable<Screen.Home> {
             HomeScreen()
         }
-        // Add other destinations as they are implemented
+        
+        composable<Screen.Profile> {
+            ProfileScreen()
+        }
     }
 }

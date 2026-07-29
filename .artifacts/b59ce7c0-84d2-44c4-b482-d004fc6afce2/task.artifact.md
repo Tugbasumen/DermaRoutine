@@ -1,23 +1,25 @@
-# Phase 1: Foundation - Task List
+# Phase 2: Splash Screen & Onboarding - Task List
 
 - [x] Update Build Configuration
-    - [x] Add dependencies to `libs.versions.toml`
-    - [x] Update root `build.gradle.kts`
-    - [x] Update app `build.gradle.kts`
-- [x] Refactor Package Structure
-    - [x] Rename package to `com.dermaroutine`
-    - [x] Create folder structure (`core`, `data`, `domain`, `presentation`)
-- [x] Initialize Hilt
-    - [x] Create `DermaRoutineApp.kt`
-- [x] Implement Design System
-    - [x] Create `Color.kt`
-    - [x] Create `Type.kt`
-    - [x] Create `Theme.kt`
-- [x] Setup Navigation
-    - [x] Create `Screen.kt`
-    - [x] Create `NavGraph.kt`
-- [x] Create Reusable Components
-    - [x] `PrimaryButton.kt` (Placeholder)
-    - [x] `AppTopBar.kt` (Placeholder)
-- [x] Update `MainActivity.kt`
+    - [x] Add `core-splashscreen` and `datastore` to `libs.versions.toml`
+    - [x] Add dependencies to app `build.gradle.kts`
+- [x] Implement State Persistence
+    - [x] Create `OnboardingDataStore.kt`
+- [x] Design System Extensions
+    - [x] Add any missing colors or typography for onboarding
+    - [x] Create `PrimaryButton` and `SecondaryButton` in `Components.kt`
+- [x] Implement Onboarding Feature
+    - [x] Create `OnboardingPage.kt` (Model)
+    - [x] Create `OnboardingViewModel.kt`
+    - [x] Create `OnboardingScreen.kt` (UI)
+- [x] Setup Splash Screen
+    - [x] Create `ic_splash_logo.xml`
+    - [x] Update `themes.xml` and `styles.xml` with Splash Screen theme
+    - [x] Configure `MainActivity.kt` with `installSplashScreen()`
+- [x] Navigation & Routing
+    - [x] Update `Screen.kt` with new destinations
+    - [x] Update `NavGraph.kt` with Onboarding and Profile placeholder
+    - [x] Create placeholder `ProfileScreen.kt`
+- [x] Final Integration
+    - [x] Handle initial route logic in `MainActivity.kt`
 - [x] Build and Verify

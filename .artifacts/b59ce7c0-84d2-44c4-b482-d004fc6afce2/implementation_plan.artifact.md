@@ -1,74 +1,58 @@
-# Phase 1: Foundation Implementation Plan
+# Phase 2: Splash Screen & Onboarding Implementation Plan
 
-This phase focuses on setting up the core architecture, design system, and navigation foundation for the DermaRoutine application. We will establish a Clean Architecture structure and integrate essential libraries like Hilt and Navigation Compose.
+This phase implements the initial user experience: a modern Splash Screen and a 3-step Onboarding flow. We will also implement simple state persistence to ensure onboarding is only shown once.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> **Package Renaming**: The project currently uses `com.tugba.dermaroutine`. To match your specification exactly (`app/src/main/java/com/dermaroutine/`), I will rename the package to `com.dermaroutine`. This involves updating `AndroidManifest.xml`, `build.gradle.kts`, and all existing source files.
->
-> **Monorepo Structure**: Your spec mentions a `DermaRoutine/android` folder. Currently, the Android project is at the root `C:/kotlinproje/DermaRoutine`. For Phase 1, I will work within the current root to ensure stability in the IDE. Reorganizing into an `android/` subfolder can be done later if desired, but might require IDE reconfiguration.
+> [!NOTE]
+> **Dependencies**: I will add `androidx.core:core-splashscreen` for the official Splash Screen API and `androidx.datastore:datastore-preferences` for persisting the onboarding completion state. These are standard Jetpack libraries.
 
 ## Proposed Changes
 
 ### Build Configuration
 
 #### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add versions and libraries for:
-    - Hilt (Dependency Injection)
-    - Navigation Compose
-    - Lifecycle ViewModel Compose
-    - Material Icons Extended
-
-#### [MODIFY] [build.gradle.kts (root)](file:///C:/kotlinproje/DermaRoutine/build.gradle.kts)
-- Add Hilt plugin.
+- Add `core-splashscreen` and `datastore-preferences` libraries.
 
 #### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
-- Apply Hilt and Kotlin Serialization plugins.
-- Update `namespace` and `applicationId` to `com.dermaroutine`.
-- Add dependencies for Hilt, Navigation, and Lifecycle.
+- Add the new dependencies.
 
-### Architecture Setup
+### Resources & Styling
 
-#### [NEW] Directory Structure
-Create the following packages under `com.dermaroutine`:
-- `core/` (common, designsystem, navigation, network, util)
-- `data/` (local, remote, repository, mapper)
-- `domain/` (model, repository, usecase)
-- `presentation/` (onboarding, profile, home, routine, etc.)
+#### [MODIFY] [themes.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/values/themes.xml)
+- Define a Splash Screen theme that inherits from `Theme.SplashScreen`.
+- Set the background to `Background` (#F8FBF8) and the brand icon.
 
-#### [NEW] [DermaRoutineApp.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/DermaRoutineApp.kt)
-- Base Application class with `@HiltAndroidApp`.
+### Core Architecture (DataStore)
 
-### Design System
+#### [NEW] [OnboardingDataStore.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/util/OnboardingDataStore.kt)
+- A simple utility class using DataStore to save and read the `is_onboarding_completed` flag.
 
-#### [NEW] [Color.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Color.kt)
-- Define the pastel green, sage green, and cream palette.
+### Presentation Layer
 
-#### [NEW] [Theme.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Theme.kt)
-- Set up Material 3 Theme using the custom color palette.
+#### [NEW] Onboarding Components
+- `OnboardingPage.kt`: Data model for onboarding pages.
+- `OnboardingScreen.kt`: The main UI with `HorizontalPager`, indicators, and buttons.
+- `OnboardingViewModel.kt`: Manages the current page and interacts with `OnboardingDataStore`.
 
-#### [NEW] [Type.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Type.kt)
-- Define typography for headings, body, and captions.
+#### [NEW] [ProfileScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/profile/ProfileScreen.kt)
+- A placeholder screen as the destination after onboarding.
 
-### Navigation
+### Navigation & Main Entry
 
-#### [NEW] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
-- Sealed class defining all major app destinations.
+#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
+- Initialize the Splash Screen API (`installSplashScreen()`).
+- Collect the onboarding state to decide the starting destination.
 
-#### [NEW] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Initial Navigation setup.
-
-### UI Components
-
-#### [NEW] Reusable Components
-- `PrimaryButton.kt`, `AppTopBar.kt`, `AppCard.kt`.
+#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
+- Add `Onboarding` and `Profile` destinations.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `./gradlew assembleDebug` to verify the project builds with the new dependencies and package structure.
+- Run `./gradlew assembleDebug` to verify no build errors.
 
 ### Manual Verification
-- Check that the application starts and displays a themed initial screen.
-- Verify that Hilt is correctly initialized via the Application class.
+- **First Launch**: App should show Splash Screen, then transition to Onboarding.
+- **Onboarding Flow**: Navigate through 3 pages, verify "Skip" and "Get Started" buttons.
+- **Persistence**: Complete onboarding, close app, and reopen. It should go directly to the Profile placeholder (or Home if decided later).

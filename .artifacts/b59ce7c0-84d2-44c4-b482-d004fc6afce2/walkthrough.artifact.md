@@ -1,43 +1,36 @@
-# Phase 1: Foundation Walkthrough
+# Phase 2: Splash Screen & Onboarding Walkthrough
 
-I have successfully completed Phase 1 of the DermaRoutine project. This phase established the project's core architecture, design system, and navigation foundation.
+Phase 2 is completed. The app now features a modern entry flow with a splash screen and a 3-step onboarding process, with persistent state management.
 
 ## Changes Made
 
-### 1. Build Configuration & Dependencies
-- Updated `libs.versions.toml` with stable versions for:
-    - **Hilt**: Dependency Injection foundation.
-    - **Navigation Compose**: Type-safe navigation using Kotlin Serialization.
-    - **Material 3**: Modern UI components.
-    - **Kotlin Serialization**: For type-safe navigation arguments.
-- Configured root and app `build.gradle.kts` files to apply these plugins and dependencies.
-- Updated `gradle.properties` to enable AndroidX and Jetifier.
+### 1. Splash Screen
+- **Splash API**: Integrated `androidx.core:core-splashscreen` for a native launch experience.
+- **Visuals**: Created `ic_splash_logo.xml` and configured a custom `Theme.App.Starting` in `styles.xml` with the pastel green background (#F8FBF8).
+- **MainActivity**: Implemented `installSplashScreen()` and used `setKeepOnScreenCondition` to hold the splash screen until the onboarding state is loaded from DataStore.
 
-### 2. Architecture & Package Structure
-- Renamed the package from `com.tugba.dermaroutine` to `com.dermaroutine`.
-- Established a **Clean Architecture** folder structure:
-    - `core/`: Design system, navigation, and utilities.
-    - `data/`: Local/remote data sources and repository implementations.
-    - `domain/`: Models, repository interfaces, and use cases.
-    - `presentation/`: Feature-based UI modules (home, profile, onboarding).
+### 2. Onboarding Flow
+- **UI Components**:
+    - `OnboardingScreen`: Uses `HorizontalPager` for smooth page transitions.
+    - `OnboardingViewModel`: Handles completion logic.
+    - `PrimaryButton` & `SecondaryButton`: Reusable styled buttons matching the design system.
+- **Pages**: 3-step guide covering "Build Your Routine", "Track Your Skin Journey", and "Understand Your Products".
+- **Navigation**:
+    - Support for "Skip" (goes straight to Profile).
+    - Support for "Continue" / "Get Started" buttons.
 
-### 3. Dependency Injection (Hilt)
-- Created `DermaRoutineApp.kt` annotated with `@HiltAndroidApp` and registered it in `AndroidManifest.xml`.
-- Annotated `MainActivity.kt` with `@AndroidEntryPoint`.
+### 3. State Persistence
+- **DataStore Preferences**: Implemented `OnboardingDataStore` to persist the `is_onboarding_completed` flag.
+- **Smart Routing**: On app launch, `MainActivity` checks the DataStore. If onboarding is already completed, the user is navigated directly to the Profile placeholder; otherwise, the Onboarding screen is shown.
 
-### 4. Design System
-- **Colors**: Implemented the custom palette (Pastel Green, Sage Green, Cream) in `Color.kt`.
-- **Typography**: Defined a Material 3 typography system in `Type.kt`.
-- **Theme**: Created `DermaRoutineTheme` in `Theme.kt` with support for light/dark modes and status bar styling.
+### 4. Navigation Updates
+- Updated `NavGraph` and `Screen` sealed class to include `Onboarding` and `Profile` destinations.
+- Created `ProfileScreen` as a temporary placeholder for the next phase.
 
-### 5. Navigation & Initial Screen
-- **Screen**: Defined a sealed class for type-safe navigation routes.
-- **NavGraph**: Set up the initial navigation host.
-- **HomeScreen**: Created a placeholder dashboard screen.
+## Dependencies Added
+- `androidx.core:core-splashscreen`: Official API for splash screens.
+- `androidx.datastore:datastore-preferences`: Modern, asynchronous way to store simple UI states.
 
 ## Build Status
 - [x] Project builds successfully (`./gradlew assembleDebug`).
-- [x] Package structure is clean and follows the specification.
-
-## Next Steps
-In Phase 2, we will implement the **Splash Screen** and the **Onboarding** flow (3 steps) as specified.
+- [x] Onboarding state correctly persists across app restarts.

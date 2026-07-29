@@ -67,6 +67,12 @@ dependencies {
     // Serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
+    
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
