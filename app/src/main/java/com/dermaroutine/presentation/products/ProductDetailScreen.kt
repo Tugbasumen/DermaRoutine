@@ -28,6 +28,7 @@ fun ProductDetailScreen(
     productId: Int,
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Int) -> Unit,
+    onNavigateToOcr: (Int) -> Unit,
     viewModel: ProductViewModel = hiltViewModel()
 ) {
     val state by viewModel.detailState.collectAsState()
@@ -105,11 +106,20 @@ fun ProductDetailScreen(
                         }
 
                         item {
-                            Text(
-                                text = "Ingredients",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Ingredients",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                TextButton(onClick = { onNavigateToOcr(productId) }) {
+                                    Text("Scan")
+                                }
+                            }
                         }
 
                         if (product.ingredients.isEmpty()) {

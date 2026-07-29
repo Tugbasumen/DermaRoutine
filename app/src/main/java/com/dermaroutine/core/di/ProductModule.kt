@@ -3,8 +3,10 @@ package com.dermaroutine.core.di
 import com.dermaroutine.data.remote.ProductApiService
 import com.dermaroutine.data.repository.ProductRepositoryImpl
 import com.dermaroutine.data.scanner.MlKitBarcodeScanner
+import com.dermaroutine.data.scanner.MlKitTextRecognizer
 import com.dermaroutine.domain.repository.ProductRepository
 import com.dermaroutine.domain.scanner.BarcodeScanner
+import com.dermaroutine.domain.scanner.TextRecognizer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,4 +31,8 @@ object ProductModule {
     @Provides
     @Singleton
     fun provideBarcodeScanner(impl: MlKitBarcodeScanner): BarcodeScanner = impl
+
+    @Provides
+    @Singleton
+    fun provideTextRecognizer(impl: MlKitTextRecognizer): TextRecognizer = impl
 }

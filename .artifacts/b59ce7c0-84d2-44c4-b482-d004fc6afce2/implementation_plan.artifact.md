@@ -1,78 +1,79 @@
-# Phase 9: Barcode Scanning Implementation Plan
+# Phase 10: OCR Ingredient Scanner Implementation Plan
 
-This phase integrates a barcode scanner into the product management flow, allowing users to quickly add products by scanning their barcodes using CameraX and ML Kit.
+This phase implements an OCR-based ingredient scanner, allowing users to scan product ingredient lists using the camera, review the recognized text, and parse it into individual ingredients.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> **Form State Preservation**: To ensure that user-entered data (name, brand, etc.) isn't lost when navigating to the scanner, I will move the form state from the `AddEditProductScreen` Composable into the `ProductViewModel`.
+> [!NOTE]
+> **Bulk Save**: I will add a bulk ingredient save endpoint to the backend to ensure the entire ingredient list is saved atomically.
 >
-> **Camera Permission**: The app will request camera access when the user taps the "Scan" button. I will handle all permission states (Granted, Denied, Permanently Denied).
+> **Parser Logic**: The ingredient parser will split text based on commas, semicolons, and newlines. The user will have a chance to review and edit the parsed list before saving.
 
 ## Proposed Changes
 
 ### 1. Build Configuration
 
 #### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add versions and libraries for:
-    - `androidx.camera:camera-camera2`
-    - `androidx.camera:camera-lifecycle`
-    - `androidx.camera:camera-view`
-    - `com.google.mlkit:barcode-scanning`
+- Add version for `mlkitTextRecognition = "16.0.0"`.
+- Add library `mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkitTextRecognition" }`.
 
 #### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
-- Add the new dependencies.
+- Add `implementation(libs.mlkit.text.recognition)`.
 
-### 2. Barcode Scanning (Domain & Data)
+### 2. Backend (DermaRoutine.Api)
 
-#### [NEW] [BarcodeScanner.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/scanner/BarcodeScanner.kt) (Interface)
-- Defines the behavior for a barcode analyzer.
+#### [MODIFY] [ProductDto.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/ProductDto.cs)
+- Add `BulkAddIngredientsRequest` DTO.
 
-#### [NEW] [MlKitBarcodeScanner.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/scanner/MlKitBarcodeScanner.kt)
-- Implements ML Kit `BarcodeScanning` logic.
-- Converts CameraX `ImageProxy` to ML Kit `InputImage`.
+#### [MODIFY] [ProductController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/ProductController.cs)
+- Implement `POST /api/products/{id}/ingredients/bulk`:
+    - Clears existing ingredients for the product.
+    - Adds the new list in a single transaction.
 
-### 3. Presentation Layer (Scanner)
+### 3. OCR Analysis (Domain & Data)
 
-#### [NEW] [BarcodeScannerScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/BarcodeScannerScreen.kt)
-- UI with `PreviewView` (CameraX).
-- Semi-transparent overlay with a focused "scan area" box.
-- Instruction text and a back button.
-- Handling of camera lifecycle and permissions.
+#### [NEW] [TextRecognizer.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/scanner/TextRecognizer.kt) (Interface)
+- Defines the behavior for a text recognition analyzer.
 
-#### [NEW] [BarcodeScannerViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/BarcodeScannerViewModel.kt)
-- Manages the scanning state (Initializing, Scanning, Detected, Error).
-- Provides a way to stop scanning after a success.
+#### [NEW] [MlKitTextRecognizer.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/scanner/MlKitTextRecognizer.kt)
+- Implements ML Kit `TextRecognition` logic.
 
-### 4. Integration with Product Form
+#### [NEW] [IngredientTextParser.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/scanner/IngredientTextParser.kt)
+- Pure Kotlin logic to split raw OCR text into a list of strings (Aqua, Glycerin, etc.).
 
-#### [MODIFY] [ProductViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/products/ProductViewModel.kt)
-- Add properties to hold the temporary form state (name, brand, category, barcode, notes).
-- Add methods to update these fields.
-- Add `checkDuplicateBarcode(barcode: String)` to verify if the user already has this product.
+### 4. Presentation Layer (OCR)
 
-#### [MODIFY] [AddEditProductScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/products/AddEditProductScreen.kt)
-- Update to use the `ProductViewModel` for all form fields.
-- Add a "Scan" icon/button next to the Barcode field that navigates to the scanner.
-- Observe the scanning result from the navigation result (SavedStateHandle).
+#### [NEW] [OcrScannerScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/OcrScannerScreen.kt)
+- CameraX preview with a frame for ingredients.
+- "Scan" button to trigger capture and processing.
+
+#### [NEW] [OcrResultScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/OcrResultScreen.kt)
+- Editable multiline text field showing the raw recognized text.
+
+#### [NEW] [IngredientPreviewScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/IngredientPreviewScreen.kt)
+- List of individual parsed ingredients.
+- Ability to remove or edit items before the final save.
+
+#### [NEW] [OcrViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/OcrViewModel.kt)
+- Manages the multi-step OCR flow state.
 
 ### 5. Navigation
 
 #### [MODIFY] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
-- Add `BarcodeScanner` destination.
+- Add `OcrScanner`, `OcrResult`, `IngredientPreview` destinations.
 
 #### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Integrate the scanner route.
-- Handle passing the scanned barcode back to the product form.
+- Integrate the OCR flow routes.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to verify dependency integration.
-- Unit test for `ProductViewModel` duplicate check logic.
+- Unit tests for `IngredientTextParser` with various separators and messy text.
+- `dotnet build` & `gradlew assembleDebug`.
 
 ### Manual Verification
-1. **Permission**: Launch the scanner, deny permission, verify the warning message. Grant permission and verify camera starts.
-2. **Scanning**: Point the camera at a common barcode (EAN-13/UPC) and verify it is detected and the value is displayed.
-3. **Return to Form**: Verify navigation returns to the Add Product screen with the barcode field filled and other fields preserved.
-4. **Duplicate**: Scan a barcode already in the user's library and verify the "Already in library" warning.
+1. **Camera Flow**: Open a product, tap "Scan Ingredients", grant permission, and see the camera preview.
+2. **Detection**: Point at an ingredient list, tap Scan, and verify text appears on the review screen.
+3. **Editing**: Correct an OCR typo in the review screen.
+4. **Parsing**: Continue to the preview screen and verify the text is split into a list.
+5. **Saving**: Confirm and save, then verify the ingredients appear in the Product Detail screen.

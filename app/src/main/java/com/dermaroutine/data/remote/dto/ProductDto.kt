@@ -48,3 +48,8 @@ data class AddIngredientRequest(
     val position: Int,
     val description: String? = null
 )
+
+@Serializable
+data class BulkAddIngredientsRequest(
+    val ingredients: List<AddIngredientRequest>
+)

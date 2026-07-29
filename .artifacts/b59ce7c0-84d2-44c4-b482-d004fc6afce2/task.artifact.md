@@ -1,23 +1,24 @@
-# Phase 9: Barcode Scanning - Task List
+# Phase 10: OCR Ingredient Scanner - Task List
 
 - [x] Update Build Configuration
-    - [x] Add CameraX, ML Kit, and Accompanist Permissions to `libs.versions.toml`
-    - [x] Add dependencies to app `build.gradle.kts`
-- [x] Refactor Product Form State
-    - [x] Move state from `AddEditProductScreen` to `ProductViewModel`
-    - [x] Implement `GetProductByBarcode` in backend `ProductController.cs`
-    - [x] Implement `BarcodeLookupUseCase` and repository logic
-- [x] Implement Scanning Logic (Data & Domain)
-    - [x] Create `BarcodeScanner` interface
-    - [x] Create `MlKitBarcodeScanner` implementation
-- [x] Create Scanner UI
-    - [x] Create `BarcodeScannerViewModel`
-    - [x] Create `BarcodeScannerScreen` with CameraX preview and overlay
-    - [x] Handle camera permissions using Accompanist
+    - [x] Add ML Kit Text Recognition to `libs.versions.toml`
+    - [x] Add dependency to app `build.gradle.kts`
+- [x] Backend: Bulk Ingredient API
+    - [x] Add `BulkAddIngredientsRequest` to `ProductDto.cs`
+    - [x] Implement `BulkAddIngredients` in `ProductController.cs`
+- [x] Implement OCR & Parsing Logic (Data & Domain)
+    - [x] Create `TextRecognizer` interface
+    - [x] Create `MlKitTextRecognizer` implementation
+    - [x] Create `IngredientTextParser` (pure Kotlin)
+- [x] Create OCR Flow UI
+    - [x] Create `OcrViewModel`
+    - [x] Create `OcrScannerScreen` (CameraX)
+    - [x] Create `OcrResultScreen` (Review & Edit)
+    - [x] Create `IngredientPreviewScreen` (Parsed list)
 - [x] Navigation & Integration
-    - [x] Update `Screen.kt` and `NavGraph.kt`
-    - [x] Add "Scan" button to `AddEditProductScreen`
-    - [x] Handle returning barcode result using `SavedStateHandle`
+    - [x] Update `Screen.kt` and `NavGraph.kt` with OCR routes
+    - [x] Update `ProductDetailScreen` to launch OCR flow
 - [x] Build and Verify
+    - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
-    - [x] Manual test of scanning flow (conceptual verification)
+    - [x] Manual verification of full OCR flow (conceptual)

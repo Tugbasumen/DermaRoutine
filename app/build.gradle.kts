@@ -91,6 +91,7 @@ dependencies {
 
     // ML Kit Barcode Scanning
     implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.mlkit.text.recognition)
     
     // Accompanist Permissions
     implementation(libs.google.accompanist.permissions)

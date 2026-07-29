@@ -184,6 +184,37 @@ namespace DermaRoutine.Api.Controllers
             return Ok();
         }
 
+        [HttpPost("{id}/ingredients/bulk")]
+        public async Task<IActionResult> BulkAddIngredients(int id, BulkAddIngredientsRequest request)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            if (userId == null) return Unauthorized();
+
+            var product = await _context.Products
+                .Include(p => p.Ingredients)
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+
+            if (product == null) return NotFound();
+
+            // Clear existing ingredients
+            _context.ProductIngredients.RemoveRange(product.Ingredients);
+
+            // Add new ones
+            foreach (var req in request.Ingredients)
+            {
+                _context.ProductIngredients.Add(new ProductIngredient
+                {
+                    ProductId = id,
+                    Name = req.Name,
+                    Position = req.Position,
+                    Description = req.Description
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
         [HttpGet("barcode/{barcode}")]
         public async Task<ActionResult<ProductDto>> GetProductByBarcode(string barcode)
         {

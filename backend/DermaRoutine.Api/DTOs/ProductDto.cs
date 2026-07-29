@@ -45,4 +45,9 @@ namespace DermaRoutine.Api.DTOs
         public int Position { get; set; }
         public string? Description { get; set; }
     }
+
+    public class BulkAddIngredientsRequest
+    {
+        public List<AddIngredientRequest> Ingredients { get; set; } = new();
+    }
 }

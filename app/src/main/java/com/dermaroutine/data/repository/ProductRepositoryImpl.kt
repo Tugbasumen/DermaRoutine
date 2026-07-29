@@ -3,6 +3,7 @@ package com.dermaroutine.data.repository
 import com.dermaroutine.data.mapper.toDomain
 import com.dermaroutine.data.remote.ProductApiService
 import com.dermaroutine.data.remote.dto.AddIngredientRequest
+import com.dermaroutine.data.remote.dto.BulkAddIngredientsRequest
 import com.dermaroutine.data.remote.dto.CreateProductRequest
 import com.dermaroutine.domain.model.*
 import com.dermaroutine.domain.repository.ProductRepository
@@ -96,6 +97,21 @@ class ProductRepositoryImpl @Inject constructor(
             val response = apiService.addIngredient(productId, request)
             if (response.isSuccessful) Result.success(Unit)
             else Result.failure(Exception("Failed to add ingredient"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun saveIngredientsBulk(productId: Int, ingredients: List<ProductIngredient>): Result<Unit> {
+        return try {
+            val request = BulkAddIngredientsRequest(
+                ingredients = ingredients.map { 
+                    AddIngredientRequest(it.name, it.position, it.description) 
+                }
+            )
+            val response = apiService.bulkAddIngredients(productId, request)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception("Failed to save ingredients"))
         } catch (e: Exception) {
             Result.failure(e)
         }

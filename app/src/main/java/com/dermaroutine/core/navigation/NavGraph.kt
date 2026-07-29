@@ -14,6 +14,7 @@ import com.dermaroutine.presentation.home.HomeScreen
 import com.dermaroutine.presentation.journal.JournalScreen
 import com.dermaroutine.presentation.onboarding.OnboardingScreen
 import com.dermaroutine.presentation.products.*
+import com.dermaroutine.presentation.scanner.ocr.*
 import com.dermaroutine.presentation.profile.ProfileScreen
 import com.dermaroutine.presentation.progress.ProgressScreen
 import com.dermaroutine.presentation.routine.CreateRoutineScreen
@@ -136,7 +137,17 @@ fun NavGraph(
             ProductDetailScreen(
                 productId = detail.id,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToEdit = { id -> navController.navigate(Screen.EditProduct(id)) }
+                onNavigateToEdit = { id -> navController.navigate(Screen.EditProduct(id)) },
+                onNavigateToOcr = { id -> navController.navigate(Screen.OcrScanner(id)) }
+            )
+        }
+
+        composable<Screen.OcrScanner> { backStackEntry ->
+            val ocr: Screen.OcrScanner = backStackEntry.toRoute()
+            OcrScannerScreen(
+                productId = ocr.productId,
+                onNavigateBack = { navController.popBackStack() },
+                onSuccess = { navController.popBackStack() }
             )
         }
 

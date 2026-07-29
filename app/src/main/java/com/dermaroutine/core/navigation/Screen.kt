@@ -48,7 +48,10 @@ sealed class Screen {
 
     @Serializable
     data object BarcodeScanner : Screen()
-    
+
+    @Serializable
+    data class OcrScanner(val productId: Int) : Screen()
+
     @Serializable
     data object Progress : Screen()
 
