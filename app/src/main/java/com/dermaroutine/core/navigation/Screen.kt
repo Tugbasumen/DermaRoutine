@@ -24,6 +24,12 @@ sealed class Screen {
     
     @Serializable
     data object Routine : Screen()
+
+    @Serializable
+    data class RoutineDetail(val id: Int) : Screen()
+
+    @Serializable
+    data object CreateRoutine : Screen()
     
     @Serializable
     data object Products : Screen()

@@ -14,6 +14,7 @@ builder.Services.AddHttpContextAccessor();
 
 // Register UserContext
 builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddScoped<IRoutineStreakService, RoutineStreakService>();
 
 // Configure EF Core with PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>

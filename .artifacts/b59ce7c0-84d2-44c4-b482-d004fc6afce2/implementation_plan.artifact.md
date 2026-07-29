@@ -1,66 +1,60 @@
-# Phase 6: Home Dashboard Implementation Plan
+# Phase 7: Routine Management, Completion & Streak Implementation Plan
 
-This phase implements the central hub of the DermaRoutine application: the Home Dashboard. We will also establish the main navigation structure with a Bottom Navigation Bar and placeholder screens for upcoming features.
+This phase implements the core skincare routine system, allowing users to manage daily habits, track completion, and maintain a consistency streak.
 
 ## User Review Required
 
 > [!NOTE]
-> **Navigation Structure**: The Bottom Bar will feature Home, Routine, Products, Progress, and Profile. Screens like the AI Assistant and Skin Journal will be accessible via Quick Actions on the Home screen.
+> **Streak Logic**: A day is considered "completed" if the user has completed **all active routines** (Morning and Evening) for that specific day. The streak represents the number of consecutive completed days.
 >
-> **Mock Data**: Since Routine and Streak features are not yet implemented on the backend, the Home screen will show appropriate "Empty States" with Call-to-Action (CTA) buttons as specified.
+> **Product Dependency**: Since the full Products feature isn't implemented yet, I will add a simple "Quick Add" product modal or a basic internal product list so you can test adding items to your routines without waiting for Phase 8.
 
 ## Proposed Changes
 
-### 1. Navigation & Routing
+### 1. Backend (DermaRoutine.Api)
 
-#### [MODIFY] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
-- Add missing destinations: `Journal`, `Assistant`.
-- Add a list of bottom navigation items.
+#### [NEW] [IRoutineStreakService](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/IRoutineStreakService.cs)
+- Logic to calculate the current streak based on `RoutineCompletion` history and active routines.
 
-#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Add composable routes for all new screens.
-- Implement placeholders for `Routine`, `Products`, `Progress`, `Journal`, and `Assistant`.
+#### [NEW] [RoutineController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/RoutineController.cs)
+- `GET /api/routines`: List user's routines.
+- `POST /api/routines`: Create a new routine.
+- `GET /api/routines/{id}`: Detailed routine with items and products.
+- `POST /api/routines/{id}/items`: Add product to routine.
+- `DELETE /api/routines/{id}/items/{itemId}`: Remove item.
+- `POST /api/routines/{id}/complete`: Record today's completion.
+- `GET /api/routines/streak`: Fetch current streak and today's status.
 
-#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
-- Wrap the `NavGraph` in a `Scaffold`.
-- Implement a `BottomNavigationBar` that only appears on main app screens (Home, Routine, Products, Progress, Profile).
-- Update the authenticated start destination to `Screen.Home`.
+### 2. Android (app)
 
-### 2. Presentation Layer (Home)
+#### [NEW] Domain Layer
+- **Models**: `Routine`, `RoutineItem`, `StreakInfo`.
+- **Use Cases**: `GetRoutinesUseCase`, `CreateRoutineUseCase`, `CompleteRoutineUseCase`, `GetStreakUseCase`, etc.
 
-#### [NEW] [HomeUiState.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeUiState.kt)
-- State for greeting, user name, date, and routine summary placeholders.
+#### [NEW] Data Layer
+- **DTOs**: `RoutineDto`, `RoutineItemDto`, `CompletionRequest`.
+- **Repository**: `RoutineRepositoryImpl` using Retrofit `RoutineApiService`.
 
-#### [NEW] [HomeViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeViewModel.kt)
-- Logic for time-aware greetings ("Good morning", etc.).
-- Retrieving display name from the currently authenticated user.
-- Managing placeholder states for routines and streaks.
+#### [NEW] Presentation Layer
+- **Routine Screen**: Overview of Morning and Evening routines.
+- **Create/Edit Routine**: Form to set routine name and type.
+- **Routine Detail**: List of products, reordering, and the "Complete Routine" button.
+- **Home Integration**: Update `HomeViewModel` to fetch real streak and completion data.
 
-#### [MODIFY] [HomeScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeScreen.kt)
-- Build the scrollable dashboard UI:
-    - **Header**: Time-aware greeting and dynamic date.
-    - **Routine Cards**: Morning and Evening summary cards with "Create Routine" CTAs.
-    - **Streak Card**: Visual 🔥 icon and current streak status (initially 0).
-    - **Skin Photo Card**: CTA for adding today's photo.
-    - **Quick Actions**: "Add Product", "Add Photo", "Ask AI" navigation buttons.
-
-### 3. Placeholder Screens
-Create basic themed placeholder screens in:
-- `presentation/routine/RoutineScreen.kt`
-- `presentation/products/ProductsScreen.kt`
-- `presentation/progress/ProgressScreen.kt`
-- `presentation/journal/JournalScreen.kt`
-- `presentation/assistant/AssistantScreen.kt`
+### 3. UI/UX Components
+- **RoutineCard**: Themed card showing completion status.
+- **ProductItemRow**: Displaying product info within a routine.
+- **CompletionFeedback**: Visual confirmation (e.g., checkmark animation or snackbar) when a routine is finished.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to ensure all new navigation paths and components compile correctly.
+- `dotnet build` & `gradlew assembleDebug`.
+- Unit test for `RoutineStreakService` logic (consecutive days, breaking streak).
 
 ### Manual Verification
-1. **Authenticated Launch**: Verify the user lands on the Home screen after login.
-2. **Greeting & Date**: Verify the greeting matches the current time and the date is correct.
-3. **Bottom Navigation**: Test switching between Home, Routine, Products, Progress, and Profile.
-4. **Quick Actions**: Verify buttons on the Home screen navigate to the correct placeholder screens.
-5. **UI Consistency**: Ensure all cards and buttons follow the Pastel Green / Sage / Cream design system.
-6. **No Fake Data**: Verify that empty states are shown instead of hardcoded fake numbers for routines/streaks.
+1. **Create Routine**: Create a "Morning Cleanse" routine.
+2. **Add Item**: Add a placeholder product to the routine.
+3. **Complete**: Tap "Complete Routine" and verify the card updates to "Completed".
+4. **Streak**: Verify the Home screen shows "1 day streak".
+5. **Security**: Ensure User A cannot view or complete User B's routines using Swagger tests with different tokens.

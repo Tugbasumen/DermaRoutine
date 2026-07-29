@@ -1,16 +1,23 @@
-# Phase 6: Home Dashboard - Task List
+# Phase 7: Routine Management & Streak - Task List
 
-- [x] Navigation Updates
-    - [x] Update `Screen.kt` with all app destinations and bottom bar list
-    - [x] Create placeholder screens in `presentation/` subfolders
-    - [x] Update `NavGraph.kt` with all routes
-- [x] Implement Home Feature
-    - [x] Create `HomeUiState.kt`
-    - [x] Create `HomeViewModel.kt` with greeting and name logic
-    - [x] Implement `HomeScreen.kt` with dashboard layout
-- [x] Main UI Integration
-    - [x] Add Bottom Navigation Bar to `MainActivity.kt`
-    - [x] Handle Bottom Bar visibility logic
+- [x] Backend Implementation
+    - [x] Create `RoutineDto.cs`, `RoutineItemDto.cs`
+    - [x] Implement `IRoutineStreakService` and `RoutineStreakService.cs`
+    - [x] Implement `RoutineController.cs` with CRUD, items, and completion
+    - [x] Register services in `Program.cs`
+- [x] Android: Domain & Data
+    - [x] Create `Routine`, `RoutineItem`, `StreakInfo` domain models
+    - [x] Create `RoutineRepository` and `RoutineRepositoryImpl`
+    - [x] Implement UseCases: `GetRoutinesUseCase`, `CompleteRoutineUseCase`, etc.
+    - [x] Create `RoutineApiService.kt` and DTOs
+- [x] Android: Presentation Layer
+    - [x] Create `RoutineViewModel.kt`
+    - [x] Create `RoutineListScreen.kt`
+    - [x] Create `RoutineDetailScreen.kt`
+    - [x] Create `CreateRoutineScreen.kt`
+- [x] Integration & Home Update
+    - [x] Update `HomeViewModel` to fetch real streak/completion
+    - [x] Update `HomeScreen` UI with real data
 - [x] Build and Verify
+    - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
-    - [x] Manual test of navigation paths

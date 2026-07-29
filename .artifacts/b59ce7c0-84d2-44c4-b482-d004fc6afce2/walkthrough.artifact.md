@@ -1,44 +1,39 @@
-# Phase 6: Home Dashboard Walkthrough
+# Phase 7: Routine Management & Streak Walkthrough
 
-Phase 6 is completed. The DermaRoutine application now has a central Home Dashboard and a fully functional primary navigation structure.
+Phase 7 is completed. The DermaRoutine application now features a fully functional skincare routine management system, including completion tracking and consistency streaks.
 
 ## Changes Made
 
-### 1. Main Navigation (Bottom Bar)
-- **Bottom Navigation**: Integrated a modern Material 3 `NavigationBar` in `MainActivity.kt`.
-- **Destinations**: The bar includes **Home**, **Routine**, **Products**, **Progress**, and **Profile**.
-- **Visibility Logic**: The bottom bar intelligently hides on Splash, Onboarding, and Auth screens, appearing only when the user is in the main app experience.
+### 1. Backend (ASP.NET Core)
+- **Routine API**: Created `RoutineController` with endpoints for listing, creating, and fetching routine details.
+- **Completion Tracking**: Implemented a completion endpoint that records daily routine usage with server-side timestamps.
+- **Streak Algorithm**: Implemented `RoutineStreakService` which calculates the user's current streak. A day is marked as completed only when **all active routines** are finished.
+- **User Isolation**: All endpoints strictly enforce user isolation by deriving the user identity from the verified Firebase token.
 
-### 2. Home Dashboard (HomeScreen)
-- **Personalized Header**: Displays a time-aware greeting ("Good morning", "Good afternoon", "Good evening") along with the user's name and the current date.
-- **Routine Summaries**: Two cards for Morning and Evening routines, showing completion status (currently placeholders) and a CTA to "Create Routine".
-- **Streak Tracker**: A visually distinct card with a 🔥 icon to track daily routine consistency.
-- **Today's Skin**: A dedicated card for the photo journal, allowing users to quickly see if they've tracked their skin today.
-- **Quick Actions**: Navigation shortcuts for adding products, adding photos, and asking the AI assistant.
+### 2. Android Domain & Data Layer
+- **Domain Models**: Defined `Routine`, `RoutineDetail`, `RoutineItem`, and `StreakInfo`.
+- **Use Cases**: Implemented a full set of use cases for routines and streaks (`GetRoutinesUseCase`, `CompleteRoutineUseCase`, `CreateRoutineUseCase`, etc.).
+- **Repository**: `RoutineRepositoryImpl` handles the authenticated network communication using Retrofit.
 
-### 3. Architecture & State
-- **HomeViewModel**: Handles the logic for the time-aware greeting and retrieves the user's name from Firebase.
-- **HomeUiState**: Manages the dashboard's data and loading/error states using `StateFlow`.
-- **Clean Architecture**: Maintained separation between UI, business logic, and navigation.
-
-### 4. Placeholder Screens
-- Created themed placeholder screens for upcoming features:
-    - `RoutineScreen`, `ProductsScreen`, `ProgressScreen`, `JournalScreen`, `AssistantScreen`.
-- These screens ensure navigation works end-to-end while indicating that features are under development.
+### 3. Android Presentation Layer
+- **Routine List**: A modern view showing Morning and Evening routines with progress indicators.
+- **Routine Details**: Displays the steps within a routine and allows the user to mark it as completed.
+- **Create Routine**: A clean form to start new skincare routines.
+- **Home Integration**: The dashboard now displays real, live data for routine progress and streaks.
 
 ## Verification Plan
 
 ### Automated Tests
+- [x] `dotnet build` finished successfully.
 - [x] `./gradlew assembleDebug` finished successfully.
 
 ### Manual Verification
-- **Authenticated Flow**: User lands on the Home screen after a successful login.
-- **Greeting Logic**: Verified that the greeting adapts based on the system time.
-- **Navigation Paths**:
-    - Verified all 5 bottom navigation tabs.
-    - Verified "Quick Action" buttons navigate to the correct placeholder screens.
-    - Verified the "Skip" button on Onboarding lands on the Home/Login screen as intended.
+- **Creation**: Successfully created a "Morning Glow" routine.
+- **Completion**: Tapped "Complete Routine" and saw the status update on both the detail and home screens.
+- **Streak**: Verified that the streak incremented after completing required routines.
+- **Security**: Verified that routines are private and secure using different test accounts.
 
 ## Build Status
-- [x] Android builds successfully (`./gradlew assembleDebug`).
-- [x] Navigation graph is stable and crash-free.
+- [x] Backend builds successfully.
+- [x] Android app builds successfully.
+- [x] End-to-end integration is verified.
