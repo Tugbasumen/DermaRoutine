@@ -1,0 +1,23 @@
+# Phase 1: Foundation - Task List
+
+- [x] Update Build Configuration
+    - [x] Add dependencies to `libs.versions.toml`
+    - [x] Update root `build.gradle.kts`
+    - [x] Update app `build.gradle.kts`
+- [x] Refactor Package Structure
+    - [x] Rename package to `com.dermaroutine`
+    - [x] Create folder structure (`core`, `data`, `domain`, `presentation`)
+- [x] Initialize Hilt
+    - [x] Create `DermaRoutineApp.kt`
+- [x] Implement Design System
+    - [x] Create `Color.kt`
+    - [x] Create `Type.kt`
+    - [x] Create `Theme.kt`
+- [x] Setup Navigation
+    - [x] Create `Screen.kt`
+    - [x] Create `NavGraph.kt`
+- [x] Create Reusable Components
+    - [x] `PrimaryButton.kt` (Placeholder)
+    - [x] `AppTopBar.kt` (Placeholder)
+- [x] Update `MainActivity.kt`
+- [x] Build and Verify
