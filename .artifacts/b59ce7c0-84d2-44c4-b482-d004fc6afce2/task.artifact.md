@@ -1,21 +1,26 @@
-# Phase 4: Backend Foundation - Task List
+# Phase 5: Profile & Full-Stack Integration - Task List
 
-- [x] Initialize Backend Project
-    - [x] Create `backend/DermaRoutine.Api` directory
-    - [x] Create new Web API project
-    - [x] Add NuGet packages (Npgsql, EF Core Design/Tools)
-- [x] Implement Domain Entities
-    - [x] Create `Entities/` folder and basic Enums
-    - [x] Create core entities: `User`, `SkinProfile`, `Product`, `Routine`, etc.
-- [x] Data Layer Setup
-    - [x] Create `AppDbContext.cs`
-    - [x] Configure Fluent API relationships
-    - [x] Set up connection string in `appsettings.Development.json`
-- [x] API Infrastructure
-    - [x] Configure services and middleware in `Program.cs`
-    - [x] Add `HealthController.cs`
-- [x] Database Migration
-    - [x] Create `InitialCreate` migration
-- [x] Build and Verify
-    - [x] Successful `dotnet build`
-    - [x] Verify Swagger configuration
+- [x] Backend: Authentication & Security
+    - [x] Add `FirebaseAdmin` and `JwtBearer` NuGet packages
+    - [x] Configure Firebase Authentication in `Program.cs`
+    - [x] Create `IUserContext` and `UserContext` to resolve current user and synchronize records
+- [x] Backend: Profile API
+    - [x] Create `SkinProfileDto.cs` and request models
+    - [x] Implement `ProfileController.cs` (Get, Create, Update) with User Isolation
+- [x] Android: Network Layer
+    - [x] Add Retrofit & OkHttp to `libs.versions.toml` and `build.gradle.kts`
+    - [x] Create `AuthInterceptor.kt` for Firebase ID Token injection
+    - [x] Create `NetworkModule.kt` for Retrofit & OkHttpClient provisioning
+    - [x] Create `ProfileApiService.kt`
+- [x] Android: Domain & Data
+    - [x] Create `SkinProfile`, `SkinType`, `SensitivityLevel` domain models
+    - [x] Create `ProfileRepository` interface and `ProfileRepositoryImpl`
+    - [x] Create `GetProfileUseCase` and `SaveProfileUseCase`
+    - [x] Create `ProfileMapper.kt` and `SkinProfileDto.kt`
+- [x] Android: Presentation Layer
+    - [x] Create `ProfileViewModel.kt` with state management
+    - [x] Create full-featured `ProfileScreen.kt` (Material 3) with chips and validation
+- [x] Verification & Build
+    - [x] `dotnet build` successful
+    - [x] `gradlew assembleDebug` successful
+    - [x] Verify full end-to-end flow

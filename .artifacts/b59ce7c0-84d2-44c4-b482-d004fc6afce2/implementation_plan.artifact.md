@@ -1,62 +1,69 @@
-# Phase 4: Backend Foundation Implementation Plan
+# Phase 5: Profile & Full-Stack Integration Plan
 
-This phase focuses on setting up the ASP.NET Core Web API backend with PostgreSQL and EF Core. We will establish the core data models and relationships that will power the DermaRoutine application.
+This phase connects the Android app to the ASP.NET Core backend to manage the User Profile. We will implement secure authentication, user synchronization, and a full-featured Profile UI.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Project Structure**: I will create a `backend` folder in the root directory. To avoid breaking your current Android Studio session, I will **not** move the existing Android files into an `android` subfolder yet, unless you confirm you are ready for a project-wide reorganization.
+> **Firebase Admin SDK Setup**:
+> 1. You need to generate a **Service Account Key** (JSON) from the Firebase Console (**Project Settings > Service accounts**).
+> 2. **DO NOT** share this file or commit it to Git.
+> 3. For local development, I will show you how to point to this file using an environment variable or .NET User Secrets.
 >
-> **Database Credentials**: I will use a placeholder connection string in `appsettings.Development.json`. You will need to provide your local PostgreSQL credentials (server, port, database, user, password) for the migrations to run successfully.
+> **Backend URL**: In development, Android needs to connect to the backend. If using an emulator, `http://10.0.2.2:5222` is typically used. For physical devices, you'll need your local IP.
 
 ## Proposed Changes
 
-### 1. Project Initialization
+### 1. Backend (DermaRoutine.Api)
 
-#### [NEW] Backend Project
-- Create directory `backend/DermaRoutine.Api`.
-- Initialize a new ASP.NET Core Web API project using .NET 8.
-- Add NuGet Packages:
-    - `Npgsql.EntityFrameworkCore.PostgreSQL`
-    - `Microsoft.EntityFrameworkCore.Design`
-    - `Microsoft.EntityFrameworkCore.Tools`
+#### [MODIFY] NuGet Packages
+- Add `FirebaseAdmin` for token verification.
+- Add `Microsoft.AspNetCore.Authentication.JwtBearer` for standard authentication middleware.
 
-### 2. Data Layer (EF Core & PostgreSQL)
+#### [NEW] [FirebaseAuthenticationHandler](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Middleware/FirebaseAuthenticationHandler.cs)
+- A custom authentication handler or standard JWT config to verify Firebase tokens.
 
-#### [NEW] [AppDbContext.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Data/AppDbContext.cs)
-- Define `DbSet` for all entities.
-- Configure relationships (1:1, 1:N) and constraints using Fluent API.
+#### [NEW] [IUserContext](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/IUserContext.cs)
+- A service to get the current user's UID and database ID from the security context.
 
-#### [NEW] Configuration
-- Configure PostgreSQL connection in `Program.cs`.
-- Set up development connection string in `appsettings.Development.json`.
+#### [MODIFY] [ProfileController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/ProfileController.cs)
+- `GET /api/profile`: Returns `SkinProfileDto`.
+- `POST /api/profile`: Creates a new profile.
+- `PUT /api/profile`: Updates existing profile.
+- **Security**: All endpoints will use `[Authorize]` and derive the `userId` from the token.
 
-### 3. Entities (Domain Model)
+### 2. Android (app)
 
-#### [NEW] Core Entities
-Create the following classes in `Entities/`:
-- `User`, `SkinProfile`, `Product`, `ProductIngredient`, `Routine`, `RoutineItem`, `RoutineCompletion`, `SkinPhoto`, `JournalEntry`.
-- Implement enums: `RoutineType`, `SkinType`, `SensitivityLevel`.
+#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
+- Add versions for `Retrofit`, `OkHttp`, and `Kotlin Serialization Converter`.
 
-### 4. API Endpoints
+#### [NEW] [AuthInterceptor.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/network/AuthInterceptor.kt)
+- Fetches the Firebase ID Token using `user.getIdToken(forceRefresh = false).await()` and adds it to the headers.
 
-#### [NEW] [HealthController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/HealthController.cs)
-- Implement `GET /api/health` returning:
-  ```json
-  { "status": "ok", "service": "DermaRoutine API" }
-  ```
+#### [NEW] [ProfileApiService.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/ProfileApiService.kt)
+- Retrofit interface for profile endpoints.
 
-### 5. Database Migration
+#### [NEW] Domain Layer
+- `SkinProfile` (Domain Model).
+- `ProfileRepository` (Interface).
+- `GetProfileUseCase`, `SaveProfileUseCase`.
 
-- Create the initial migration: `InitialCreate`.
-- (Optional/Manual) Update the database if credentials are provided.
+#### [NEW] [ProfileScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/profile/ProfileScreen.kt)
+- Comprehensive UI with:
+    - Selection for **Skin Type** (Dry, Oily, etc.).
+    - Selection for **Sensitivity** (Low, Medium, High).
+    - Multi-selection for **Concerns** (Redness, Dullness, etc.).
+    - Notes text field.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `dotnet build` to ensure the project compiles without errors.
-- Run `dotnet ef migrations add InitialCreate` to verify the EF Core configuration.
+- `dotnet build` and `gradlew assembleDebug`.
+- Verify user isolation: Attempt to access `/api/profile` with an invalid token (should return 401).
 
 ### Manual Verification
-- Start the API and access `http://localhost:<port>/swagger` to verify the Swagger UI and Health endpoint.
-- Verify that the database schema is generated correctly in PostgreSQL (if credentials available).
+1. Register/Login on Android.
+2. Navigate to Profile.
+3. Fill out the profile and click "Save".
+4. Check PostgreSQL to verify the user and profile records are created.
+5. Restart the app and verify the profile loads correctly.

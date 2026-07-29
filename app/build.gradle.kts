@@ -84,6 +84,12 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
+    // Retrofit & OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.retrofit.serialization)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
