@@ -1,55 +1,62 @@
-# Phase 3 Extension: Google Sign-In Implementation Plan
+# Phase 4: Backend Foundation Implementation Plan
 
-This plan extends the current Authentication phase to include Google Sign-In using the modern Android Credential Manager API.
+This phase focuses on setting up the ASP.NET Core Web API backend with PostgreSQL and EF Core. We will establish the core data models and relationships that will power the DermaRoutine application.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Firebase Configuration**:
-> 1. You MUST enable **Google** as a sign-in provider in the Firebase Console (**Build > Authentication > Sign-in method**).
-> 2. You MUST add your **SHA-1 fingerprint** to your Android app settings in the Firebase Console.
-> 3. After enabling Google Sign-In, you will get a **Web Client ID**. Please provide this ID to me or update it in `res/values/strings.xml` as `default_web_client_id`.
+> **Project Structure**: I will create a `backend` folder in the root directory. To avoid breaking your current Android Studio session, I will **not** move the existing Android files into an `android` subfolder yet, unless you confirm you are ready for a project-wide reorganization.
+>
+> **Database Credentials**: I will use a placeholder connection string in `appsettings.Development.json`. You will need to provide your local PostgreSQL credentials (server, port, database, user, password) for the migrations to run successfully.
 
 ## Proposed Changes
 
-### Build Configuration
+### 1. Project Initialization
 
-#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add dependencies for Credential Manager:
-    - `androidx.credentials:credentials`
-    - `androidx.credentials:credentials-play-services-auth`
-    - `com.google.android.libraries.identity.googleid:googleid`
+#### [NEW] Backend Project
+- Create directory `backend/DermaRoutine.Api`.
+- Initialize a new ASP.NET Core Web API project using .NET 8.
+- Add NuGet Packages:
+    - `Npgsql.EntityFrameworkCore.PostgreSQL`
+    - `Microsoft.EntityFrameworkCore.Design`
+    - `Microsoft.EntityFrameworkCore.Tools`
 
-#### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
-- Add the new dependencies.
+### 2. Data Layer (EF Core & PostgreSQL)
 
-### Domain Layer
+#### [NEW] [AppDbContext.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Data/AppDbContext.cs)
+- Define `DbSet` for all entities.
+- Configure relationships (1:1, 1:N) and constraints using Fluent API.
 
-#### [MODIFY] [AuthRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/repository/AuthRepository.kt)
-- Add `suspend fun signInWithGoogle(idToken: String): Result<User>`.
+#### [NEW] Configuration
+- Configure PostgreSQL connection in `Program.cs`.
+- Set up development connection string in `appsettings.Development.json`.
 
-#### [NEW] [SignInWithGoogleUseCase.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/usecase/SignInWithGoogleUseCase.kt)
-- A new use case to handle the Google authentication logic.
+### 3. Entities (Domain Model)
 
-### Data Layer
+#### [NEW] Core Entities
+Create the following classes in `Entities/`:
+- `User`, `SkinProfile`, `Product`, `ProductIngredient`, `Routine`, `RoutineItem`, `RoutineCompletion`, `SkinPhoto`, `JournalEntry`.
+- Implement enums: `RoutineType`, `SkinType`, `SensitivityLevel`.
 
-#### [MODIFY] [FirebaseAuthRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/FirebaseAuthRepository.kt)
-- Implement `signInWithGoogle` using `AuthCredential` from the Google ID token.
+### 4. API Endpoints
 
-### Presentation Layer
+#### [NEW] [HealthController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/HealthController.cs)
+- Implement `GET /api/health` returning:
+  ```json
+  { "status": "ok", "service": "DermaRoutine API" }
+  ```
 
-#### [MODIFY] [LoginViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/auth/LoginViewModel.kt)
-- Add `signInWithGoogle(idToken: String)` to handle the result from Credential Manager.
+### 5. Database Migration
 
-#### [MODIFY] [LoginScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/auth/LoginScreen.kt)
-- Integrate Android `CredentialManager` to launch the Google Sign-In selector.
-- Add a "Sign in with Google" button using the Design System.
+- Create the initial migration: `InitialCreate`.
+- (Optional/Manual) Update the database if credentials are provided.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `./gradlew assembleDebug` to ensure all dependencies and code are correctly integrated.
+- Run `dotnet build` to ensure the project compiles without errors.
+- Run `dotnet ef migrations add InitialCreate` to verify the EF Core configuration.
 
 ### Manual Verification
-- **Google Sign-In Flow**: Click the Google button, select an account, and verify successful login and navigation to the Profile placeholder.
-- **Error Handling**: Verify behavior when sign-in is cancelled or fails.
+- Start the API and access `http://localhost:<port>/swagger` to verify the Swagger UI and Health endpoint.
+- Verify that the database schema is generated correctly in PostgreSQL (if credentials available).

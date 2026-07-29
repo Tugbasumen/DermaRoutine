@@ -1,28 +1,21 @@
-# Phase 3: Firebase Authentication - Task List
+# Phase 4: Backend Foundation - Task List
 
-- [x] Update Build Configuration
-    - [x] Add Firebase, Google Services, and Credential Manager to `libs.versions.toml`
-    - [x] Update root `build.gradle.kts`
-    - [x] Update app `build.gradle.kts`
-- [x] Implement Domain Layer
-    - [x] Create `User.kt` (Model)
-    - [x] Create `AuthRepository.kt` (Interface)
-    - [x] Create `LoginUseCase.kt`
-    - [x] Create `RegisterUseCase.kt`
-    - [x] Create `LogoutUseCase.kt`
-    - [x] Create `GetCurrentUserUseCase.kt`
-    - [x] Create `SignInWithGoogleUseCase.kt`
-- [x] Implement Data Layer
-    - [x] Create `FirebaseAuthRepository.kt` (including Google Sign-In)
-    - [x] Create `AuthModule.kt` (Hilt)
-- [x] Implement Presentation Layer
-    - [x] Create `LoginScreen.kt` (with Google Sign-In button)
-    - [x] Create `LoginViewModel.kt` (with Google Sign-In logic)
-    - [x] Create `RegisterScreen.kt`
-    - [x] Create `RegisterViewModel.kt`
-    - [x] Create `AppTextField` in `Components.kt`
-- [x] Navigation & Integration
-    - [x] Update `Screen.kt` and `NavGraph.kt`
-    - [x] Update `MainActivity.kt` with session logic
-    - [x] Add `default_web_client_id` to `strings.xml`
+- [x] Initialize Backend Project
+    - [x] Create `backend/DermaRoutine.Api` directory
+    - [x] Create new Web API project
+    - [x] Add NuGet packages (Npgsql, EF Core Design/Tools)
+- [x] Implement Domain Entities
+    - [x] Create `Entities/` folder and basic Enums
+    - [x] Create core entities: `User`, `SkinProfile`, `Product`, `Routine`, etc.
+- [x] Data Layer Setup
+    - [x] Create `AppDbContext.cs`
+    - [x] Configure Fluent API relationships
+    - [x] Set up connection string in `appsettings.Development.json`
+- [x] API Infrastructure
+    - [x] Configure services and middleware in `Program.cs`
+    - [x] Add `HealthController.cs`
+- [x] Database Migration
+    - [x] Create `InitialCreate` migration
 - [x] Build and Verify
+    - [x] Successful `dotnet build`
+    - [x] Verify Swagger configuration
