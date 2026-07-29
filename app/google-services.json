@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1033325573722",
+    "project_id": "dermaroutine-7e7a8",
+    "storage_bucket": "dermaroutine-7e7a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033325573722:android:4bc4931bace0f6a6ca0a63",
+        "android_client_info": {
+          "package_name": "com.dermaroutine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9O7omEZq3Kt9oI68qSQs_n7HTBmDANOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

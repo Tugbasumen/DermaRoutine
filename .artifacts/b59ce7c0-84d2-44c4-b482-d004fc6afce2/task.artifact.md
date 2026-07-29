@@ -1,25 +1,28 @@
-# Phase 2: Splash Screen & Onboarding - Task List
+# Phase 3: Firebase Authentication - Task List
 
 - [x] Update Build Configuration
-    - [x] Add `core-splashscreen` and `datastore` to `libs.versions.toml`
-    - [x] Add dependencies to app `build.gradle.kts`
-- [x] Implement State Persistence
-    - [x] Create `OnboardingDataStore.kt`
-- [x] Design System Extensions
-    - [x] Add any missing colors or typography for onboarding
-    - [x] Create `PrimaryButton` and `SecondaryButton` in `Components.kt`
-- [x] Implement Onboarding Feature
-    - [x] Create `OnboardingPage.kt` (Model)
-    - [x] Create `OnboardingViewModel.kt`
-    - [x] Create `OnboardingScreen.kt` (UI)
-- [x] Setup Splash Screen
-    - [x] Create `ic_splash_logo.xml`
-    - [x] Update `themes.xml` and `styles.xml` with Splash Screen theme
-    - [x] Configure `MainActivity.kt` with `installSplashScreen()`
-- [x] Navigation & Routing
-    - [x] Update `Screen.kt` with new destinations
-    - [x] Update `NavGraph.kt` with Onboarding and Profile placeholder
-    - [x] Create placeholder `ProfileScreen.kt`
-- [x] Final Integration
-    - [x] Handle initial route logic in `MainActivity.kt`
+    - [x] Add Firebase, Google Services, and Credential Manager to `libs.versions.toml`
+    - [x] Update root `build.gradle.kts`
+    - [x] Update app `build.gradle.kts`
+- [x] Implement Domain Layer
+    - [x] Create `User.kt` (Model)
+    - [x] Create `AuthRepository.kt` (Interface)
+    - [x] Create `LoginUseCase.kt`
+    - [x] Create `RegisterUseCase.kt`
+    - [x] Create `LogoutUseCase.kt`
+    - [x] Create `GetCurrentUserUseCase.kt`
+    - [x] Create `SignInWithGoogleUseCase.kt`
+- [x] Implement Data Layer
+    - [x] Create `FirebaseAuthRepository.kt` (including Google Sign-In)
+    - [x] Create `AuthModule.kt` (Hilt)
+- [x] Implement Presentation Layer
+    - [x] Create `LoginScreen.kt` (with Google Sign-In button)
+    - [x] Create `LoginViewModel.kt` (with Google Sign-In logic)
+    - [x] Create `RegisterScreen.kt`
+    - [x] Create `RegisterViewModel.kt`
+    - [x] Create `AppTextField` in `Components.kt`
+- [x] Navigation & Integration
+    - [x] Update `Screen.kt` and `NavGraph.kt`
+    - [x] Update `MainActivity.kt` with session logic
+    - [x] Add `default_web_client_id` to `strings.xml`
 - [x] Build and Verify

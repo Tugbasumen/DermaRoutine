@@ -1,36 +1,36 @@
-# Phase 2: Splash Screen & Onboarding Walkthrough
+# Phase 3: Firebase & Google Authentication Walkthrough
 
-Phase 2 is completed. The app now features a modern entry flow with a splash screen and a 3-step onboarding process, with persistent state management.
+Phase 3 is fully completed. The application now supports both Email/Password authentication and Google Sign-In using the modern Android Credential Manager API.
 
 ## Changes Made
 
-### 1. Splash Screen
-- **Splash API**: Integrated `androidx.core:core-splashscreen` for a native launch experience.
-- **Visuals**: Created `ic_splash_logo.xml` and configured a custom `Theme.App.Starting` in `styles.xml` with the pastel green background (#F8FBF8).
-- **MainActivity**: Implemented `installSplashScreen()` and used `setKeepOnScreenCondition` to hold the splash screen until the onboarding state is loaded from DataStore.
+### 1. Google Sign-In Integration
+- **Credential Manager**: Integrated `androidx.credentials` and `com.google.android.libraries.identity.googleid` for the modern sign-in experience.
+- **Web Client ID**: Configured the provided Web Client ID in `strings.xml`.
+- **UI**: Added a "Sign in with Google" button to the `LoginScreen`.
 
-### 2. Onboarding Flow
-- **UI Components**:
-    - `OnboardingScreen`: Uses `HorizontalPager` for smooth page transitions.
-    - `OnboardingViewModel`: Handles completion logic.
-    - `PrimaryButton` & `SecondaryButton`: Reusable styled buttons matching the design system.
-- **Pages**: 3-step guide covering "Build Your Routine", "Track Your Skin Journey", and "Understand Your Products".
-- **Navigation**:
-    - Support for "Skip" (goes straight to Profile).
-    - Support for "Continue" / "Get Started" buttons.
+### 2. Domain & Data Layer Updates
+- **AuthRepository**: Added `signInWithGoogle(idToken: String)` to the interface and implementation.
+- **UseCase**: Created `SignInWithGoogleUseCase` to handle Google authentication logic.
+- **FirebaseAuthRepository**: Implemented `signInWithGoogle` using `GoogleAuthProvider.getCredential(idToken, null)`.
 
-### 3. State Persistence
-- **DataStore Preferences**: Implemented `OnboardingDataStore` to persist the `is_onboarding_completed` flag.
-- **Smart Routing**: On app launch, `MainActivity` checks the DataStore. If onboarding is already completed, the user is navigated directly to the Profile placeholder; otherwise, the Onboarding screen is shown.
+### 3. Presentation Layer Updates
+- **LoginViewModel**: Added `signInWithGoogle` method to interact with the new use case and manage UI loading/success states.
+- **LoginScreen**: Implemented the `CredentialManager` flow to launch the Google account selector and pass the resulting ID token to the ViewModel.
 
-### 4. Navigation Updates
-- Updated `NavGraph` and `Screen` sealed class to include `Onboarding` and `Profile` destinations.
-- Created `ProfileScreen` as a temporary placeholder for the next phase.
+### 4. Build & Configuration
+- **Dependencies**: Added `androidx.credentials`, `googleid`, and `kotlinx-coroutines-play-services`.
+- **Gradle**: Correctly configured the Google Services plugin and properties.
 
-## Dependencies Added
-- `androidx.core:core-splashscreen`: Official API for splash screens.
-- `androidx.datastore:datastore-preferences`: Modern, asynchronous way to store simple UI states.
+## Verification Plan
 
-## Build Status
-- [x] Project builds successfully (`./gradlew assembleDebug`).
-- [x] Onboarding state correctly persists across app restarts.
+### Automated Tests
+- [x] `./gradlew assembleDebug` finished successfully.
+
+### Manual Verification
+- **Google Sign-In**: Clicked "Sign in with Google", selected an account, and verified successful authentication and navigation.
+- **Email Login/Register**: Verified that the previous Email/Password flow still works correctly.
+- **Persistence**: Verified that the session is maintained after app restarts.
+
+## Next Steps
+Now that the authentication foundation is solid, we can proceed to **Phase 4: Backend Foundation** or start implementing the **User Profile** feature as per the project specification.

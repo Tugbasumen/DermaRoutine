@@ -1,58 +1,55 @@
-# Phase 2: Splash Screen & Onboarding Implementation Plan
+# Phase 3 Extension: Google Sign-In Implementation Plan
 
-This phase implements the initial user experience: a modern Splash Screen and a 3-step Onboarding flow. We will also implement simple state persistence to ensure onboarding is only shown once.
+This plan extends the current Authentication phase to include Google Sign-In using the modern Android Credential Manager API.
 
 ## User Review Required
 
-> [!NOTE]
-> **Dependencies**: I will add `androidx.core:core-splashscreen` for the official Splash Screen API and `androidx.datastore:datastore-preferences` for persisting the onboarding completion state. These are standard Jetpack libraries.
+> [!IMPORTANT]
+> **Firebase Configuration**:
+> 1. You MUST enable **Google** as a sign-in provider in the Firebase Console (**Build > Authentication > Sign-in method**).
+> 2. You MUST add your **SHA-1 fingerprint** to your Android app settings in the Firebase Console.
+> 3. After enabling Google Sign-In, you will get a **Web Client ID**. Please provide this ID to me or update it in `res/values/strings.xml` as `default_web_client_id`.
 
 ## Proposed Changes
 
 ### Build Configuration
 
 #### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add `core-splashscreen` and `datastore-preferences` libraries.
+- Add dependencies for Credential Manager:
+    - `androidx.credentials:credentials`
+    - `androidx.credentials:credentials-play-services-auth`
+    - `com.google.android.libraries.identity.googleid:googleid`
 
 #### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
 - Add the new dependencies.
 
-### Resources & Styling
+### Domain Layer
 
-#### [MODIFY] [themes.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/values/themes.xml)
-- Define a Splash Screen theme that inherits from `Theme.SplashScreen`.
-- Set the background to `Background` (#F8FBF8) and the brand icon.
+#### [MODIFY] [AuthRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/repository/AuthRepository.kt)
+- Add `suspend fun signInWithGoogle(idToken: String): Result<User>`.
 
-### Core Architecture (DataStore)
+#### [NEW] [SignInWithGoogleUseCase.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/usecase/SignInWithGoogleUseCase.kt)
+- A new use case to handle the Google authentication logic.
 
-#### [NEW] [OnboardingDataStore.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/util/OnboardingDataStore.kt)
-- A simple utility class using DataStore to save and read the `is_onboarding_completed` flag.
+### Data Layer
+
+#### [MODIFY] [FirebaseAuthRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/FirebaseAuthRepository.kt)
+- Implement `signInWithGoogle` using `AuthCredential` from the Google ID token.
 
 ### Presentation Layer
 
-#### [NEW] Onboarding Components
-- `OnboardingPage.kt`: Data model for onboarding pages.
-- `OnboardingScreen.kt`: The main UI with `HorizontalPager`, indicators, and buttons.
-- `OnboardingViewModel.kt`: Manages the current page and interacts with `OnboardingDataStore`.
+#### [MODIFY] [LoginViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/auth/LoginViewModel.kt)
+- Add `signInWithGoogle(idToken: String)` to handle the result from Credential Manager.
 
-#### [NEW] [ProfileScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/profile/ProfileScreen.kt)
-- A placeholder screen as the destination after onboarding.
-
-### Navigation & Main Entry
-
-#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
-- Initialize the Splash Screen API (`installSplashScreen()`).
-- Collect the onboarding state to decide the starting destination.
-
-#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Add `Onboarding` and `Profile` destinations.
+#### [MODIFY] [LoginScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/auth/LoginScreen.kt)
+- Integrate Android `CredentialManager` to launch the Google Sign-In selector.
+- Add a "Sign in with Google" button using the Design System.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `./gradlew assembleDebug` to verify no build errors.
+- Run `./gradlew assembleDebug` to ensure all dependencies and code are correctly integrated.
 
 ### Manual Verification
-- **First Launch**: App should show Splash Screen, then transition to Onboarding.
-- **Onboarding Flow**: Navigate through 3 pages, verify "Skip" and "Get Started" buttons.
-- **Persistence**: Complete onboarding, close app, and reopen. It should go directly to the Profile placeholder (or Home if decided later).
+- **Google Sign-In Flow**: Click the Google button, select an account, and verify successful login and navigation to the Profile placeholder.
+- **Error Handling**: Verify behavior when sign-in is cancelled or fails.
