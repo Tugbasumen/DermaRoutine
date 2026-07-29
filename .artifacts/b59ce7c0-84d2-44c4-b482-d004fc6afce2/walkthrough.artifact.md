@@ -1,46 +1,33 @@
-# Phase 8: Product Management Walkthrough
+# Phase 9: Barcode Scanning Walkthrough
 
-Phase 8 is completed. The DermaRoutine application now has a robust Product Management system that integrates seamlessly with the Skincare Routines feature.
+Phase 9 is completed. The DermaRoutine application now features a native barcode scanner, allowing users to quickly add skincare products to their library by scanning their barcodes.
 
 ## Changes Made
 
-### 1. Backend (ASP.NET Core)
-- **Product API**: Created `ProductController` with full CRUD support for personal skincare products and their ingredients.
-- **Search & Filter**: Added search (by name/brand) and category filtering functionality directly in the API.
-- **Safety Features**: Implemented a deletion check. A product cannot be deleted if it is currently part of any routine, preventing broken data.
-- **Database Schema**: Updated the `Product` entity with a strongly-typed `ProductCategory` enum and generated the `ImproveProductManagement` migration.
+### 1. CameraX & ML Kit Integration
+- **Camera Preview**: Implemented a modern `CameraPreview` using CameraX's `PreviewView` and `ProcessCameraProvider`.
+- **Barcode Analysis**: Integrated **Google ML Kit Barcode Scanning** for high-performance detection of common product barcodes (EAN-13, EAN-8, UPC-A, UPC-E).
+- **Scanning Logic**: Created `MlKitBarcodeScanner.kt` which processes camera frames in the background using `ImageAnalysis`.
 
-### 2. Android Domain & Data Layer
-- **Domain Models**: Defined `Product`, `ProductDetail`, `ProductIngredient`, and `ProductCategory`.
-- **Use Cases**: Implemented a comprehensive set of use cases for product operations (`GetProductsUseCase`, `CreateProductUseCase`, `UpdateProductUseCase`, `DeleteProductUseCase`, etc.).
-- **Data Layer**: `ProductRepositoryImpl` manages network communication, and `ProductMapper.kt` handles DTO-to-Domain conversions.
+### 2. Scanner UI & UX
+- **Scanner Screen**: A dedicated `BarcodeScannerScreen` with a themed overlay and a focused scanning area.
+- **Permissions**: Used **Accompanist Permissions** for a seamless, modern camera permission flow (handling grant, deny, and permanent denial states).
+- **Feedback**: Provides immediate feedback when a barcode is detected and automatically returns the value to the product form.
 
-### 3. Android Presentation Layer (Material 3)
-- **Product Library**: A main screen to list all products with a search bar and category filter chips.
-- **Product Details**: A detailed view showing product info, notes, and the full ingredient list.
-- **Add/Edit Form**: A dynamic form using Material 3 `ExposedDropdownMenuBox` for category selection and validation.
-- **Product Selector**: A specialized search screen used when adding products to a routine.
+### 3. Product Form Refactoring
+- **State Preservation**: Moved the `AddEditProductScreen` form state into the `ProductViewModel`. This ensures that any data the user typed (like name or brand) is preserved when they navigate to the scanner and back.
+- **Scan Integration**: Added a "Scan" icon to the barcode field that launches the scanner.
+- **Duplicate Detection**: The backend now includes a `GET /api/products/barcode/{barcode}` endpoint. If a scanned barcode already exists in the user's library, the app shows a warning dialog and offers to view the existing product.
 
-### 4. Routine Integration
-- **Add Product to Routine**: Updated the `RoutineDetailScreen` with an "Add" action.
-- **Navigation Result Handling**: Used Compose Navigation's `SavedStateHandle` to safely pass selected products back to the routine detail view and trigger the update API.
+### 4. Navigation Flow
+- **Bidirectional Data**: Used Compose Navigation's `SavedStateHandle` to pass the scanned barcode value back from the scanner screen to the product form without losing existing state.
 
-## Verification Plan
-
-### Automated Tests
-- [x] `dotnet build` finished successfully.
-- [x] `./gradlew assembleDebug` finished successfully.
-
-### Manual Verification
-- **Search**: Verified that searching for "Serum" correctly filters the list.
-- **Validation**: Confirmed that products cannot be saved without a name.
-- **End-to-End**:
-    1. Added a new "Cleanser".
-    2. Navigated to a "Morning Routine".
-    3. Selected the new cleanser from the selector.
-    4. Verified it appeared in the routine steps.
-- **Delete Protection**: Attempted to delete the cleanser and verified the `409 Conflict` error was handled.
+## Dependencies Added
+- `androidx.camera:camera-*`: Core, Lifecycle, and View libraries for CameraX.
+- `com.google.mlkit:barcode-scanning`: High-speed barcode detection.
+- `com.google.accompanist:accompanist-permissions`: Modern permission handling for Compose.
 
 ## Build Status
-- [x] Backend and Android projects are fully synced and buildable.
-- [x] Full product lifecycle (Add -> Edit -> Search -> Routine -> Delete) is verified.
+- [x] Android builds successfully (`./gradlew assembleDebug`).
+- [x] Backend builds successfully (`dotnet build`).
+- [x] Scanner lifecycle and navigation are stable.

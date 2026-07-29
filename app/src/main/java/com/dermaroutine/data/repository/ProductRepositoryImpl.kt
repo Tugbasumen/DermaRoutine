@@ -100,4 +100,19 @@ class ProductRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getProductByBarcode(barcode: String): Result<Product?> {
+        return try {
+            val response = apiService.getProductByBarcode(barcode)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.toDomain())
+            } else if (response.code() == 404) {
+                Result.success(null)
+            } else {
+                Result.failure(Exception("Failed to check barcode"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,15 +20,13 @@ import com.dermaroutine.domain.model.ProductCategory
 @Composable
 fun AddEditProductScreen(
     productId: Int? = null,
+    scannedBarcode: String? = null,
     onNavigateBack: () -> Unit,
+    onNavigateToScanner: () -> Unit,
+    onNavigateToProductDetail: (Int) -> Unit,
     onProductSaved: () -> Unit,
     viewModel: ProductViewModel = hiltViewModel()
 ) {
-    var name by remember { mutableStateOf("") }
-    var brand by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf(ProductCategory.Cleanser) }
-    var barcode by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
     var isMenuExpanded by remember { mutableStateOf(false) }
 
     val saveState by viewModel.saveState.collectAsState()
@@ -36,17 +35,20 @@ fun AddEditProductScreen(
     LaunchedEffect(productId) {
         if (productId != null) {
             viewModel.loadProductDetail(productId)
+        } else {
+            viewModel.clearForm()
+        }
+    }
+
+    LaunchedEffect(scannedBarcode) {
+        if (scannedBarcode != null) {
+            viewModel.onBarcodeScanned(scannedBarcode)
         }
     }
 
     LaunchedEffect(detailState) {
         if (detailState is ProductDetailUiState.Success) {
-            val product = (detailState as ProductDetailUiState.Success).detail
-            name = product.name
-            brand = product.brand
-            selectedCategory = product.category
-            barcode = product.barcode ?: ""
-            notes = product.notes ?: ""
+            viewModel.setFormFromProduct((detailState as ProductDetailUiState.Success).detail)
         }
     }
 
@@ -55,6 +57,28 @@ fun AddEditProductScreen(
             onProductSaved()
             viewModel.resetSaveState()
         }
+    }
+
+    if (saveState is SaveProductUiState.DuplicateFound) {
+        val existingProduct = (saveState as SaveProductUiState.DuplicateFound).product
+        AlertDialog(
+            onDismissRequest = { viewModel.resetSaveState() },
+            title = { Text("Product already in library") },
+            text = { Text("This barcode belongs to '${existingProduct.name}'. Would you like to view it instead?") },
+            confirmButton = {
+                TextButton(onClick = { 
+                    viewModel.resetSaveState()
+                    onNavigateToProductDetail(existingProduct.id) 
+                }) {
+                    Text("View Product")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.resetSaveState() }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -78,15 +102,15 @@ fun AddEditProductScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AppTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = viewModel.formName.value,
+                onValueChange = { viewModel.formName.value = it },
                 label = "Product Name*",
                 modifier = Modifier.fillMaxWidth()
             )
 
             AppTextField(
-                value = brand,
-                onValueChange = { brand = it },
+                value = viewModel.formBrand.value,
+                onValueChange = { viewModel.formBrand.value = it },
                 label = "Brand",
                 modifier = Modifier.fillMaxWidth()
             )
@@ -97,7 +121,7 @@ fun AddEditProductScreen(
                 onExpandedChange = { isMenuExpanded = !isMenuExpanded }
             ) {
                 OutlinedTextField(
-                    value = selectedCategory.name,
+                    value = viewModel.formCategory.value.name,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Category*") },
@@ -113,7 +137,7 @@ fun AddEditProductScreen(
                         DropdownMenuItem(
                             text = { Text(category.name) },
                             onClick = {
-                                selectedCategory = category
+                                viewModel.formCategory.value = category
                                 isMenuExpanded = false
                             }
                         )
@@ -122,15 +146,20 @@ fun AddEditProductScreen(
             }
 
             AppTextField(
-                value = barcode,
-                onValueChange = { barcode = it },
+                value = viewModel.formBarcode.value,
+                onValueChange = { viewModel.formBarcode.value = it },
                 label = "Barcode (Optional)",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = onNavigateToScanner) {
+                        Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan Barcode")
+                    }
+                }
             )
 
             AppTextField(
-                value = notes,
-                onValueChange = { notes = it },
+                value = viewModel.formNotes.value,
+                onValueChange = { viewModel.formNotes.value = it },
                 label = "Notes (Optional)",
                 modifier = Modifier.height(120.dp)
             )
@@ -148,9 +177,16 @@ fun AddEditProductScreen(
             PrimaryButton(
                 text = if (saveState is SaveProductUiState.Loading) "Saving..." else "Save Product",
                 onClick = { 
-                    viewModel.saveProduct(productId, name, brand, selectedCategory, barcode.ifBlank { null }, notes.ifBlank { null }) 
+                    viewModel.saveProduct(
+                        productId, 
+                        viewModel.formName.value, 
+                        viewModel.formBrand.value, 
+                        viewModel.formCategory.value, 
+                        viewModel.formBarcode.value.ifBlank { null }, 
+                        viewModel.formNotes.value.ifBlank { null }
+                    ) 
                 },
-                enabled = name.isNotBlank() && saveState !is SaveProductUiState.Loading
+                enabled = viewModel.formName.value.isNotBlank() && saveState !is SaveProductUiState.Loading
             )
         }
     }

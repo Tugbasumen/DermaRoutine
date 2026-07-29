@@ -25,4 +25,7 @@ interface ProductApiService {
 
     @POST("api/product/{id}/ingredients")
     suspend fun addIngredient(@Path("id") id: Int, @Body request: AddIngredientRequest): Response<Unit>
+
+    @GET("api/product/barcode/{barcode}")
+    suspend fun getProductByBarcode(@Path("barcode") barcode: String): Response<ProductDto>
 }

@@ -1,60 +1,78 @@
-# Phase 8: Product Management Implementation Plan
+# Phase 9: Barcode Scanning Implementation Plan
 
-This phase focuses on the "Product Library" feature, allowing users to manage their personal skincare products and their ingredients. We will also integrate these real products into the routine management system.
+This phase integrates a barcode scanner into the product management flow, allowing users to quickly add products by scanning their barcodes using CameraX and ML Kit.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Product Deletion**: I will implement a safety check to prevent users from deleting a product that is currently used in one or more routines. The API will return a `409 Conflict` in this case.
+> **Form State Preservation**: To ensure that user-entered data (name, brand, etc.) isn't lost when navigating to the scanner, I will move the form state from the `AddEditProductScreen` Composable into the `ProductViewModel`.
 >
-> **Ingredient Entry**: For this phase, ingredients are manually entered as a simple list. Automated OCR and AI analysis will be handled in later phases.
+> **Camera Permission**: The app will request camera access when the user taps the "Scan" button. I will handle all permission states (Granted, Denied, Permanently Denied).
 
 ## Proposed Changes
 
-### 1. Backend (DermaRoutine.Api)
+### 1. Build Configuration
 
-#### [NEW] [ProductCategory.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Enums/ProductCategory.cs)
-- Enum for categories: `Cleanser`, `Toner`, `Serum`, `Moisturizer`, `Sunscreen`, `Mask`, `Exfoliant`, `EyeCare`, `Treatment`, `Other`.
+#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
+- Add versions and libraries for:
+    - `androidx.camera:camera-camera2`
+    - `androidx.camera:camera-lifecycle`
+    - `androidx.camera:camera-view`
+    - `com.google.mlkit:barcode-scanning`
 
-#### [MODIFY] [Product.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Entities/Product.cs)
-- Update `Category` type to `ProductCategory` (will require a migration).
+#### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
+- Add the new dependencies.
 
-#### [NEW] [ProductController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/ProductController.cs)
-- `GET /api/products`: Filtered/Searched list of user's products.
-- `POST /api/products`: Create product.
-- `GET /api/products/{id}`: Detailed product info with ingredients.
-- `PUT /api/products/{id}`: Update info.
-- `DELETE /api/products/{id}`: Secure deletion with routine check.
-- `POST /api/products/{id}/ingredients`: Manage ingredients manually.
+### 2. Barcode Scanning (Domain & Data)
 
-### 2. Android (app)
+#### [NEW] [BarcodeScanner.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/scanner/BarcodeScanner.kt) (Interface)
+- Defines the behavior for a barcode analyzer.
 
-#### [NEW] Domain Layer
-- **Models**: `Product`, `ProductCategory`, `ProductIngredient`.
-- **Use Cases**: `GetProductsUseCase`, `CreateProductUseCase`, `UpdateProductUseCase`, `DeleteProductUseCase`, `SearchProductsUseCase`.
+#### [NEW] [MlKitBarcodeScanner.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/scanner/MlKitBarcodeScanner.kt)
+- Implements ML Kit `BarcodeScanning` logic.
+- Converts CameraX `ImageProxy` to ML Kit `InputImage`.
 
-#### [NEW] Data Layer
-- **DTOs**: `ProductDto`, `ProductIngredientDto`, `CreateProductRequest`.
-- **Repository**: `ProductRepositoryImpl` using Retrofit `ProductApiService`.
+### 3. Presentation Layer (Scanner)
 
-#### [NEW] Presentation Layer
-- **Product List Screen**: Search bar, category filter chips, and product grid/list.
-- **Product Detail Screen**: Displays full info, notes, and the ingredient list.
-- **Add/Edit Product Screen**: Form with validation for creating or modifying products.
+#### [NEW] [BarcodeScannerScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/BarcodeScannerScreen.kt)
+- UI with `PreviewView` (CameraX).
+- Semi-transparent overlay with a focused "scan area" box.
+- Instruction text and a back button.
+- Handling of camera lifecycle and permissions.
 
-### 3. Routine Integration
-- **Add to Routine**: Update `RoutineDetailScreen` to navigate to a "Select Product" screen.
-- **Selector**: A simplified version of the product list where clicking a product adds it to the current routine.
+#### [NEW] [BarcodeScannerViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/BarcodeScannerViewModel.kt)
+- Manages the scanning state (Initializing, Scanning, Detected, Error).
+- Provides a way to stop scanning after a success.
+
+### 4. Integration with Product Form
+
+#### [MODIFY] [ProductViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/products/ProductViewModel.kt)
+- Add properties to hold the temporary form state (name, brand, category, barcode, notes).
+- Add methods to update these fields.
+- Add `checkDuplicateBarcode(barcode: String)` to verify if the user already has this product.
+
+#### [MODIFY] [AddEditProductScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/products/AddEditProductScreen.kt)
+- Update to use the `ProductViewModel` for all form fields.
+- Add a "Scan" icon/button next to the Barcode field that navigates to the scanner.
+- Observe the scanning result from the navigation result (SavedStateHandle).
+
+### 5. Navigation
+
+#### [MODIFY] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
+- Add `BarcodeScanner` destination.
+
+#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
+- Integrate the scanner route.
+- Handle passing the scanned barcode back to the product form.
 
 ## Verification Plan
 
 ### Automated Tests
-- `dotnet build` & `gradlew assembleDebug`.
-- Verify `409 Conflict` when trying to delete a product used in a routine.
+- Run `gradlew assembleDebug` to verify dependency integration.
+- Unit test for `ProductViewModel` duplicate check logic.
 
 ### Manual Verification
-1. **Add Product**: Add "Hydrating Cleanser" under the "Cleanser" category.
-2. **Search/Filter**: Search for "Hydrating" or filter by "Cleanser" to find it.
-3. **Routine Link**: Add this cleanser to your "Morning Routine".
-4. **Delete Safety**: Try deleting the cleanser while it's in the routine (should show an error).
-5. **Isolation**: Verify User A cannot see User B's product list via Swagger.
+1. **Permission**: Launch the scanner, deny permission, verify the warning message. Grant permission and verify camera starts.
+2. **Scanning**: Point the camera at a common barcode (EAN-13/UPC) and verify it is detected and the value is displayed.
+3. **Return to Form**: Verify navigation returns to the Add Product screen with the barcode field filled and other fields preserved.
+4. **Duplicate**: Scan a barcode already in the user's library and verify the "Already in library" warning.

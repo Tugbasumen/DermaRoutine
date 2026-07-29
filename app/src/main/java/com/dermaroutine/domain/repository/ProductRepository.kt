@@ -9,4 +9,5 @@ interface ProductRepository {
     suspend fun updateProduct(id: Int, product: Product): Result<Unit>
     suspend fun deleteProduct(id: Int): Result<Unit>
     suspend fun addIngredient(productId: Int, ingredient: ProductIngredient): Result<Unit>
+    suspend fun getProductByBarcode(barcode: String): Result<Product?>
 }

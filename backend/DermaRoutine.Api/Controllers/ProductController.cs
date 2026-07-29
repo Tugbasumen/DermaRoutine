@@ -183,5 +183,28 @@ namespace DermaRoutine.Api.Controllers
 
             return Ok();
         }
+
+        [HttpGet("barcode/{barcode}")]
+        public async Task<ActionResult<ProductDto>> GetProductByBarcode(string barcode)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            if (userId == null) return Unauthorized();
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Barcode == barcode && p.UserId == userId);
+
+            if (product == null) return NotFound();
+
+            return Ok(new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Brand = product.Brand,
+                Barcode = product.Barcode,
+                Category = product.Category,
+                ImageUrl = product.ImageUrl,
+                Notes = product.Notes
+            });
+        }
     }
 }

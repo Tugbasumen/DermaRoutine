@@ -84,6 +84,17 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
+    // CameraX
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // ML Kit Barcode Scanning
+    implementation(libs.mlkit.barcode.scanning)
+    
+    // Accompanist Permissions
+    implementation(libs.google.accompanist.permissions)
+
     // Retrofit & OkHttp
     implementation(libs.retrofit)
     implementation(libs.okhttp)

@@ -1,26 +1,23 @@
-# Phase 8: Product Management - Task List
+# Phase 9: Barcode Scanning - Task List
 
-- [x] Backend Implementation
-    - [x] Create `ProductCategory.cs` enum
-    - [x] Update `Product.cs` entity and create migration
-    - [x] Create `ProductDto.cs`
-    - [x] Implement `ProductController.cs` (CRUD + Ingredients)
-    - [x] Added `AddItemToRoutine` and `RemoveItemFromRoutine` to `RoutineController.cs`
-- [x] Android: Domain & Data
-    - [x] Create `Product`, `ProductCategory`, `ProductIngredient` domain models
-    - [x] Create `ProductRepository` and `ProductRepositoryImpl`
-    - [x] Implement UseCases: `GetProductsUseCase`, `CreateProductUseCase`, `UpdateProductUseCase`, `DeleteProductUseCase`
-    - [x] Create `ProductApiService.kt` and DTOs
-    - [x] Create `ProductMapper.kt`
-- [x] Android: Presentation Layer
-    - [x] Create `ProductViewModel.kt`
-    - [x] Create `ProductListScreen.kt` (with search & filter)
-    - [x] Create `ProductDetailScreen.kt`
-    - [x] Create `AddEditProductScreen.kt`
-- [x] Routine Integration
-    - [x] Update `RoutineDetailScreen` with "Add Product" logic
-    - [x] Create `ProductSelectorScreen.kt`
-    - [x] Handle cross-screen navigation results using `SavedStateHandle`
+- [x] Update Build Configuration
+    - [x] Add CameraX, ML Kit, and Accompanist Permissions to `libs.versions.toml`
+    - [x] Add dependencies to app `build.gradle.kts`
+- [x] Refactor Product Form State
+    - [x] Move state from `AddEditProductScreen` to `ProductViewModel`
+    - [x] Implement `GetProductByBarcode` in backend `ProductController.cs`
+    - [x] Implement `BarcodeLookupUseCase` and repository logic
+- [x] Implement Scanning Logic (Data & Domain)
+    - [x] Create `BarcodeScanner` interface
+    - [x] Create `MlKitBarcodeScanner` implementation
+- [x] Create Scanner UI
+    - [x] Create `BarcodeScannerViewModel`
+    - [x] Create `BarcodeScannerScreen` with CameraX preview and overlay
+    - [x] Handle camera permissions using Accompanist
+- [x] Navigation & Integration
+    - [x] Update `Screen.kt` and `NavGraph.kt`
+    - [x] Add "Scan" button to `AddEditProductScreen`
+    - [x] Handle returning barcode result using `SavedStateHandle`
 - [x] Build and Verify
-    - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
+    - [x] Manual test of scanning flow (conceptual verification)

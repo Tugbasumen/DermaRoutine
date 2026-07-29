@@ -19,6 +19,7 @@ import com.dermaroutine.presentation.progress.ProgressScreen
 import com.dermaroutine.presentation.routine.CreateRoutineScreen
 import com.dermaroutine.presentation.routine.RoutineDetailScreen
 import com.dermaroutine.presentation.routine.RoutineListScreen
+import com.dermaroutine.presentation.scanner.BarcodeScannerScreen
 
 @Composable
 fun NavGraph(
@@ -108,9 +109,13 @@ fun NavGraph(
             )
         }
 
-        composable<Screen.AddProduct> {
+        composable<Screen.AddProduct> { backStackEntry ->
+            val scannedBarcode by backStackEntry.savedStateHandle.getStateFlow<String?>("scanned_barcode", null).collectAsState()
             AddEditProductScreen(
+                scannedBarcode = scannedBarcode,
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToScanner = { navController.navigate(Screen.BarcodeScanner) },
+                onNavigateToProductDetail = { id -> navController.navigate(Screen.ProductDetail(id)) },
                 onProductSaved = { navController.popBackStack() }
             )
         }
@@ -120,6 +125,8 @@ fun NavGraph(
             AddEditProductScreen(
                 productId = edit.id,
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToScanner = { navController.navigate(Screen.BarcodeScanner) },
+                onNavigateToProductDetail = { id -> navController.navigate(Screen.ProductDetail(id)) },
                 onProductSaved = { navController.popBackStack() }
             )
         }
@@ -139,6 +146,18 @@ fun NavGraph(
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("selected_product_id", product.id)
+                    navController.popBackStack()
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.BarcodeScanner> {
+            BarcodeScannerScreen(
+                onBarcodeDetected = { barcode ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("scanned_barcode", barcode)
                     navController.popBackStack()
                 },
                 onNavigateBack = { navController.popBackStack() }

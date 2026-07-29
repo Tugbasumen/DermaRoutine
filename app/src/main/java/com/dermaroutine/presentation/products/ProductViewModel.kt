@@ -1,5 +1,6 @@
 package com.dermaroutine.presentation.products
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dermaroutine.domain.model.*
@@ -17,7 +18,8 @@ class ProductViewModel @Inject constructor(
     private val getProductDetailUseCase: GetProductDetailUseCase,
     private val createProductUseCase: CreateProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
-    private val deleteProductUseCase: DeleteProductUseCase
+    private val deleteProductUseCase: DeleteProductUseCase,
+    private val barcodeLookupUseCase: BarcodeLookupUseCase
 ) : ViewModel() {
 
     private val _listState = MutableStateFlow<ProductListUiState>(ProductListUiState.Loading)
@@ -28,6 +30,13 @@ class ProductViewModel @Inject constructor(
 
     private val _saveState = MutableStateFlow<SaveProductUiState>(SaveProductUiState.Idle)
     val saveState = _saveState.asStateFlow()
+
+    // Form State
+    var formName = mutableStateOf("")
+    var formBrand = mutableStateOf("")
+    var formCategory = mutableStateOf(ProductCategory.Cleanser)
+    var formBarcode = mutableStateOf("")
+    var formNotes = mutableStateOf("")
 
     private val _searchQuery = MutableStateFlow("")
     private val _selectedCategory = MutableStateFlow<ProductCategory?>(null)
@@ -44,6 +53,37 @@ class ProductViewModel @Inject constructor(
 
     fun onCategorySelected(category: ProductCategory?) {
         _selectedCategory.value = category
+    }
+
+    fun clearForm() {
+        formName.value = ""
+        formBrand.value = ""
+        formCategory.value = ProductCategory.Cleanser
+        formBarcode.value = ""
+        formNotes.value = ""
+    }
+
+    fun setFormFromProduct(product: ProductDetail) {
+        formName.value = product.name
+        formBrand.value = product.brand
+        formCategory.value = product.category
+        formBarcode.value = product.barcode ?: ""
+        formNotes.value = product.notes ?: ""
+    }
+
+    fun onBarcodeScanned(barcode: String) {
+        formBarcode.value = barcode
+        checkDuplicateBarcode(barcode)
+    }
+
+    private fun checkDuplicateBarcode(barcode: String) {
+        viewModelScope.launch {
+            barcodeLookupUseCase(barcode).onSuccess { product ->
+                if (product != null) {
+                    _saveState.value = SaveProductUiState.DuplicateFound(product)
+                }
+            }
+        }
     }
 
     fun loadProducts(query: String? = null, category: ProductCategory? = null) {
@@ -117,5 +157,6 @@ sealed class SaveProductUiState {
     data object Idle : SaveProductUiState()
     data object Loading : SaveProductUiState()
     data object Success : SaveProductUiState()
+    data class DuplicateFound(val product: Product) : SaveProductUiState()
     data class Error(val message: String) : SaveProductUiState()
 }
