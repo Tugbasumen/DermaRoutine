@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dermaroutine.core.designsystem.AppTextField
 import com.dermaroutine.core.designsystem.PrimaryButton
+import com.dermaroutine.core.designsystem.SecondaryButton
 import com.dermaroutine.domain.model.SensitivityLevel
 import com.dermaroutine.domain.model.SkinType
 
@@ -168,6 +169,14 @@ fun ProfileScreen(
                         text = "Profile saved successfully! 🌿",
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+
+                // Debug-only crash test
+                if (com.dermaroutine.BuildConfig.DEBUG) {
+                    SecondaryButton(
+                        text = "Test Crash (Debug Only)",
+                        onClick = { throw RuntimeException("Crashlytics Test Crash") }
                     )
                 }
 

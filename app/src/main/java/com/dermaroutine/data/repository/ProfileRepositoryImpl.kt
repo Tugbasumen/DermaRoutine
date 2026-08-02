@@ -1,5 +1,6 @@
 package com.dermaroutine.data.repository
 
+import com.dermaroutine.core.error.ErrorMapper
 import com.dermaroutine.data.mapper.toDomain
 import com.dermaroutine.data.remote.ProfileApiService
 import com.dermaroutine.data.remote.dto.CreateProfileRequest
@@ -23,7 +24,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to fetch profile: ${response.message()}"))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(ErrorMapper.map(e).message))
         }
     }
 
@@ -51,7 +52,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 else Result.failure(Exception("Failed to create profile"))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(ErrorMapper.map(e).message))
         }
     }
 }

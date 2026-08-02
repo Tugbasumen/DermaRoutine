@@ -11,13 +11,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dermaroutine.core.util.debouncedClickable
 
 @Composable
 fun AppTextField(
@@ -65,8 +66,15 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    var lastClickTime by remember { mutableLongStateOf(0L) }
     Button(
-        onClick = onClick,
+        onClick = {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime > 500L) {
+                lastClickTime = currentTime
+                onClick()
+            }
+        },
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
@@ -93,8 +101,15 @@ fun SecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var lastClickTime by remember { mutableLongStateOf(0L) }
     TextButton(
-        onClick = onClick,
+        onClick = {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime > 500L) {
+                lastClickTime = currentTime
+                onClick()
+            }
+        },
         modifier = modifier,
         colors = ButtonDefaults.textButtonColors(
             contentColor = Primary

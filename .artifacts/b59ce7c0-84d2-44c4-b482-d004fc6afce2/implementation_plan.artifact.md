@@ -1,78 +1,68 @@
-# Phase 13: Routine Notifications & WorkManager Implementation Plan
+# Phase 14: Crashlytics, Error Handling & App Stabilization Plan
 
-This phase implements local morning and evening routine reminders using Android notifications and WorkManager for background scheduling. Users will be able to customize reminder times and toggle them on/off.
+This phase focuses on making DermaRoutine production-ready by integrating Firebase Crashlytics, implementing centralized error handling on both Android and Backend, and stabilizing the overall user experience.
 
 ## User Review Required
 
 > [!NOTE]
-> **WorkManager Timing**: WorkManager is optimized for battery life and is not an "exact" alarm API. Reminders will be delivered as close to the target time as possible, but might be slightly delayed depending on system conditions (Doze mode, battery saver, etc.).
+> **Crashlytics Verification**: I will add a temporary, hidden way to trigger a test crash in Debug builds to verify that Crashlytics is working.
 >
-> **Deep Linking**: Tapping a notification will launch the app and navigate directly to the Morning or Evening routine detail screen.
+> **Global Result Pattern**: I will refactor the Android repository layers to use a consistent `AppResult` and `AppError` pattern, which might require small changes in ViewModels to handle the new result types.
 
 ## Proposed Changes
 
-### 1. Build Configuration
+### 1. Build Configuration (Android)
 
 #### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add `androidx.work:work-runtime-ktx` version and library.
+- Add `firebase-crashlytics` library and `firebase-crashlytics-gradle` plugin.
+
+#### [MODIFY] [build.gradle.kts (root)](file:///C:/kotlinproje/DermaRoutine/build.gradle.kts)
+- Add the Crashlytics plugin to the plugins block (apply false).
 
 #### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
-- Add `implementation(libs.androidx.work.runtime.ktx)`.
+- Apply `com.google.firebase.crashlytics` plugin.
+- Add `implementation(libs.firebase.crashlytics)` dependency.
 
-### 2. Notification Infrastructure (Data Layer)
+### 2. Android Core: Error Handling
 
-#### [NEW] [RoutineNotificationManager.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/notifications/RoutineNotificationManager.kt)
-- Responsible for creating the `routine_reminders` notification channel.
-- Building notifications with titles ("Morning skincare routine 🌿", "Evening skincare routine 🌙") and deep-link PendingIntents.
+#### [NEW] [AppError.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/error/AppError.kt)
+- Sealed class defining standard errors: `Network`, `Unauthorized`, `Server`, `NotFound`, `Validation`, `Unknown`.
 
-#### [NEW] [RoutineReminderWorker.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/notifications/RoutineReminderWorker.kt)
-- The WorkManager `CoroutineWorker` that triggers the notification when executed.
+#### [NEW] [ErrorMapper.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/error/ErrorMapper.kt)
+- Helper to map HTTP codes and Exceptions to `AppError`.
 
-#### [NEW] [RoutineReminderScheduler.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/notifications/RoutineReminderScheduler.kt)
-- Handles scheduling and cancelling work.
-- Uses `PeriodicWorkRequestBuilder` with a 24-hour interval and an initial delay calculated to hit the user's selected time.
+#### [NEW] [ModifierExt.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/util/ModifierExt.kt)
+- Extension for `Modifier.clickable` to add a debounce period, preventing duplicate button taps.
 
-#### [NEW] [RoutineReminderPreferences.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/util/RoutineReminderPreferences.kt)
-- DataStore implementation to persist:
-    - `morningEnabled`: Boolean
-    - `morningTime`: String (HH:mm)
-    - `eveningEnabled`: Boolean
-    - `eveningTime`: String (HH:mm)
+### 3. Backend: Global Exception Handling
 
-### 3. Domain Layer
+#### [NEW] [ErrorResponse.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/ErrorResponse.cs)
+- Standardized error DTO: `Code`, `Message`, `TraceId`.
 
-#### [NEW] UseCases
-- `GetReminderSettingsUseCase.kt`: Reads settings from DataStore.
-- `UpdateReminderSettingUseCase.kt`: Saves setting and triggers (re)scheduling via the Scheduler.
+#### [NEW] [ExceptionHandlingMiddleware.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Middleware/ExceptionHandlingMiddleware.cs)
+- Middleware to catch all unhandled exceptions, log them with a Trace ID, and return a safe `ErrorResponse`.
 
-### 4. Presentation Layer (UI)
+#### [MODIFY] [Program.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Program.cs)
+- Register the `ExceptionHandlingMiddleware`.
 
-#### [NEW] [RoutineReminderSettingsScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/notifications/RoutineReminderSettingsScreen.kt)
-- UI for toggling reminders and selecting times.
-- Integration with Material 3 `TimePicker`.
-- Requesting `POST_NOTIFICATIONS` permission when a reminder is enabled.
+### 4. Stabilization & UX Review
 
-#### [NEW] [RoutineReminderViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/notifications/RoutineReminderViewModel.kt)
-- Manages the UI state and coordinates between UseCases and UI.
+#### [MODIFY] UI Components
+- Update `PrimaryButton` and `SecondaryButton` in `Components.kt` to use debounced click logic.
+- Review `ProfileScreen`, `RoutineDetailScreen`, and `HomeScreen` to ensure all `Error` states show a "Try Again" button.
 
-### 5. Integration
-
-#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Add the reminder settings route.
-- Configure deep link handling for `Screen.RoutineDetail`.
-
-#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
-- Ensure the app handles incoming intents from notifications correctly to navigate to the right screen.
+#### [MODIFY] Network Layer
+- Update `AuthInterceptor.kt` to log custom Crashlytics keys (e.g., current screen) when a network failure occurs.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to verify dependency integration.
-- Unit tests for time delay calculation logic (ensuring the initial delay correctly targets the next occurrence).
+- `dotnet build` & `gradlew assembleDebug`.
+- Verify the API returns the correct JSON error structure when a manual exception is thrown.
 
 ### Manual Verification
-1. **Enable Reminder**: Toggle "Morning Reminder" ON, grant permission, and set time to 1 minute in the future.
-2. **Delivery**: Verify the notification appears (might take a few minutes due to WorkManager nature).
-3. **Deep Link**: Tap the notification while the app is closed and verify it opens the Morning Routine detail.
-4. **Disable**: Toggle OFF and verify the WorkManager job is cancelled (`adb shell dumpsys jobscheduler`).
-5. **Persistence**: Change the time, restart the app, and verify the new time is saved.
+1. **Crashlytics**: Trigger a test crash in Debug and verify it appears in the Firebase Console.
+2. **Offline Mode**: Disable internet and verify the app shows a friendly "No internet" message with a retry button instead of a technical error.
+3. **Double Taps**: Rapidly tap "Save Profile" and verify only one network request is sent.
+4. **401 Handling**: Manually invalidate a token and verify the app handles the unauthorized state gracefully.
+5. **Backend Security**: Attempt to access a resource without a token and verify the `ErrorResponse` structure.

@@ -1,6 +1,7 @@
 package com.dermaroutine.core.network
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import okhttp3.Interceptor
@@ -27,9 +28,22 @@ class AuthInterceptor @Inject constructor(
             }
             if (token != null) {
                 requestBuilder.addHeader("Authorization", "Bearer $token")
+            } else {
+                FirebaseCrashlytics.getInstance().log("AuthInterceptor: Failed to retrieve Firebase ID Token")
             }
         }
 
-        return chain.proceed(requestBuilder.build())
+        val response = try {
+            chain.proceed(requestBuilder.build())
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+            throw e
+        }
+
+        if (response.code == 401) {
+            FirebaseCrashlytics.getInstance().log("AuthInterceptor: Received 401 Unauthorized")
+        }
+
+        return response
     }
 }

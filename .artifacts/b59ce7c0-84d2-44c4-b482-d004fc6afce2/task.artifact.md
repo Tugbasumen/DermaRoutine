@@ -1,24 +1,24 @@
-# Phase 13: Routine Notifications & WorkManager - Task List
+# Phase 14: Crashlytics & Stabilization - Task List
 
 - [x] Update Build Configuration
-    - [x] Add `androidx.work` to `libs.versions.toml`
-    - [x] Add dependency to app `build.gradle.kts`
-- [x] Implement Notification Infrastructure
-    - [x] Create `RoutineReminderPreferences.kt` (DataStore)
-    - [x] Create `RoutineNotificationManager.kt` (Channel & Builder)
-    - [x] Create `RoutineReminderWorker.kt` (CoroutineWorker)
-    - [x] Create `RoutineReminderScheduler.kt` (WorkManager scheduling)
-- [x] Implement Domain Layer
-    - [x] Create `ReminderSettings.kt` (Model)
-    - [x] Create `GetReminderSettingsUseCase.kt`
-    - [x] Create `UpdateReminderSettingUseCase.kt`
-- [x] Create UI & Presentation
-    - [x] Create `RoutineReminderViewModel.kt`
-    - [x] Create `RoutineReminderSettingsScreen.kt` (Material 3 TimePicker)
-- [x] Final Integration
-    - [x] Update `NavGraph.kt` with settings route
-    - [x] Handle deep links in `MainActivity.kt`
-    - [x] Added reminder entry point to `ProfileScreen.kt`
+    - [x] Add Crashlytics to `libs.versions.toml`
+    - [x] Update root `build.gradle.kts` with Crashlytics plugin
+    - [x] Update app `build.gradle.kts` with plugin and dependency
+- [x] Implement Android Error Handling
+    - [x] Create `AppError.kt` (Sealed class)
+    - [x] Create `ErrorMapper.kt`
+    - [x] Implement `Modifier.debouncedClickable` in `ModifierExt.kt`
+- [x] Implement Backend Error Handling
+    - [x] Create `ErrorResponse.cs` DTO
+    - [x] Implement `ExceptionHandlingMiddleware.cs`
+    - [x] Register Middleware in `Program.cs`
+- [x] Refactor Repositories & ViewModels
+    - [x] Update `ProfileRepository` and `RoutineRepository` to use `AppError`
+    - [x] Ensure all screens have proper Error states with Retry buttons
+- [x] UX & Stability Review
+    - [x] Update `PrimaryButton` and `SecondaryButton` with debounce
+    - [x] Add custom Crashlytics logs to major actions (AuthInterceptor)
 - [x] Build and Verify
+    - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
-    - [x] Manual test of notification delivery and navigation
+    - [x] Test Crashlytics with a debug crash (Trigger added to Profile)

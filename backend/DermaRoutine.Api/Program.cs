@@ -1,4 +1,5 @@
 using DermaRoutine.Api.Data;
+using DermaRoutine.Api.Middleware;
 using DermaRoutine.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,8 @@ builder.Services
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
