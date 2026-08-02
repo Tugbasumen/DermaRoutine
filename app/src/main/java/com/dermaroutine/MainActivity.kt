@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -60,6 +61,23 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
+
+                    // Deep Link Handling from Notifications
+                    LaunchedEffect(intent) {
+                        intent?.getStringExtra("navigate_to")?.let { target ->
+                            when (target) {
+                                "morning_routine" -> {
+                                    // For now navigate to the general Routine list or specific detail if we have ID
+                                    // But based on Phase 13 spec, just open appropriate routine screen.
+                                    navController.navigate(Screen.Routine)
+                                }
+                                "evening_routine" -> {
+                                    navController.navigate(Screen.Routine)
+                                }
+                            }
+                            intent.removeExtra("navigate_to")
+                        }
+                    }
 
                     val showBottomBar = bottomNavItems.any { item ->
                         currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true

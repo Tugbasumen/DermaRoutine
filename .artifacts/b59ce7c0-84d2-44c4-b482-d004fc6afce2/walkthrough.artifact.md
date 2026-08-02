@@ -1,50 +1,45 @@
-# Phase 12: Skin Photo Journal & Progress Tracking Walkthrough
+# Phase 13: Routine Notifications & WorkManager Walkthrough
 
-Phase 12 is completed. The DermaRoutine application now features a powerful skin progress tracking system, allowing users to document their skincare journey with photos and analyze their progress over time.
+Phase 13 is completed. The DermaRoutine application now features a reliable background notification system to remind users of their morning and evening skincare routines.
 
 ## Changes Made
 
-### 1. Hybrid Storage Strategy (Secure & Scalable)
-- **Firebase Storage**: Implemented `SkinPhotoStorage.kt` to securely upload and store raw image files. Photos are organized by user UID (`skin-photos/{uid}/{photoId}.jpg`) to ensure privacy.
-- **PostgreSQL Metadata**: Created `SkinPhotoController` in the backend to manage photo metadata (date taken, rating, notes, and the Firebase storage path). This links the binary file in the cloud with the structured data in our database.
+### 1. Reliable Background Scheduling (WorkManager)
+- **WorkManager**: Integrated `androidx.work` to handle battery-efficient, persistent background tasks.
+- **RoutineReminderWorker**: A background worker that triggers notifications even if the app is closed or the device is restarted.
+- **Unique Work**: Used unique work names (`morning_routine_reminder`, `evening_routine_reminder`) and `ExistingPeriodicWorkPolicy.UPDATE` to ensure no duplicate reminders are scheduled and settings changes are applied immediately.
 
-### 2. Progress Dashboard (UI/UX)
-- **Chronological Timeline**: The `ProgressScreen` displays a grid of photos sorted by date, giving a quick visual overview of the skin's history.
-- **Key Statistics**: Integrated basic tracking stats (total photos, consistency) into the dashboard.
-- **Coil Integration**: Used the **Coil** library for efficient image loading, caching, and placeholder support, ensuring a smooth scrolling experience.
+### 2. User-Controlled Settings
+- **Notification Settings Screen**: A new screen in the Profile section allowing users to:
+    - Toggle Morning and Evening reminders independently.
+    - Set custom reminder times using a Material 3 **TimePicker**.
+- **DataStore Persistence**: Used DataStore to persist reminder states and times locally on the device.
 
-### 3. Add Photo Flow
-- **Photo Picker**: Integrated the modern Android Photo Picker to allow users to select high-quality photos from their gallery.
-- **Assessment Form**: A clean review screen where users can set the date, rate their skin (1-5), and add personal notes before uploading.
-- **Atomic Operations**: Implemented a robust upload flow that handles potential failures by cleaning up cloud storage if the backend metadata save fails.
+### 3. Notification Experience
+- **Notification Channel**: Created a dedicated `routine_reminders` channel with appropriate priority.
+- **Themed Content**: Short, friendly messages ("Morning skincare routine 🌿", "Evening skincare routine 🌙") that match the brand's wellness tone.
+- **Deep Linking**: Configured a `PendingIntent` that launches the app and navigates directly to the Routine screen when the notification is tapped.
 
-### 4. Comparison & Analysis
-- **Side-by-Side View**: The `ComparePhotosScreen` allows users to select any two photos from their history and view them side-by-side to notice changes and improvements.
-- **Interactive Selection**: Users can tap on thumbnails to select "Before" and "After" candidates for comparison.
+### 4. Modern Permission Handling
+- **Android 13+ Support**: Implemented runtime requests for the `POST_NOTIFICATIONS` permission using Accompanist Permissions.
+- **Contextual Request**: The app only asks for permission when the user attempts to enable a reminder, providing a better user experience.
 
-### 5. Security & Privacy
-- **User Isolation**: All API endpoints and storage paths are protected by Firebase Authentication. User A can never see or delete User B's progress photos.
-- **Clean Architecture**: Followed the established pattern with dedicated UseCases (`AddSkinPhotoUseCase`, `GetSkinPhotosUseCase`) and repository implementations.
+### 5. Architecture
+- **Clean Architecture**: Followed the established pattern with dedicated UseCases (`GetReminderSettingsUseCase`, `UpdateReminderSettingUseCase`) and a `RoutineReminderScheduler` abstraction.
+- **Hilt Integration**: Correctly configured `HiltWorker` to allow dependency injection into the background worker.
 
-## Manual Steps Required (Important)
+## Verification Plan
 
-> [!IMPORTANT]
-> **Firebase Storage Setup**:
-> 1. Go to the [Firebase Console](https://console.firebase.google.com/).
-> 2. Select your project and navigate to **Build > Storage**.
-> 3. Click **Get Started** and select a location.
-> 4. Go to the **Rules** tab and set the following rules for maximum privacy:
->    ```javascript
->    service firebase.storage {
->      match /b/{bucket}/o {
->        match /skin-photos/{userId}/{allPaths=**} {
->          allow read, write: if request.auth != null && request.auth.uid == userId;
->        }
->      }
->    }
->    ```
+### Automated Tests
+- [x] `./gradlew assembleDebug` finished successfully.
+- [x] Verified WorkManager scheduling logic with unit tests for time delay calculations.
+
+### Manual Verification
+- **Enable/Disable**: Toggled reminders and verified work was enqueued/cancelled using `adb shell dumpsys jobscheduler`.
+- **Time Change**: Updated a reminder time and confirmed the initial delay was correctly recalculated.
+- **Navigation**: Tapped a simulated notification and verified it opened the correct destination in the app.
+- **Persistence**: Verified that settings are remembered after closing and reopening the app.
 
 ## Build Status
-- [x] Backend builds successfully (`dotnet build`).
-- [x] Android app builds successfully (`./gradlew assembleDebug`).
-- [x] Cloud storage and local database are fully integrated.
+- [x] Android app builds successfully.
+- [x] No regressions in previous features (Login, Profile, Routines, Products).

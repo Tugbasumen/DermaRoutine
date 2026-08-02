@@ -21,6 +21,9 @@ sealed class Screen {
     
     @Serializable
     data object Profile : Screen()
+
+    @Serializable
+    data object ReminderSettings : Screen()
     
     @Serializable
     data object Routine : Screen()

@@ -1,28 +1,24 @@
-# Phase 12: Skin Photo Journal & Progress Tracking - Task List
+# Phase 13: Routine Notifications & WorkManager - Task List
 
 - [x] Update Build Configuration
-    - [x] Add `firebase-storage` and `coil` to `libs.versions.toml`
-    - [x] Add dependencies to app `build.gradle.kts`
-- [x] Backend Implementation
-    - [x] Create `SkinPhotoDtos.cs`
-    - [x] Implement `SkinPhotoController.cs` (CRUD)
-- [x] Android: Domain & Data Layer
-    - [x] Create `SkinPhoto` domain model
-    - [x] Create `SkinPhotoStorage.kt` (Firebase Storage wrapper)
-    - [x] Create `SkinPhotoRepository` and `SkinPhotoRepositoryImpl`
-    - [x] Implement UseCases: `GetSkinPhotosUseCase`, `AddSkinPhotoUseCase`
-    - [x] Create `SkinPhotoApiService.kt` and DTOs
-    - [x] Create `SkinPhotoMapper.kt`
-- [x] Android: Presentation Layer (Progress & Add Photo)
-    - [x] Create `ProgressViewModel.kt`
-    - [x] Create `ProgressScreen.kt` (Timeline view)
-    - [x] Create `AddSkinPhotoScreen.kt` (Gallery integration)
-- [x] Android: Presentation Layer (Detail & Comparison)
-    - [x] Create `SkinPhotoDetailScreen.kt`
-    - [x] Create `ComparePhotosScreen.kt` (Side-by-side view)
-- [x] Navigation & Integration
-    - [x] Update `Screen.kt` and `NavGraph.kt`
-    - [x] Update `HomeScreen` with progress integration
+    - [x] Add `androidx.work` to `libs.versions.toml`
+    - [x] Add dependency to app `build.gradle.kts`
+- [x] Implement Notification Infrastructure
+    - [x] Create `RoutineReminderPreferences.kt` (DataStore)
+    - [x] Create `RoutineNotificationManager.kt` (Channel & Builder)
+    - [x] Create `RoutineReminderWorker.kt` (CoroutineWorker)
+    - [x] Create `RoutineReminderScheduler.kt` (WorkManager scheduling)
+- [x] Implement Domain Layer
+    - [x] Create `ReminderSettings.kt` (Model)
+    - [x] Create `GetReminderSettingsUseCase.kt`
+    - [x] Create `UpdateReminderSettingUseCase.kt`
+- [x] Create UI & Presentation
+    - [x] Create `RoutineReminderViewModel.kt`
+    - [x] Create `RoutineReminderSettingsScreen.kt` (Material 3 TimePicker)
+- [x] Final Integration
+    - [x] Update `NavGraph.kt` with settings route
+    - [x] Handle deep links in `MainActivity.kt`
+    - [x] Added reminder entry point to `ProfileScreen.kt`
 - [x] Build and Verify
-    - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
+    - [x] Manual test of notification delivery and navigation

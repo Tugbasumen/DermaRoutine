@@ -15,6 +15,7 @@ import com.dermaroutine.presentation.home.HomeScreen
 import com.dermaroutine.presentation.journal.JournalScreen
 import com.dermaroutine.presentation.onboarding.OnboardingScreen
 import com.dermaroutine.presentation.products.*
+import com.dermaroutine.presentation.notifications.RoutineReminderSettingsScreen
 import com.dermaroutine.presentation.profile.ProfileScreen
 import com.dermaroutine.presentation.progress.*
 import com.dermaroutine.presentation.routine.CreateRoutineScreen
@@ -207,7 +208,15 @@ fun NavGraph(
         }
         
         composable<Screen.Profile> {
-            ProfileScreen()
+            ProfileScreen(
+                onNavigateToReminders = { navController.navigate(Screen.ReminderSettings) }
+            )
+        }
+
+        composable<Screen.ReminderSettings> {
+            RoutineReminderSettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable<Screen.Journal> {
