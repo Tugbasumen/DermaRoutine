@@ -16,6 +16,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddScoped<IRoutineStreakService, RoutineStreakService>();
 
+// Register Gemini Services
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
+
 // Configure EF Core with PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -1,24 +1,23 @@
-# Phase 10: OCR Ingredient Scanner - Task List
+# Phase 11: AI Ingredient Assistant - Task List
 
-- [x] Update Build Configuration
-    - [x] Add ML Kit Text Recognition to `libs.versions.toml`
-    - [x] Add dependency to app `build.gradle.kts`
-- [x] Backend: Bulk Ingredient API
-    - [x] Add `BulkAddIngredientsRequest` to `ProductDto.cs`
-    - [x] Implement `BulkAddIngredients` in `ProductController.cs`
-- [x] Implement OCR & Parsing Logic (Data & Domain)
-    - [x] Create `TextRecognizer` interface
-    - [x] Create `MlKitTextRecognizer` implementation
-    - [x] Create `IngredientTextParser` (pure Kotlin)
-- [x] Create OCR Flow UI
-    - [x] Create `OcrViewModel`
-    - [x] Create `OcrScannerScreen` (CameraX)
-    - [x] Create `OcrResultScreen` (Review & Edit)
-    - [x] Create `IngredientPreviewScreen` (Parsed list)
-- [x] Navigation & Integration
-    - [x] Update `Screen.kt` and `NavGraph.kt` with OCR routes
-    - [x] Update `ProductDetailScreen` to launch OCR flow
+- [x] Backend: Gemini Integration
+    - [x] Add Gemini config to `appsettings.json`
+    - [x] Create `AssistantDtos.cs`
+    - [x] Implement `IGeminiService` & `GeminiService`
+    - [x] Implement `AssistantController` with safety prompt
+    - [x] Register services in `Program.cs`
+- [x] Android: Domain & Data Layer
+    - [x] Create `IngredientExplanation` domain model
+    - [x] Create `AssistantApiService.kt` & DTOs
+    - [x] Implement `AssistantRepository` & `AssistantRepositoryImpl`
+    - [x] Create `GetIngredientExplanationUseCase.kt`
+- [x] Android: Presentation Layer
+    - [x] Update `Screen.kt` (parameterized route)
+    - [x] Create `IngredientAssistantViewModel.kt`
+    - [x] Create `IngredientAssistantScreen.kt` (Material 3)
+    - [x] Update `ProductDetailScreen.kt` (clickable list)
+    - [x] Update `NavGraph.kt`
 - [x] Build and Verify
     - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
-    - [x] Manual verification of full OCR flow (conceptual)
+    - [x] Manual test of the AI flow (conceptual)

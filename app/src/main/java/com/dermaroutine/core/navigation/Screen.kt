@@ -59,7 +59,7 @@ sealed class Screen {
     data object Journal : Screen()
 
     @Serializable
-    data object Assistant : Screen()
+    data class Assistant(val ingredientName: String) : Screen()
 }
 
 data class BottomNavItem(

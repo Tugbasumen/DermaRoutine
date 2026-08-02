@@ -1,39 +1,43 @@
-# Phase 10: OCR Ingredient Scanner Walkthrough
+# Phase 11: AI Ingredient Assistant Walkthrough
 
-Phase 10 is completed. The DermaRoutine application now has an OCR-powered ingredient scanner that allows users to capture and parse skincare product ingredients using their camera.
+Phase 11 is completed. The DermaRoutine application now features an AI-powered assistant that provides educational explanations for skincare ingredients using the Gemini API through a secure backend layer.
 
 ## Changes Made
 
-### 1. Backend (ASP.NET Core)
-- **Bulk Ingredient API**: Implemented a new endpoint `POST /api/products/{id}/ingredients/bulk`. This allows the application to save a full list of ingredients in a single transaction, clearing any previous ones to ensure data consistency.
-- **Security**: The bulk save endpoint strictly enforces user isolation by verifying the Firebase token.
+### 1. Secure AI Integration (Backend)
+- **Gemini Service**: Implemented `GeminiService.cs` in the ASP.NET Core project. It handles secure communication with Google's Gemini API. The API key is managed via configuration (User Secrets), keeping it out of the source code.
+- **Safety Prompt**: Enforced a strict system prompt that instructs the AI to provide only **educational** information. It explicitly prohibits medical diagnosis, prescriptions, or treatment recommendations.
+- **Structured Response**: The backend parses raw AI output into a structured JSON format (Summary, Common Uses, Considerations, Disclaimer) to ensure a clean UI on the mobile app.
 
-### 2. OCR & Text Recognition
-- **ML Kit Text Recognition**: Integrated the Google ML Kit Text Recognition library for high-accuracy character recognition.
-- **Scanning Logic**: Reused the CameraX infrastructure from the barcode scanner to provide a consistent and high-performance camera experience.
-- **Ingredient Parser**: Developed a custom `IngredientTextParser.kt` in the domain layer to clean and split raw OCR text into individual ingredient names (handling commas, newlines, and semicolons).
+### 2. Android Domain & Data Layer
+- **Domain Model**: Created `IngredientExplanation.kt` to represent the structured AI data.
+- **UseCase**: Implemented `GetIngredientExplanationUseCase.kt` to encapsulate the business logic of fetching AI data.
+- **Repository**: `AssistantRepositoryImpl.kt` handles the authenticated network request to the backend using the existing Retrofit and Auth Interceptor setup.
 
-### 3. OCR User Flow (UI/UX)
-- **OcrScannerScreen**: A dedicated camera view with a focus frame for the ingredient list and a manual capture button.
-- **OcrResultScreen**: Allows users to review and manually correct the raw recognized text before parsing.
-- **IngredientPreviewScreen**: Displays the final parsed list as individual items. Users can remove unwanted items before confirming the final save.
+### 3. AI Assistant UI (Material 3)
+- **IngredientAssistantScreen**: A modern, clean screen that displays:
+    - A summary of what the ingredient is.
+    - A bulleted list of common cosmetic uses.
+    - General considerations and "things to know".
+    - A persistent **Educational Disclaimer** at the bottom.
+- **Interactive Integration**: Updated the `ProductDetailScreen` to make individual ingredients clickable. Tapping an ingredient now launches the AI Assistant for that specific item.
 
-### 4. Integration
-- **Product Detail**: Added a "Scan" button to the ingredients section of the product detail screen to trigger the OCR flow for that specific product.
-- **Navigation**: Established a robust 3-step navigation flow for OCR with proper lifecycle management.
+### 4. Navigation
+- **Parameterized Routing**: Updated `Screen.kt` and `NavGraph.kt` to support passing the `ingredientName` to the assistant screen, ensuring deep-link compatibility and proper state management.
 
-## Verification Plan
+## Manual Steps Required (Important)
 
-### Automated Tests
-- [x] `dotnet build` finished successfully.
-- [x] `./gradlew assembleDebug` finished successfully.
-
-### Manual Verification
-- **Capture**: Verified that the camera opens and captures text correctly.
-- **Parsing**: Confirmed that a comma-separated list like "Aqua, Glycerin, Phenoxyethanol" is correctly split into three individual items.
-- **Bulk Save**: Verified that clicking "Save All" correctly updates the product's ingredients in the PostgreSQL database.
-- **Duplicate Prevention**: Confirmed that repeated scans of the same text don't create duplicate entries thanks to the transactional clear-and-add logic.
+> [!IMPORTANT]
+> **To enable Gemini, you must add your API key to the backend:**
+> 1. Obtain a Gemini API Key from the [Google AI Studio](https://aistudio.google.com/).
+> 2. Open a terminal in `backend/DermaRoutine.Api`.
+> 3. Run the following command to store the key securely in your local **User Secrets**:
+>    ```bash
+>    dotnet user-secrets set "Gemini:ApiKey" "YOUR_API_KEY_HERE"
+>    ```
+> 4. Restart the backend.
 
 ## Build Status
-- [x] Backend and Android projects are synced.
-- [x] Full OCR lifecycle (Camera -> Review -> Parse -> Save) is functional.
+- [x] Backend builds successfully (`dotnet build`).
+- [x] Android app builds successfully (`./gradlew assembleDebug`).
+- [x] Secure full-stack AI flow is established.

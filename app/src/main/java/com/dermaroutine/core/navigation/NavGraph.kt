@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.dermaroutine.presentation.assistant.AssistantScreen
+import com.dermaroutine.presentation.assistant.IngredientAssistantScreen
 import com.dermaroutine.presentation.auth.LoginScreen
 import com.dermaroutine.presentation.auth.RegisterScreen
 import com.dermaroutine.presentation.home.HomeScreen
@@ -138,7 +139,8 @@ fun NavGraph(
                 productId = detail.id,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToEdit = { id -> navController.navigate(Screen.EditProduct(id)) },
-                onNavigateToOcr = { id -> navController.navigate(Screen.OcrScanner(id)) }
+                onNavigateToOcr = { id -> navController.navigate(Screen.OcrScanner(id)) },
+                onNavigateToIngredientAssistant = { name -> navController.navigate(Screen.Assistant(name)) }
             )
         }
 

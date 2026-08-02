@@ -1,79 +1,67 @@
-# Phase 10: OCR Ingredient Scanner Implementation Plan
+# Phase 11: AI Ingredient Assistant Implementation Plan
 
-This phase implements an OCR-based ingredient scanner, allowing users to scan product ingredient lists using the camera, review the recognized text, and parse it into individual ingredients.
+This phase implements an AI-powered skincare ingredient assistant using the Gemini API. The backend will handle the communication with Gemini to ensure security and controlled prompt design, while the Android app will provide a user-friendly interface for educational explanations.
 
 ## User Review Required
 
-> [!NOTE]
-> **Bulk Save**: I will add a bulk ingredient save endpoint to the backend to ensure the entire ingredient list is saved atomically.
+> [!IMPORTANT]
+> **Gemini API Key**: You must provide a valid Gemini API key. I will show you how to add it to your backend's **User Secrets** so it is never committed to Git.
 >
-> **Parser Logic**: The ingredient parser will split text based on commas, semicolons, and newlines. The user will have a chance to review and edit the parsed list before saving.
+> **Educational Disclaimer**: All AI responses will strictly include a disclaimer stating that the information is for educational purposes only and not medical advice.
 
 ## Proposed Changes
 
-### 1. Build Configuration
+### 1. Backend (DermaRoutine.Api)
 
-#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add version for `mlkitTextRecognition = "16.0.0"`.
-- Add library `mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkitTextRecognition" }`.
+#### [MODIFY] [appsettings.json](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/appsettings.json)
+- Add placeholder configuration for Gemini (Model, BaseUrl).
 
-#### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
-- Add `implementation(libs.mlkit.text.recognition)`.
+#### [NEW] [IGeminiService.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/IGeminiService.cs) & [GeminiService.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/GeminiService.cs)
+- Handles raw HTTP communication with the Gemini API.
+- Implements secure API key usage from configuration.
 
-### 2. Backend (DermaRoutine.Api)
+#### [NEW] [AssistantController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/AssistantController.cs)
+- `POST /api/assistant/ingredient`: Receives an ingredient name and returns a structured educational explanation.
+- **System Prompt**: Enforced at the controller/service level to ensure no medical advice is given.
 
-#### [MODIFY] [ProductDto.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/ProductDto.cs)
-- Add `BulkAddIngredientsRequest` DTO.
+#### [NEW] [AssistantDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/AssistantDtos.cs)
+- `IngredientExplanationRequest` and `IngredientExplanationResponse`.
 
-#### [MODIFY] [ProductController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/ProductController.cs)
-- Implement `POST /api/products/{id}/ingredients/bulk`:
-    - Clears existing ingredients for the product.
-    - Adds the new list in a single transaction.
+### 2. Android (app)
 
-### 3. OCR Analysis (Domain & Data)
+#### [NEW] [AssistantApiService.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/AssistantApiService.kt)
+- Retrofit interface for the assistant endpoint.
 
-#### [NEW] [TextRecognizer.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/scanner/TextRecognizer.kt) (Interface)
-- Defines the behavior for a text recognition analyzer.
+#### [NEW] Domain Layer
+- `IngredientExplanation` (Domain Model).
+- `AssistantRepository` (Interface).
+- `GetIngredientExplanationUseCase`.
 
-#### [NEW] [MlKitTextRecognizer.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/scanner/MlKitTextRecognizer.kt)
-- Implements ML Kit `TextRecognition` logic.
+#### [NEW] [IngredientAssistantScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/assistant/IngredientAssistantScreen.kt)
+- Displays the AI-generated summary, common uses, and considerations.
+- Prominent "Not medical advice" disclaimer.
+- Loading and error states.
 
-#### [NEW] [IngredientTextParser.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/scanner/IngredientTextParser.kt)
-- Pure Kotlin logic to split raw OCR text into a list of strings (Aqua, Glycerin, etc.).
+#### [MODIFY] [ProductDetailScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/products/ProductDetailScreen.kt)
+- Make individual ingredients clickable to launch the `IngredientAssistantScreen`.
 
-### 4. Presentation Layer (OCR)
-
-#### [NEW] [OcrScannerScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/OcrScannerScreen.kt)
-- CameraX preview with a frame for ingredients.
-- "Scan" button to trigger capture and processing.
-
-#### [NEW] [OcrResultScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/OcrResultScreen.kt)
-- Editable multiline text field showing the raw recognized text.
-
-#### [NEW] [IngredientPreviewScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/IngredientPreviewScreen.kt)
-- List of individual parsed ingredients.
-- Ability to remove or edit items before the final save.
-
-#### [NEW] [OcrViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/scanner/OcrViewModel.kt)
-- Manages the multi-step OCR flow state.
-
-### 5. Navigation
+### 3. Navigation
 
 #### [MODIFY] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
-- Add `OcrScanner`, `OcrResult`, `IngredientPreview` destinations.
+- Update `Assistant` destination to accept an `ingredientName` parameter.
 
 #### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Integrate the OCR flow routes.
+- Integrate the parameterized assistant route.
 
 ## Verification Plan
 
 ### Automated Tests
-- Unit tests for `IngredientTextParser` with various separators and messy text.
 - `dotnet build` & `gradlew assembleDebug`.
+- Backend unit tests for prompt structure and safety rules.
 
 ### Manual Verification
-1. **Camera Flow**: Open a product, tap "Scan Ingredients", grant permission, and see the camera preview.
-2. **Detection**: Point at an ingredient list, tap Scan, and verify text appears on the review screen.
-3. **Editing**: Correct an OCR typo in the review screen.
-4. **Parsing**: Continue to the preview screen and verify the text is split into a list.
-5. **Saving**: Confirm and save, then verify the ingredients appear in the Product Detail screen.
+1. Open a product (e.g., Hydrating Serum).
+2. Tap on "Niacinamide" in the ingredient list.
+3. Verify that the `IngredientAssistantScreen` opens and shows a loading state.
+4. Confirm that a structured explanation appears with the educational disclaimer.
+5. Verify that the API key is not visible anywhere in the Android code or Git history.

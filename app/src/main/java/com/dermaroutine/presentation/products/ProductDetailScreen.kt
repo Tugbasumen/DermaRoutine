@@ -1,6 +1,7 @@
 package com.dermaroutine.presentation.products
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +30,7 @@ fun ProductDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Int) -> Unit,
     onNavigateToOcr: (Int) -> Unit,
+    onNavigateToIngredientAssistant: (String) -> Unit,
     viewModel: ProductViewModel = hiltViewModel()
 ) {
     val state by viewModel.detailState.collectAsState()
@@ -132,7 +134,10 @@ fun ProductDetailScreen(
                             }
                         } else {
                             items(product.ingredients) { ingredient ->
-                                IngredientRow(ingredient)
+                                IngredientRow(
+                                    ingredient = ingredient,
+                                    onClick = { onNavigateToIngredientAssistant(ingredient.name) }
+                                )
                             }
                         }
                     }
@@ -177,12 +182,13 @@ fun InfoLabel(label: String, value: String) {
 }
 
 @Composable
-fun IngredientRow(ingredient: ProductIngredient) {
+fun IngredientRow(ingredient: ProductIngredient, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
