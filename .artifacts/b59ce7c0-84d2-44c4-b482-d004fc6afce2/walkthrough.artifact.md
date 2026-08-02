@@ -1,33 +1,17 @@
-# Google-Only Simplified Authentication Walkthrough
+# Launcher Icon Integration Walkthrough
 
-I have successfully refactored the authentication system to use **Google Sign-In as the exclusive entry method**. This change streamlines the user experience and ensures a secure, single-tap onboarding process.
+The DermaRoutine application icon has been updated. The professional logo you provided will now be visible on the phone's home screen and in the app drawer.
 
 ## Changes Made
 
-### 1. Unified Authentication Screen
-- **AuthScreen**: Created a new, minimalist entry screen that replaces the separate Login and Register screens. It features the DermaRoutine branding and a prominent **"Continue with Google"** button.
-- **Simplified UX**: Users no longer need to decide between registering or logging in. Google Sign-In handles both flows automatically (creating an account if it doesn't exist, or logging in if it does).
+### 1. Android Manifest Update
+- Updated `AndroidManifest.xml` to set the new logo as the official application icon.
+- Both the standard icon (`android:icon`) and the round icon (`android:roundIcon`) now point to `@drawable/app_logo`.
 
-### 2. Domain & Data Consolidation
-- **AuthRepository**: Removed `login` and `register` methods, keeping only `signInWithGoogle` and session management logic.
-- **FirebaseAuthRepository**: Cleaned up the implementation to remove all email/password related code, reducing technical debt.
-- **UseCase Removal**: Deleted the now-obsolete `LoginUseCase` and `RegisterUseCase`.
-
-### 3. Navigation Refactoring
-- **Screen Routes**: Replaced `Login` and `Register` routes with a single `Auth` destination in the `Screen` sealed class.
-- **Smart Routing**: Updated `MainActivity` and `NavGraph` to correctly handle the new flow. The app now routes unauthenticated users directly to the unified `AuthScreen` after onboarding.
-
-### 4. Code Cleanup
-- **Deleted Files**: Successfully removed several redundant files:
-    - `LoginScreen.kt`, `RegisterScreen.kt`
-    - `LoginViewModel.kt`, `RegisterViewModel.kt`
-    - `LoginUseCase.kt`, `RegisterUseCase.kt`
-
-## Build Status
-- [x] Android app builds successfully (`./gradlew assembleDebug`).
-- [x] All existing features (Profile, Home, Routines, Products, AI Assistant) remain functional.
-- [x] Authentication is now strictly Google-based.
+## Verification Results
+- [x] **Build Status**: The project built successfully (`./gradlew assembleDebug`).
+- [x] **Resource Check**: Verified that the app correctly references the PNG logo for the launcher.
 
 ## Important Note
-> [!NOTE]
-> Existing test accounts created via Email/Password will no longer be accessible through the UI. Users should now use their Google accounts for all future sessions.
+> [!TIP]
+> After this change, you may need to **uninstall the app** from your device or emulator and **reinstall** it (Run again from Android Studio) to see the new icon updated on the home screen. Some launchers cache the old icon.

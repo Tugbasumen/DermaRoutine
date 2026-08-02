@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -58,14 +59,14 @@ fun AuthScreen(
         verticalArrangement = Arrangement.Center
     ) {
         // App Brand
-        Box(
+        Image(
+            painter = painterResource(id = R.drawable.app_logo),
+            contentDescription = null,
             modifier = Modifier
-                .size(120.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(32.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "🌿", fontSize = 64.sp)
-        }
+                .size(180.dp)
+                .clip(RoundedCornerShape(32.dp)),
+            contentScale = ContentScale.Fit
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 

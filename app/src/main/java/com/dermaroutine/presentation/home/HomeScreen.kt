@@ -1,5 +1,6 @@
 package com.dermaroutine.presentation.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,10 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.PrimaryButton
 import com.dermaroutine.core.designsystem.SecondaryButton
 
@@ -88,13 +92,21 @@ fun HomeScreen(
 @Composable
 fun HomeHeader(greeting: String, userName: String, date: String) {
     Column {
-        Text(
-            text = "$greeting${if (userName.isNotEmpty()) ", $userName" else ""} 🌿",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "$greeting${if (userName.isNotEmpty()) ", $userName" else ""}",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
             )
-        )
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = painterResource(id = R.drawable.app_logo),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp).clip(CircleShape)
+            )
+        }
         Text(
             text = date,
             style = MaterialTheme.typography.bodyLarge,
