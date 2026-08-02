@@ -7,10 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.dermaroutine.presentation.assistant.AssistantScreen
-import com.dermaroutine.presentation.assistant.IngredientAssistantScreen
-import com.dermaroutine.presentation.auth.LoginScreen
-import com.dermaroutine.presentation.auth.RegisterScreen
+import com.dermaroutine.presentation.assistant.*
+import com.dermaroutine.presentation.auth.AuthScreen
 import com.dermaroutine.presentation.home.HomeScreen
 import com.dermaroutine.presentation.journal.JournalScreen
 import com.dermaroutine.presentation.onboarding.OnboardingScreen
@@ -36,35 +34,19 @@ fun NavGraph(
         composable<Screen.Onboarding> {
             OnboardingScreen(
                 onFinished = {
-                    navController.navigate(Screen.Login) {
+                    navController.navigate(Screen.Auth) {
                         popUpTo(Screen.Onboarding) { inclusive = true }
                     }
                 }
             )
         }
 
-        composable<Screen.Login> {
-            LoginScreen(
-                onLoginSuccess = {
+        composable<Screen.Auth> {
+            AuthScreen(
+                onAuthSuccess = {
                     navController.navigate(Screen.Home) {
-                        popUpTo(Screen.Login) { inclusive = true }
+                        popUpTo(Screen.Auth) { inclusive = true }
                     }
-                },
-                onNavigateToRegister = {
-                    navController.navigate(Screen.Register)
-                }
-            )
-        }
-
-        composable<Screen.Register> {
-            RegisterScreen(
-                onRegisterSuccess = {
-                    navController.navigate(Screen.Home) {
-                        popUpTo(Screen.Register) { inclusive = true }
-                    }
-                },
-                onNavigateToLogin = {
-                    navController.popBackStack()
                 }
             )
         }
@@ -74,7 +56,7 @@ fun NavGraph(
                 onNavigateToRoutine = { navController.navigate(Screen.Routine) },
                 onNavigateToProducts = { navController.navigate(Screen.Products) },
                 onNavigateToJournal = { navController.navigate(Screen.Journal) },
-                onNavigateToAssistant = { navController.navigate(Screen.Assistant("Skin Analysis")) } // Placeholder
+                onNavigateToAssistant = { navController.navigate(Screen.Assistant("Skin Analysis")) }
             )
         }
 

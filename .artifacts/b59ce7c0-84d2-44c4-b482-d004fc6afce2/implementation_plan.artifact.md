@@ -1,68 +1,61 @@
-# Phase 14: Crashlytics, Error Handling & App Stabilization Plan
+# Google-Only Simplified Authentication Plan
 
-This phase focuses on making DermaRoutine production-ready by integrating Firebase Crashlytics, implementing centralized error handling on both Android and Backend, and stabilizing the overall user experience.
+This plan refactors the entire authentication flow to use Google Sign-In as the **exclusive** method for accessing the application. This simplifies the UX and ensures a secure, single-tap entry for all users.
 
 ## User Review Required
 
-> [!NOTE]
-> **Crashlytics Verification**: I will add a temporary, hidden way to trigger a test crash in Debug builds to verify that Crashlytics is working.
+> [!CAUTION]
+> **Data Access**: If you have already created test users via Email/Password, they will no longer be able to log in using those credentials. They must use their Google account. If the emails match, Firebase can automatically link them, but for this phase, we are moving to a pure Google flow.
 >
-> **Global Result Pattern**: I will refactor the Android repository layers to use a consistent `AppResult` and `AppError` pattern, which might require small changes in ViewModels to handle the new result types.
+> **Cleanup**: I will be deleting `LoginScreen.kt`, `RegisterScreen.kt`, and their respective ViewModels (consolidating into a single `AuthViewModel`).
 
 ## Proposed Changes
 
-### 1. Build Configuration (Android)
+### 1. Domain & Data Layer (Android)
 
-#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
-- Add `firebase-crashlytics` library and `firebase-crashlytics-gradle` plugin.
+#### [MODIFY] [AuthRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/repository/AuthRepository.kt)
+- Remove `login(email, password)` and `register(email, password)`.
+- Keep `signInWithGoogle` and `logout`.
 
-#### [MODIFY] [build.gradle.kts (root)](file:///C:/kotlinproje/DermaRoutine/build.gradle.kts)
-- Add the Crashlytics plugin to the plugins block (apply false).
+#### [MODIFY] [FirebaseAuthRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/FirebaseAuthRepository.kt)
+- Remove email/password implementations.
+- Retain and verify the `signInWithGoogle` logic.
 
-#### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
-- Apply `com.google.firebase.crashlytics` plugin.
-- Add `implementation(libs.firebase.crashlytics)` dependency.
+#### [DELETE] Email UseCases
+- Delete `LoginUseCase.kt` and `RegisterUseCase.kt`.
 
-### 2. Android Core: Error Handling
+### 2. Presentation Layer (Android)
 
-#### [NEW] [AppError.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/error/AppError.kt)
-- Sealed class defining standard errors: `Network`, `Unauthorized`, `Server`, `NotFound`, `Validation`, `Unknown`.
+#### [NEW] [AuthScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/auth/AuthScreen.kt)
+- A clean, wellness-themed entry screen.
+- Large DermaRoutine logo/icon.
+- A single, prominent "Continue with Google" button.
+- Educational subtitle: "Your skincare journey starts with a single tap."
 
-#### [NEW] [ErrorMapper.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/error/ErrorMapper.kt)
-- Helper to map HTTP codes and Exceptions to `AppError`.
+#### [NEW] [AuthViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/auth/AuthViewModel.kt)
+- Consolidate Google sign-in and state management.
 
-#### [NEW] [ModifierExt.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/util/ModifierExt.kt)
-- Extension for `Modifier.clickable` to add a debounce period, preventing duplicate button taps.
+#### [DELETE] Old Auth Files
+- `LoginScreen.kt`, `RegisterScreen.kt`, `LoginViewModel.kt`, `RegisterViewModel.kt`.
 
-### 3. Backend: Global Exception Handling
+### 3. Navigation & Main Entry
 
-#### [NEW] [ErrorResponse.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/ErrorResponse.cs)
-- Standardized error DTO: `Code`, `Message`, `TraceId`.
+#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
+- Update routes to use `Screen.Auth` instead of separate login/register screens.
 
-#### [NEW] [ExceptionHandlingMiddleware.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Middleware/ExceptionHandlingMiddleware.cs)
-- Middleware to catch all unhandled exceptions, log them with a Trace ID, and return a safe `ErrorResponse`.
+#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
+- Ensure the initial routing logic correctly points to the new `Auth` screen if the user is not logged in.
 
-#### [MODIFY] [Program.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Program.cs)
-- Register the `ExceptionHandlingMiddleware`.
+### 4. Backend (DermaRoutine.Api)
 
-### 4. Stabilization & UX Review
-
-#### [MODIFY] UI Components
-- Update `PrimaryButton` and `SecondaryButton` in `Components.kt` to use debounced click logic.
-- Review `ProfileScreen`, `RoutineDetailScreen`, and `HomeScreen` to ensure all `Error` states show a "Try Again" button.
-
-#### [MODIFY] Network Layer
-- Update `AuthInterceptor.kt` to log custom Crashlytics keys (e.g., current screen) when a network failure occurs.
+- No changes required. The backend already validates Firebase tokens independently of the provider (it just sees a valid UID).
 
 ## Verification Plan
 
 ### Automated Tests
-- `dotnet build` & `gradlew assembleDebug`.
-- Verify the API returns the correct JSON error structure when a manual exception is thrown.
+- `gradlew assembleDebug` to ensure no broken references to deleted files.
 
 ### Manual Verification
-1. **Crashlytics**: Trigger a test crash in Debug and verify it appears in the Firebase Console.
-2. **Offline Mode**: Disable internet and verify the app shows a friendly "No internet" message with a retry button instead of a technical error.
-3. **Double Taps**: Rapidly tap "Save Profile" and verify only one network request is sent.
-4. **401 Handling**: Manually invalidate a token and verify the app handles the unauthorized state gracefully.
-5. **Backend Security**: Attempt to access a resource without a token and verify the `ErrorResponse` structure.
+1. **New User**: Tap "Continue with Google". Verify the account is created in the database and you land on the Home/Profile screen.
+2. **Returning User**: Tap "Continue with Google". Verify you land on the Home screen immediately.
+3. **Logout**: Verify that logging out returns you to the simplified Google-only screen.

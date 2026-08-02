@@ -11,10 +11,7 @@ sealed class Screen {
     data object Onboarding : Screen()
     
     @Serializable
-    data object Login : Screen()
-    
-    @Serializable
-    data object Register : Screen()
+    data object Auth : Screen()
     
     @Serializable
     data object Home : Screen()

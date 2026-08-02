@@ -111,10 +111,10 @@ class MainActivity : ComponentActivity() {
                     ) { padding ->
                         Box(modifier = Modifier.padding(padding)) {
                             val startDestination = when {
-                                currentUser != null -> Screen.Home
-                                onboardingDone -> Screen.Login
-                                else -> Screen.Onboarding
-                            }
+                            currentUser != null -> Screen.Home
+                            onboardingDone -> Screen.Auth
+                            else -> Screen.Onboarding
+                        }
 
                             NavGraph(
                                 navController = navController,

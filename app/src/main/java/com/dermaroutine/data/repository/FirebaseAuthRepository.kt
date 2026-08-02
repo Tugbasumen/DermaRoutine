@@ -16,34 +16,6 @@ class FirebaseAuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : AuthRepository {
 
-    override suspend fun login(email: String, password: String): Result<User> {
-        return try {
-            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            val firebaseUser = result.user
-            if (firebaseUser != null) {
-                Result.success(User(firebaseUser.uid, firebaseUser.email ?: ""))
-            } else {
-                Result.failure(Exception("Login failed: User is null"))
-            }
-        } catch (e: Exception) {
-            Result.failure(mapFirebaseException(e))
-        }
-    }
-
-    override suspend fun register(email: String, password: String): Result<User> {
-        return try {
-            val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            val firebaseUser = result.user
-            if (firebaseUser != null) {
-                Result.success(User(firebaseUser.uid, firebaseUser.email ?: ""))
-            } else {
-                Result.failure(Exception("Registration failed: User is null"))
-            }
-        } catch (e: Exception) {
-            Result.failure(mapFirebaseException(e))
-        }
-    }
-
     override suspend fun signInWithGoogle(idToken: String): Result<User> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -77,14 +49,6 @@ class FirebaseAuthRepository @Inject constructor(
         firebaseAuth.addAuthStateListener(listener)
         awaitClose {
             firebaseAuth.removeAuthStateListener(listener)
-        }
-    }
-
-    private fun mapFirebaseException(e: Exception): Exception {
-        // Basic mapping as per requirements
-        return when (e.message?.contains("email address is badly formatted") == true) {
-            true -> Exception("Please enter a valid email.")
-            else -> e
         }
     }
 }

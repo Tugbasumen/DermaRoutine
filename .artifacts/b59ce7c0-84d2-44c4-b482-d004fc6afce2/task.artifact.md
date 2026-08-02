@@ -1,24 +1,17 @@
-# Phase 14: Crashlytics & Stabilization - Task List
+# Phase: Google-Only Authentication Simplification - Task List
 
-- [x] Update Build Configuration
-    - [x] Add Crashlytics to `libs.versions.toml`
-    - [x] Update root `build.gradle.kts` with Crashlytics plugin
-    - [x] Update app `build.gradle.kts` with plugin and dependency
-- [x] Implement Android Error Handling
-    - [x] Create `AppError.kt` (Sealed class)
-    - [x] Create `ErrorMapper.kt`
-    - [x] Implement `Modifier.debouncedClickable` in `ModifierExt.kt`
-- [x] Implement Backend Error Handling
-    - [x] Create `ErrorResponse.cs` DTO
-    - [x] Implement `ExceptionHandlingMiddleware.cs`
-    - [x] Register Middleware in `Program.cs`
-- [x] Refactor Repositories & ViewModels
-    - [x] Update `ProfileRepository` and `RoutineRepository` to use `AppError`
-    - [x] Ensure all screens have proper Error states with Retry buttons
-- [x] UX & Stability Review
-    - [x] Update `PrimaryButton` and `SecondaryButton` with debounce
-    - [x] Add custom Crashlytics logs to major actions (AuthInterceptor)
+- [x] Domain & Data Layer Cleanup
+    - [x] Modify `AuthRepository.kt` (Remove email/password methods)
+    - [x] Modify `FirebaseAuthRepository.kt` (Remove email/password logic)
+    - [x] Delete `LoginUseCase.kt` and `RegisterUseCase.kt`
+- [x] Implement Unified Presentation Layer
+    - [x] Create `AuthViewModel.kt` (Consolidated logic)
+    - [x] Create `AuthScreen.kt` (Modern Google-only UI)
+    - [x] Delete `LoginScreen.kt`, `RegisterScreen.kt`, `LoginViewModel.kt`, `RegisterViewModel.kt`
+- [x] Navigation & Integration
+    - [x] Update `Screen.kt` (Replace Login/Register with Auth)
+    - [x] Update `NavGraph.kt` (Simplified routing)
+    - [x] Update `MainActivity.kt` (Starting destination logic)
 - [x] Build and Verify
-    - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
-    - [x] Test Crashlytics with a debug crash (Trigger added to Profile)
+    - [x] Verify single-tap Google login/registration flow
