@@ -1,67 +1,85 @@
-# Phase 11: AI Ingredient Assistant Implementation Plan
+# Phase 12: Skin Photo Journal & Progress Tracking Implementation Plan
 
-This phase implements an AI-powered skincare ingredient assistant using the Gemini API. The backend will handle the communication with Gemini to ensure security and controlled prompt design, while the Android app will provide a user-friendly interface for educational explanations.
+This phase implements a comprehensive skin progress tracking system. Users can take or select photos, add assessments, and view their journey over time, including side-by-side comparisons and basic statistics.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Gemini API Key**: You must provide a valid Gemini API key. I will show you how to add it to your backend's **User Secrets** so it is never committed to Git.
+> **Firebase Storage Rules**: You MUST configure your Firebase Storage rules to ensure privacy. I will provide the rules that allow only the authenticated owner to access their `skin-photos/{uid}/*` folder.
 >
-> **Educational Disclaimer**: All AI responses will strictly include a disclaimer stating that the information is for educational purposes only and not medical advice.
+> **Image Quality**: Photos will be compressed on the device before upload to save storage space and bandwidth while maintaining enough detail for progress comparison.
 
 ## Proposed Changes
 
-### 1. Backend (DermaRoutine.Api)
+### 1. Build Configuration & Setup
 
-#### [MODIFY] [appsettings.json](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/appsettings.json)
-- Add placeholder configuration for Gemini (Model, BaseUrl).
+#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
+- Add `firebase-storage-ktx` for image storage.
+- Add `coil-compose` for efficient image loading and caching.
 
-#### [NEW] [IGeminiService.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/IGeminiService.cs) & [GeminiService.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Services/GeminiService.cs)
-- Handles raw HTTP communication with the Gemini API.
-- Implements secure API key usage from configuration.
+#### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
+- Add the new dependencies.
 
-#### [NEW] [AssistantController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/AssistantController.cs)
-- `POST /api/assistant/ingredient`: Receives an ingredient name and returns a structured educational explanation.
-- **System Prompt**: Enforced at the controller/service level to ensure no medical advice is given.
+### 2. Backend (DermaRoutine.Api)
 
-#### [NEW] [AssistantDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/AssistantDtos.cs)
-- `IngredientExplanationRequest` and `IngredientExplanationResponse`.
+#### [NEW] [SkinPhotoDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/SkinPhotoDtos.cs)
+- `SkinPhotoDto`, `CreateSkinPhotoRequest`, `UpdateSkinPhotoRequest`.
 
-### 2. Android (app)
+#### [NEW] [SkinPhotoController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/SkinPhotoController.cs)
+- `GET /api/skin-photos`: List history sorted by date (newest first).
+- `GET /api/skin-photos/{id}`: Detailed metadata.
+- `POST /api/skin-photos`: Save metadata after successful Firebase upload.
+- `PUT /api/skin-photos/{id}`: Update notes or assessment.
+- `DELETE /api/skin-photos/{id}`: Remove metadata (Android will handle Storage deletion).
 
-#### [NEW] [AssistantApiService.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/AssistantApiService.kt)
-- Retrofit interface for the assistant endpoint.
+### 3. Android Data & Domain Layer
+
+#### [NEW] [SkinPhotoStorage.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/storage/SkinPhotoStorage.kt)
+- Wrapper for Firebase Storage to handle `uploadPhoto` and `deletePhoto`.
 
 #### [NEW] Domain Layer
-- `IngredientExplanation` (Domain Model).
-- `AssistantRepository` (Interface).
-- `GetIngredientExplanationUseCase`.
+- `SkinPhoto` domain model.
+- `SkinPhotoRepository` interface and implementation.
+- Use Cases: `GetSkinPhotosUseCase`, `AddSkinPhotoUseCase`, `DeleteSkinPhotoUseCase`, etc.
 
-#### [NEW] [IngredientAssistantScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/assistant/IngredientAssistantScreen.kt)
-- Displays the AI-generated summary, common uses, and considerations.
-- Prominent "Not medical advice" disclaimer.
-- Loading and error states.
+### 4. Presentation Layer (UI)
 
-#### [MODIFY] [ProductDetailScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/products/ProductDetailScreen.kt)
-- Make individual ingredients clickable to launch the `IngredientAssistantScreen`.
+#### [NEW] [ProgressScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/ProgressScreen.kt)
+- Dashboard showing:
+    - Current tracking stats (total photos, days tracking).
+    - A chronological list of photo thumbnails with dates and ratings.
+    - Navigation to "Add Photo" and "Compare".
 
-### 3. Navigation
+#### [NEW] [AddSkinPhotoScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/AddSkinPhotoScreen.kt)
+- Integration with **CameraX** and **Photo Picker**.
+- Image preview with a form for:
+    - **Date & Time** (Default to now).
+    - **Skin Assessment** (Rating 1-5 or descriptive chips).
+    - **Personal Note**.
+
+#### [NEW] [SkinPhotoDetailScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/SkinPhotoDetailScreen.kt)
+- Full-screen image viewer with metadata display and delete action.
+
+#### [NEW] [ComparePhotosScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/ComparePhotosScreen.kt)
+- UI to select two photos from history and view them side-by-side.
+
+### 5. Navigation
 
 #### [MODIFY] [Screen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/Screen.kt)
-- Update `Assistant` destination to accept an `ingredientName` parameter.
+- Add `AddSkinPhoto`, `SkinPhotoDetail`, and `ComparePhotos` routes.
 
 #### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
-- Integrate the parameterized assistant route.
+- Integrate all new progress-related routes.
 
 ## Verification Plan
 
 ### Automated Tests
 - `dotnet build` & `gradlew assembleDebug`.
-- Backend unit tests for prompt structure and safety rules.
+- Backend tests for user isolation on photo metadata.
 
 ### Manual Verification
-1. Open a product (e.g., Hydrating Serum).
-2. Tap on "Niacinamide" in the ingredient list.
-3. Verify that the `IngredientAssistantScreen` opens and shows a loading state.
-4. Confirm that a structured explanation appears with the educational disclaimer.
-5. Verify that the API key is not visible anywhere in the Android code or Git history.
+1. **Take Photo**: Capture a skin photo via camera, fill out the form, and save.
+2. **Gallery**: Select an image from the gallery and verify it uploads correctly.
+3. **History**: Verify the new photo appears at the top of the `ProgressScreen` list.
+4. **Compare**: Select two photos from different dates and verify the side-by-side view works.
+5. **Security**: Log in with User A and ensure you cannot see or delete User B's photos by manually testing API endpoints.

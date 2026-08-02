@@ -56,6 +56,15 @@ sealed class Screen {
     data object Progress : Screen()
 
     @Serializable
+    data object AddSkinPhoto : Screen()
+
+    @Serializable
+    data class SkinPhotoDetail(val id: Int) : Screen()
+
+    @Serializable
+    data object ComparePhotos : Screen()
+
+    @Serializable
     data object Journal : Screen()
 
     @Serializable

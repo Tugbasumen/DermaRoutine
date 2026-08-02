@@ -15,13 +15,13 @@ import com.dermaroutine.presentation.home.HomeScreen
 import com.dermaroutine.presentation.journal.JournalScreen
 import com.dermaroutine.presentation.onboarding.OnboardingScreen
 import com.dermaroutine.presentation.products.*
-import com.dermaroutine.presentation.scanner.ocr.*
 import com.dermaroutine.presentation.profile.ProfileScreen
-import com.dermaroutine.presentation.progress.ProgressScreen
+import com.dermaroutine.presentation.progress.*
 import com.dermaroutine.presentation.routine.CreateRoutineScreen
 import com.dermaroutine.presentation.routine.RoutineDetailScreen
 import com.dermaroutine.presentation.routine.RoutineListScreen
 import com.dermaroutine.presentation.scanner.BarcodeScannerScreen
+import com.dermaroutine.presentation.scanner.ocr.*
 
 @Composable
 fun NavGraph(
@@ -73,7 +73,7 @@ fun NavGraph(
                 onNavigateToRoutine = { navController.navigate(Screen.Routine) },
                 onNavigateToProducts = { navController.navigate(Screen.Products) },
                 onNavigateToJournal = { navController.navigate(Screen.Journal) },
-                onNavigateToAssistant = { navController.navigate(Screen.Assistant) }
+                onNavigateToAssistant = { navController.navigate(Screen.Assistant("Skin Analysis")) } // Placeholder
             )
         }
 
@@ -144,15 +144,6 @@ fun NavGraph(
             )
         }
 
-        composable<Screen.OcrScanner> { backStackEntry ->
-            val ocr: Screen.OcrScanner = backStackEntry.toRoute()
-            OcrScannerScreen(
-                productId = ocr.productId,
-                onNavigateBack = { navController.popBackStack() },
-                onSuccess = { navController.popBackStack() }
-            )
-        }
-
         composable<Screen.ProductSelector> {
             ProductSelectorScreen(
                 onProductSelected = { product ->
@@ -177,8 +168,42 @@ fun NavGraph(
             )
         }
 
+        composable<Screen.OcrScanner> { backStackEntry ->
+            val ocr: Screen.OcrScanner = backStackEntry.toRoute()
+            OcrScannerScreen(
+                productId = ocr.productId,
+                onNavigateBack = { navController.popBackStack() },
+                onSuccess = { navController.popBackStack() }
+            )
+        }
+
         composable<Screen.Progress> {
-            ProgressScreen()
+            ProgressScreen(
+                onNavigateToAddPhoto = { navController.navigate(Screen.AddSkinPhoto) },
+                onNavigateToDetail = { id -> navController.navigate(Screen.SkinPhotoDetail(id)) },
+                onNavigateToCompare = { navController.navigate(Screen.ComparePhotos) }
+            )
+        }
+
+        composable<Screen.AddSkinPhoto> {
+            AddSkinPhotoScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onSuccess = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.SkinPhotoDetail> { backStackEntry ->
+            val detail: Screen.SkinPhotoDetail = backStackEntry.toRoute()
+            SkinPhotoDetailScreen(
+                photoId = detail.id,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.ComparePhotos> {
+            ComparePhotosScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         
         composable<Screen.Profile> {
@@ -189,8 +214,12 @@ fun NavGraph(
             JournalScreen()
         }
 
-        composable<Screen.Assistant> {
-            AssistantScreen()
+        composable<Screen.Assistant> { backStackEntry ->
+            val assistant: Screen.Assistant = backStackEntry.toRoute()
+            IngredientAssistantScreen(
+                ingredientName = assistant.ingredientName,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

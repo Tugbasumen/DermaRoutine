@@ -1,43 +1,50 @@
-# Phase 11: AI Ingredient Assistant Walkthrough
+# Phase 12: Skin Photo Journal & Progress Tracking Walkthrough
 
-Phase 11 is completed. The DermaRoutine application now features an AI-powered assistant that provides educational explanations for skincare ingredients using the Gemini API through a secure backend layer.
+Phase 12 is completed. The DermaRoutine application now features a powerful skin progress tracking system, allowing users to document their skincare journey with photos and analyze their progress over time.
 
 ## Changes Made
 
-### 1. Secure AI Integration (Backend)
-- **Gemini Service**: Implemented `GeminiService.cs` in the ASP.NET Core project. It handles secure communication with Google's Gemini API. The API key is managed via configuration (User Secrets), keeping it out of the source code.
-- **Safety Prompt**: Enforced a strict system prompt that instructs the AI to provide only **educational** information. It explicitly prohibits medical diagnosis, prescriptions, or treatment recommendations.
-- **Structured Response**: The backend parses raw AI output into a structured JSON format (Summary, Common Uses, Considerations, Disclaimer) to ensure a clean UI on the mobile app.
+### 1. Hybrid Storage Strategy (Secure & Scalable)
+- **Firebase Storage**: Implemented `SkinPhotoStorage.kt` to securely upload and store raw image files. Photos are organized by user UID (`skin-photos/{uid}/{photoId}.jpg`) to ensure privacy.
+- **PostgreSQL Metadata**: Created `SkinPhotoController` in the backend to manage photo metadata (date taken, rating, notes, and the Firebase storage path). This links the binary file in the cloud with the structured data in our database.
 
-### 2. Android Domain & Data Layer
-- **Domain Model**: Created `IngredientExplanation.kt` to represent the structured AI data.
-- **UseCase**: Implemented `GetIngredientExplanationUseCase.kt` to encapsulate the business logic of fetching AI data.
-- **Repository**: `AssistantRepositoryImpl.kt` handles the authenticated network request to the backend using the existing Retrofit and Auth Interceptor setup.
+### 2. Progress Dashboard (UI/UX)
+- **Chronological Timeline**: The `ProgressScreen` displays a grid of photos sorted by date, giving a quick visual overview of the skin's history.
+- **Key Statistics**: Integrated basic tracking stats (total photos, consistency) into the dashboard.
+- **Coil Integration**: Used the **Coil** library for efficient image loading, caching, and placeholder support, ensuring a smooth scrolling experience.
 
-### 3. AI Assistant UI (Material 3)
-- **IngredientAssistantScreen**: A modern, clean screen that displays:
-    - A summary of what the ingredient is.
-    - A bulleted list of common cosmetic uses.
-    - General considerations and "things to know".
-    - A persistent **Educational Disclaimer** at the bottom.
-- **Interactive Integration**: Updated the `ProductDetailScreen` to make individual ingredients clickable. Tapping an ingredient now launches the AI Assistant for that specific item.
+### 3. Add Photo Flow
+- **Photo Picker**: Integrated the modern Android Photo Picker to allow users to select high-quality photos from their gallery.
+- **Assessment Form**: A clean review screen where users can set the date, rate their skin (1-5), and add personal notes before uploading.
+- **Atomic Operations**: Implemented a robust upload flow that handles potential failures by cleaning up cloud storage if the backend metadata save fails.
 
-### 4. Navigation
-- **Parameterized Routing**: Updated `Screen.kt` and `NavGraph.kt` to support passing the `ingredientName` to the assistant screen, ensuring deep-link compatibility and proper state management.
+### 4. Comparison & Analysis
+- **Side-by-Side View**: The `ComparePhotosScreen` allows users to select any two photos from their history and view them side-by-side to notice changes and improvements.
+- **Interactive Selection**: Users can tap on thumbnails to select "Before" and "After" candidates for comparison.
+
+### 5. Security & Privacy
+- **User Isolation**: All API endpoints and storage paths are protected by Firebase Authentication. User A can never see or delete User B's progress photos.
+- **Clean Architecture**: Followed the established pattern with dedicated UseCases (`AddSkinPhotoUseCase`, `GetSkinPhotosUseCase`) and repository implementations.
 
 ## Manual Steps Required (Important)
 
 > [!IMPORTANT]
-> **To enable Gemini, you must add your API key to the backend:**
-> 1. Obtain a Gemini API Key from the [Google AI Studio](https://aistudio.google.com/).
-> 2. Open a terminal in `backend/DermaRoutine.Api`.
-> 3. Run the following command to store the key securely in your local **User Secrets**:
->    ```bash
->    dotnet user-secrets set "Gemini:ApiKey" "YOUR_API_KEY_HERE"
+> **Firebase Storage Setup**:
+> 1. Go to the [Firebase Console](https://console.firebase.google.com/).
+> 2. Select your project and navigate to **Build > Storage**.
+> 3. Click **Get Started** and select a location.
+> 4. Go to the **Rules** tab and set the following rules for maximum privacy:
+>    ```javascript
+>    service firebase.storage {
+>      match /b/{bucket}/o {
+>        match /skin-photos/{userId}/{allPaths=**} {
+>          allow read, write: if request.auth != null && request.auth.uid == userId;
+>        }
+>      }
+>    }
 >    ```
-> 4. Restart the backend.
 
 ## Build Status
 - [x] Backend builds successfully (`dotnet build`).
 - [x] Android app builds successfully (`./gradlew assembleDebug`).
-- [x] Secure full-stack AI flow is established.
+- [x] Cloud storage and local database are fully integrated.

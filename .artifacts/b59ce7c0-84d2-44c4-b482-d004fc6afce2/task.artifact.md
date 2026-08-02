@@ -1,23 +1,28 @@
-# Phase 11: AI Ingredient Assistant - Task List
+# Phase 12: Skin Photo Journal & Progress Tracking - Task List
 
-- [x] Backend: Gemini Integration
-    - [x] Add Gemini config to `appsettings.json`
-    - [x] Create `AssistantDtos.cs`
-    - [x] Implement `IGeminiService` & `GeminiService`
-    - [x] Implement `AssistantController` with safety prompt
-    - [x] Register services in `Program.cs`
+- [x] Update Build Configuration
+    - [x] Add `firebase-storage` and `coil` to `libs.versions.toml`
+    - [x] Add dependencies to app `build.gradle.kts`
+- [x] Backend Implementation
+    - [x] Create `SkinPhotoDtos.cs`
+    - [x] Implement `SkinPhotoController.cs` (CRUD)
 - [x] Android: Domain & Data Layer
-    - [x] Create `IngredientExplanation` domain model
-    - [x] Create `AssistantApiService.kt` & DTOs
-    - [x] Implement `AssistantRepository` & `AssistantRepositoryImpl`
-    - [x] Create `GetIngredientExplanationUseCase.kt`
-- [x] Android: Presentation Layer
-    - [x] Update `Screen.kt` (parameterized route)
-    - [x] Create `IngredientAssistantViewModel.kt`
-    - [x] Create `IngredientAssistantScreen.kt` (Material 3)
-    - [x] Update `ProductDetailScreen.kt` (clickable list)
-    - [x] Update `NavGraph.kt`
+    - [x] Create `SkinPhoto` domain model
+    - [x] Create `SkinPhotoStorage.kt` (Firebase Storage wrapper)
+    - [x] Create `SkinPhotoRepository` and `SkinPhotoRepositoryImpl`
+    - [x] Implement UseCases: `GetSkinPhotosUseCase`, `AddSkinPhotoUseCase`
+    - [x] Create `SkinPhotoApiService.kt` and DTOs
+    - [x] Create `SkinPhotoMapper.kt`
+- [x] Android: Presentation Layer (Progress & Add Photo)
+    - [x] Create `ProgressViewModel.kt`
+    - [x] Create `ProgressScreen.kt` (Timeline view)
+    - [x] Create `AddSkinPhotoScreen.kt` (Gallery integration)
+- [x] Android: Presentation Layer (Detail & Comparison)
+    - [x] Create `SkinPhotoDetailScreen.kt`
+    - [x] Create `ComparePhotosScreen.kt` (Side-by-side view)
+- [x] Navigation & Integration
+    - [x] Update `Screen.kt` and `NavGraph.kt`
+    - [x] Update `HomeScreen` with progress integration
 - [x] Build and Verify
     - [x] Successful `dotnet build`
     - [x] Successful `gradlew assembleDebug`
-    - [x] Manual test of the AI flow (conceptual)

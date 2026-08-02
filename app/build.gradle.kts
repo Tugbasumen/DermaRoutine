@@ -77,6 +77,7 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
     implementation(libs.kotlinx.coroutines.play.services)
 
     // Credentials Manager & Google Sign-In
@@ -95,6 +96,9 @@ dependencies {
     
     // Accompanist Permissions
     implementation(libs.google.accompanist.permissions)
+
+    // Image Loading
+    implementation(libs.coil.compose)
 
     // Retrofit & OkHttp
     implementation(libs.retrofit)
