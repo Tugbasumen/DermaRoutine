@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.dermaroutine.MainActivity
 import com.dermaroutine.R
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,10 +35,10 @@ class RoutineNotificationManager @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Routine Reminders",
+                context.getString(R.string.reminder_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "Reminders for morning and evening skincare routines"
+                description = context.getString(R.string.reminder_channel_desc)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -48,16 +47,16 @@ class RoutineNotificationManager @Inject constructor(
     fun showMorningReminder() {
         showNotification(
             id = MORNING_NOTIFICATION_ID,
-            title = "Morning skincare routine 🌿",
-            body = "Your morning routine is waiting for you."
+            title = context.getString(R.string.reminder_morning_title),
+            body = context.getString(R.string.reminder_morning_body)
         )
     }
 
     fun showEveningReminder() {
         showNotification(
             id = EVENING_NOTIFICATION_ID,
-            title = "Evening skincare routine 🌙",
-            body = "Time for your evening skincare routine."
+            title = context.getString(R.string.reminder_evening_title),
+            body = context.getString(R.string.reminder_evening_body)
         )
     }
 
@@ -75,7 +74,7 @@ class RoutineNotificationManager @Inject constructor(
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_splash_logo) // Using splash logo as small icon for now
+            .setSmallIcon(R.drawable.app_logo)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

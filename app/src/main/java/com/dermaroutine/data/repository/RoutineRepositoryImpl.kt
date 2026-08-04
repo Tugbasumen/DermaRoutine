@@ -22,7 +22,7 @@ class RoutineRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to load routines"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -35,7 +35,7 @@ class RoutineRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to load routine detail"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -49,7 +49,7 @@ class RoutineRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to create routine"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -62,7 +62,7 @@ class RoutineRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to complete routine"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -75,7 +75,7 @@ class RoutineRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to load streak"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -86,7 +86,7 @@ class RoutineRepositoryImpl @Inject constructor(
             if (response.isSuccessful) Result.success(Unit)
             else Result.failure(Exception("Failed to add product to routine"))
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -96,7 +96,7 @@ class RoutineRepositoryImpl @Inject constructor(
             if (response.isSuccessful) Result.success(Unit)
             else Result.failure(Exception("Failed to remove product from routine"))
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 }

@@ -1,4 +1,170 @@
 <resources>
     <string name="app_name">DermaRoutine</string>
     <string name="default_web_client_id">1033325573722-vle027ptabhlvt5hdtna26tujotp32o0.apps.googleusercontent.com</string>
+
+    <!-- Common -->
+    <string name="back">Geri</string>
+    <string name="cancel">İptal</string>
+    <string name="save">Kaydet</string>
+    <string name="delete">Sil</string>
+    <string name="edit">Düzenle</string>
+    <string name="loading">Yükleniyor...</string>
+    <string name="error_unknown">Beklenmedik bir hata oluştu.</string>
+    <string name="error_network">İnternet bağlantısı yok. Lütfen kontrol edip tekrar deneyin.</string>
+    <string name="try_again">Tekrar Dene</string>
+    <string name="ok">Tamam</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Atla</string>
+    <string name="onboarding_continue">Devam Et</string>
+    <string name="onboarding_get_started">Başla</string>
+    <string name="onboarding_title_1">Rutinini Oluştur</string>
+    <string name="onboarding_desc_1">Kişisel sabah ve akşam cilt bakım rutinlerini oluştur ve düzenle.</string>
+    <string name="onboarding_title_2">Cilt Yolculuğunu Takip Et</string>
+    <string name="onboarding_desc_2">Zaman içindeki gelişimini takip etmek için fotoğraf ve notlar ekle.</string>
+    <string name="onboarding_title_3">Ürünlerini Tanı</string>
+    <string name="onboarding_desc_3">Cilt bakım ürünlerini keşfet ve içerikleri hakkında bilgi edin.</string>
+
+    <!-- Auth -->
+    <string name="auth_welcome">Hoş Geldiniz</string>
+    <string name="auth_subtitle">Cilt bakım yolculuğunuz tek bir tıkla başlıyor.</string>
+    <string name="auth_continue_google">Google ile Devam Et</string>
+    <string name="auth_connecting">Bağlanıyor...</string>
+    <string name="auth_terms">Devam ederek Kullanım Koşulları ve Gizlilik Politikamızı kabul etmiş olursunuz.</string>
+
+    <!-- Home -->
+    <string name="home_greeting_morning">Günaydın</string>
+    <string name="home_greeting_afternoon">Tünaydın</string>
+    <string name="home_greeting_evening">İyi Akşamlar</string>
+    <string name="home_today_routine">Bugünkü Rutinin</string>
+    <string name="home_current_streak">Güncel Seri</string>
+    <string name="home_days">%d Gün</string>
+    <string name="home_today_skin">Bugünkü Cildin</string>
+    <string name="home_photo_added">Fotoğraf eklendi! 🌿</string>
+    <string name="home_view_photo">Fotoğrafı Gör</string>
+    <string name="home_keep_track">Cilt yolculuğunu takip etmeye devam et.</string>
+    <string name="home_add_photo">Bugünkü Fotoğrafı Ekle</string>
+    <string name="home_quick_actions">Hızlı Aksiyonlar</string>
+    <string name="home_action_product">Ürün</string>
+    <string name="home_action_photo">Fotoğraf</string>
+    <string name="home_action_ai">Yapay Zeka</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Cilt Günlüğü</string>
+    <string name="journal_coming_soon">Cilt Günlüğü Yakında Gelecek 🌿</string>
+
+    <!-- Routine -->
+    <string name="routine_title">Cilt Bakım Rutinleri</string>
+    <string name="routine_morning">Sabah</string>
+    <string name="routine_evening">Akşam</string>
+    <string name="routine_empty">Henüz rutin yok</string>
+    <string name="routine_empty_desc">Başlamak için sabah veya akşam rutininizi oluşturun.</string>
+    <string name="routine_add">Rutin Ekle</string>
+    <string name="routine_new">Yeni Rutin</string>
+    <string name="routine_name_label">Rutin Adı (Örn: Günlük Işıltı)</string>
+    <string name="routine_type_label">Rutin Tipi</string>
+    <string name="routine_create">Rutin Oluştur</string>
+    <string name="routine_products_count">%d Ürün</string>
+    <string name="routine_completed">Tamamlandı</string>
+    <string name="routine_complete_btn">Rutini Tamamla</string>
+    <string name="routine_completed_today">Bugün Tamamlandı ✅</string>
+    <string name="routine_no_products">Bu rutinde henüz ürün yok.</string>
+
+    <!-- Products -->
+    <string name="product_library">Ürün Kütüphanesi</string>
+    <string name="product_search_hint">Ürün ara...</string>
+    <string name="product_category_all">Hepsi</string>
+    <string name="product_empty">Henüz ürün yok</string>
+    <string name="product_empty_desc">Rutinini düzenli tutmak için cilt bakım ürünlerini ekle.</string>
+    <string name="product_add_first">İlk Ürününü Ekle</string>
+    <string name="product_details">Ürün Detayları</string>
+    <string name="product_ingredients">İçerikler</string>
+    <string name="product_no_ingredients">Henüz içerik eklenmemiş.</string>
+    <string name="product_scan">Tara</string>
+    <string name="product_name_label">Ürün Adı*</string>
+    <string name="product_brand_label">Marka</string>
+    <string name="product_category_label">Kategori*</string>
+    <string name="product_barcode_label">Barkod (Opsiyonel)</string>
+    <string name="product_notes_label">Notlar (Opsiyonel)</string>
+    <string name="product_save">Ürünü Kaydet</string>
+    <string name="product_delete_confirm">Ürünü Sil?</string>
+    <string name="product_delete_desc">Bu ürün kütüphanenizden kaldırılacak.</string>
+    <string name="product_conflict">Bu ürün bir rutinde kullanılıyor. Önce rutinden çıkarmalısınız.</string>
+    <string name="product_already_in_library_title">Ürün zaten kütüphanede</string>
+    <string name="product_already_in_library_desc">Bu barkod \'%s\' ürününe ait. Görüntülemek ister misiniz?</string>
+    <string name="product_view_existing">Ürünü Görüntüle</string>
+
+    <!-- Progress & Photos -->
+    <string name="progress_title">Gelişimim</string>
+    <string name="progress_no_photos">Henüz fotoğraf yok</string>
+    <string name="progress_no_photos_desc">Yolculuğunu takip etmek için ilk cilt fotoğrafını ekle.</string>
+    <string name="progress_add_photo">Fotoğraf Ekle</string>
+    <string name="progress_compare">Karşılaştır</string>
+    <string name="progress_photo_detail">Fotoğraf Detayı</string>
+    <string name="progress_assessment">Değerlendirme: </string>
+    <string name="progress_notes">Notlar</string>
+    <string name="progress_add_title">Cilt Fotoğrafı Ekle</string>
+    <string name="progress_how_is_skin">Bugün cildiniz nasıl görünüyor?</string>
+    <string name="progress_gallery">Galeriden Seç</string>
+    <string name="progress_saving">Fotoğrafınız kaydediliyor...</string>
+    <string name="progress_compare_title">Gelişimi Karşılaştır</string>
+    <string name="progress_compare_before">Önce</string>
+    <string name="progress_compare_after">Sonra</string>
+    <string name="progress_select_hint">Yolculuğundan fotoğraflar seç</string>
+    <string name="progress_view_full">Tam Karşılaştırmayı Gör</string>
+
+    <!-- Scanner & AI -->
+    <string name="scan_barcode_title">Barkod Tara</string>
+    <string name="scan_barcode_hint">Barkodu çerçevenin içine hizalayın</string>
+    <string name="scan_ingredients_title">İçerikleri Tara</string>
+    <string name="scan_analyzing">Metin analiz ediliyor...</string>
+    <string name="scan_review_title">Tanınan Metni İncele</string>
+    <string name="scan_confirmed_title">Onaylanan İçerikler (%d)</string>
+    <string name="scan_save_all">Hepsini Kaydet</string>
+    <string name="scan_permission_req">Ürünleri taramak için kamera izni gerekiyor. 🌿</string>
+    <string name="scan_open_settings">Ayarları Aç</string>
+    <string name="scan_grant_permission">İzin Ver</string>
+    <string name="scan_again">Tekrar Tara</string>
+    <string name="scan_continue">Devam Et</string>
+
+    <string name="ai_assistant_title">Yapay Zeka Asistanı</string>
+    <string name="ai_consulting">DermaRoutine AI\u0027ya danışılıyor...</string>
+    <string name="ai_what_is">Nedir?</string>
+    <string name="ai_common_uses">Yaygın Kozmetik Kullanımları</string>
+    <string name="ai_considerations">Genel Değerlendirmeler</string>
+    <string name="ai_error">Yapay zeka bilgisi yüklenemedi.</string>
+    <string name="ai_oops">Tüh!</string>
+    <string name="ai_no_info">Bilgi bulunamadı.</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profil</string>
+    <string name="profile_skin_type">Cilt Tipi</string>
+    <string name="profile_sensitivity">Hassasiyet Düzeyi</string>
+    <string name="profile_concerns">Kişisel Sorunlar</string>
+    <string name="profile_notes">Notlar</string>
+    <string name="profile_saved">Profil başarıyla kaydedildi! 🌿</string>
+    <string name="profile_reminders">Hatırlatıcılar</string>
+    <string name="profile_saving">Kaydediliyor...</string>
+    <string name="profile_observations">Ek gözlemler...</string>
+    <string name="profile_concerns_list">Kuruluk,Yağlılık,Düzensiz görünüm,Kızarıklık,Doku,Matlık,Koyu lekeler,Diğer</string>
+
+    <!-- Reminders -->
+    <string name="reminder_title">Rutin Hatırlatıcıları</string>
+    <string name="reminder_desc">Cilt bakım zamanı geldiğinde bildirim alın. 🌿</string>
+    <string name="reminder_morning">Sabah Hatırlatıcısı</string>
+    <string name="reminder_evening">Akşam Hatırlatıcısı</string>
+    <string name="reminder_permission_error">Hatırlatıcıları almak için bildirim izni gereklidir.</string>
+    <string name="reminder_morning_title">Sabah cilt bakımı zamanı 🌿</string>
+    <string name="reminder_morning_body">Sabah rutinin seni bekliyor.</string>
+    <string name="reminder_evening_title">Akşam cilt bakımı zamanı 🌙</string>
+    <string name="reminder_evening_body">Akşam cilt bakımını yapmayı unutma.</string>
+    <string name="reminder_channel_name">Rutin Hatırlatıcıları</string>
+    <string name="reminder_channel_desc">Sabah ve akşam cilt bakımı rutinleri için hatırlatıcılar</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_routine">Rutin</string>
+    <string name="nav_products">Ürünler</string>
+    <string name="nav_progress">Gelişim</string>
+    <string name="nav_profile">Profil</string>
 </resources>

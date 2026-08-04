@@ -140,7 +140,7 @@ fun AuthScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = if (uiState is AuthUiState.Loading) "Connecting..." else "Continue with Google",
+                    text = if (uiState is AuthUiState.Loading) stringResource(id = R.string.auth_connecting) else stringResource(id = R.string.auth_continue_google),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
@@ -158,7 +158,7 @@ fun AuthScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "By continuing, you agree to our Terms and Privacy Policy.",
+            text = stringResource(id = R.string.auth_terms),
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)

@@ -13,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.AppTextField
 import com.dermaroutine.core.designsystem.PrimaryButton
 import com.dermaroutine.domain.model.RoutineType
@@ -42,10 +44,10 @@ fun CreateRoutineScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Routine", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.routine_new), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -60,24 +62,24 @@ fun CreateRoutineScreen(
             AppTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = "Routine Name (e.g. Daily Glow)",
+                label = stringResource(id = R.string.routine_name_label),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(text = "Routine Type", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(id = R.string.routine_type_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 TypeCard(
-                    label = "Morning",
+                    label = stringResource(id = R.string.routine_morning),
                     selected = selectedType == RoutineType.Morning,
                     onClick = { selectedType = RoutineType.Morning },
                     modifier = Modifier.weight(1f)
                 )
                 TypeCard(
-                    label = "Evening",
+                    label = stringResource(id = R.string.routine_evening),
                     selected = selectedType == RoutineType.Evening,
                     onClick = { selectedType = RoutineType.Evening },
                     modifier = Modifier.weight(1f)
@@ -95,7 +97,7 @@ fun CreateRoutineScreen(
             }
 
             PrimaryButton(
-                text = if (createState is CreateRoutineUiState.Loading) "Creating..." else "Create Routine",
+                text = if (createState is CreateRoutineUiState.Loading) stringResource(id = R.string.loading) else stringResource(id = R.string.routine_create),
                 onClick = { viewModel.createRoutine(name, selectedType) },
                 enabled = createState !is CreateRoutineUiState.Loading
             )

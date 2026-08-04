@@ -9,11 +9,14 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.AppTextField
 import com.dermaroutine.core.designsystem.PrimaryButton
+import com.dermaroutine.core.util.getDisplayName
 import com.dermaroutine.domain.model.ProductCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +31,7 @@ fun AddEditProductScreen(
     viewModel: ProductViewModel = hiltViewModel()
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val saveState by viewModel.saveState.collectAsState()
     val detailState by viewModel.detailState.collectAsState()
@@ -63,19 +67,19 @@ fun AddEditProductScreen(
         val existingProduct = (saveState as SaveProductUiState.DuplicateFound).product
         AlertDialog(
             onDismissRequest = { viewModel.resetSaveState() },
-            title = { Text("Product already in library") },
-            text = { Text("This barcode belongs to '${existingProduct.name}'. Would you like to view it instead?") },
+            title = { Text(stringResource(id = R.string.product_already_in_library_title)) },
+            text = { Text(stringResource(id = R.string.product_already_in_library_desc, existingProduct.name)) },
             confirmButton = {
                 TextButton(onClick = { 
                     viewModel.resetSaveState()
                     onNavigateToProductDetail(existingProduct.id) 
                 }) {
-                    Text("View Product")
+                    Text(stringResource(id = R.string.product_view_existing))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.resetSaveState() }) {
-                    Text("Cancel")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )
@@ -84,10 +88,10 @@ fun AddEditProductScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (productId == null) "Add Product" else "Edit Product", fontWeight = FontWeight.Bold) },
+                title = { Text(if (productId == null) stringResource(id = R.string.routine_add) else stringResource(id = R.string.edit), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -104,14 +108,14 @@ fun AddEditProductScreen(
             AppTextField(
                 value = viewModel.formName.value,
                 onValueChange = { viewModel.formName.value = it },
-                label = "Product Name*",
+                label = stringResource(id = R.string.product_name_label),
                 modifier = Modifier.fillMaxWidth()
             )
 
             AppTextField(
                 value = viewModel.formBrand.value,
                 onValueChange = { viewModel.formBrand.value = it },
-                label = "Brand",
+                label = stringResource(id = R.string.product_brand_label),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -121,10 +125,10 @@ fun AddEditProductScreen(
                 onExpandedChange = { isMenuExpanded = !isMenuExpanded }
             ) {
                 OutlinedTextField(
-                    value = viewModel.formCategory.value.name,
+                    value = viewModel.formCategory.value.getDisplayName(context),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Category*") },
+                    label = { Text(stringResource(id = R.string.product_category_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isMenuExpanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
@@ -135,7 +139,7 @@ fun AddEditProductScreen(
                 ) {
                     ProductCategory.entries.forEach { category ->
                         DropdownMenuItem(
-                            text = { Text(category.name) },
+                            text = { Text(category.getDisplayName(context)) },
                             onClick = {
                                 viewModel.formCategory.value = category
                                 isMenuExpanded = false
@@ -148,11 +152,11 @@ fun AddEditProductScreen(
             AppTextField(
                 value = viewModel.formBarcode.value,
                 onValueChange = { viewModel.formBarcode.value = it },
-                label = "Barcode (Optional)",
+                label = stringResource(id = R.string.product_barcode_label),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     IconButton(onClick = onNavigateToScanner) {
-                        Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan Barcode")
+                        Icon(Icons.Default.QrCodeScanner, contentDescription = stringResource(id = R.string.product_scan))
                     }
                 }
             )
@@ -160,22 +164,28 @@ fun AddEditProductScreen(
             AppTextField(
                 value = viewModel.formNotes.value,
                 onValueChange = { viewModel.formNotes.value = it },
-                label = "Notes (Optional)",
+                label = stringResource(id = R.string.product_notes_label),
                 modifier = Modifier.height(120.dp)
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             if (saveState is SaveProductUiState.Error) {
+                val errorMsg = (saveState as SaveProductUiState.Error).message
+                // Map known backend errors to localized ones if possible
+                val displayError = if (errorMsg.contains("already exists") || errorMsg.contains("in use")) {
+                    stringResource(id = R.string.product_conflict)
+                } else errorMsg
+                
                 Text(
-                    text = (saveState as SaveProductUiState.Error).message,
+                    text = displayError,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
 
             PrimaryButton(
-                text = if (saveState is SaveProductUiState.Loading) "Saving..." else "Save Product",
+                text = if (saveState is SaveProductUiState.Loading) stringResource(id = R.string.loading) else stringResource(id = R.string.product_save),
                 onClick = { 
                     viewModel.saveProduct(
                         productId, 

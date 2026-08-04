@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -88,9 +89,10 @@ class MainActivity : ComponentActivity() {
                             if (showBottomBar) {
                                 NavigationBar {
                                     bottomNavItems.forEach { item ->
+                                        val label = stringResource(id = item.labelRes)
                                         NavigationBarItem(
-                                            icon = { Icon(item.icon, contentDescription = item.label) },
-                                            label = { Text(item.label) },
+                                            icon = { Icon(item.icon, contentDescription = label) },
+                                            label = { Text(label) },
                                             selected = currentDestination?.hierarchy?.any { 
                                                 it.hasRoute(item.route::class) 
                                             } == true,

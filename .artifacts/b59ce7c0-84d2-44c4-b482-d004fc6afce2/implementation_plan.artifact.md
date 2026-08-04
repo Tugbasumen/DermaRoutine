@@ -1,22 +1,40 @@
-# App Launcher Icon Integration Plan
+# Final Localization & Network Security Fix Plan
 
-This plan aims to replace the default Android launcher icon with the new DermaRoutine professional logo, so it appears correctly on the phone's home screen and app drawer.
+This plan addresses the remaining hardcoded English strings identified in the UI and resolves the "CLEARTEXT communication" network security error preventing connections to the local backend.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Network Security**: To allow the app to communicate with your local backend (10.0.2.2) via HTTP, I will add a network security configuration. This is necessary for development but will be restricted to the local IP for security.
 
 ## Proposed Changes
 
-### 1. Android Manifest Update
+### 1. Localization Cleanup
+
+#### [MODIFY] [strings.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/values/strings.xml)
+- Add missing strings for the Journal placeholder.
+- Ensure onboarding button labels are consistent.
+
+#### [MODIFY] [OnboardingScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/onboarding/OnboardingScreen.kt)
+- Fix "Get Started" and "Continue" hardcoded buttons.
+
+#### [MODIFY] [JournalScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalScreen.kt)
+- Fix "Skin Journal Coming Soon 🌿" hardcoded text.
+
+### 2. Network Security Fix
+
+#### [NEW] [network_security_config.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/xml/network_security_config.xml)
+- Define a policy to allow cleartext (HTTP) traffic specifically for `10.0.2.2` (the Android emulator loopback).
 
 #### [MODIFY] [AndroidManifest.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/AndroidManifest.xml)
-- Update the `android:icon` and `android:roundIcon` attributes in the `<application>` tag to point to `@drawable/app_logo` instead of `@mipmap/ic_launcher`.
-
-### 2. Cleanup (Optional but Recommended)
-- I will keep the existing mipmap folders for now to avoid build errors, but the manifest will prioritize the new logo.
+- Link the new network security configuration in the `<application>` tag.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to ensure the manifest correctly links to the new drawable resource.
+- Run `gradlew assembleDebug` to verify no resource or manifest errors.
 
 ### Manual Verification
-1. **Home Screen**: Install the app on a device/emulator and verify that the DermaRoutine logo appears on the home screen.
-2. **Settings/App Info**: Check the app's entry in Android Settings to ensure the logo is consistent.
+1. **Onboarding**: Swipe through the pages and verify buttons are in Turkish ("Başla" / "Devam Et").
+2. **Journal**: Open the Journal tab and verify the message is in Turkish.
+3. **Routine/API**: Navigate to the Routine screen and verify that the red "CLEARTEXT" error is gone and routines are loaded (or shows "Henüz rutin yok").

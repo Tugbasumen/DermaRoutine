@@ -2,7 +2,6 @@ package com.dermaroutine.presentation.products
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -10,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.domain.model.Product
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,10 +33,10 @@ fun ProductSelectorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Product", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.product_library), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -48,7 +49,7 @@ fun ProductSelectorScreen(
                     searchQuery = it
                     viewModel.onSearchQueryChanged(it)
                 },
-                placeholder = { Text("Search your products...") },
+                placeholder = { Text(stringResource(id = R.string.product_search_hint)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
@@ -62,15 +63,16 @@ fun ProductSelectorScreen(
                 }
                 is ProductListUiState.Empty -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "No products found. Add them in the Library.")
+                        Text(text = stringResource(id = R.string.product_empty_desc))
                     }
                 }
                 is ProductListUiState.Success -> {
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(listState.products) { product ->
+                        items(listState.products.size) { index ->
+                            val product = listState.products[index]
                             ProductCard(
                                 product = product,
                                 onClick = { onProductSelected(product) }

@@ -20,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.dermaroutine.R
 import com.dermaroutine.domain.model.SkinPhoto
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -46,10 +48,10 @@ fun ProgressScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Your Progress", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.progress_title), fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = onNavigateToCompare) {
-                        Icon(Icons.Default.Compare, contentDescription = "Compare Photos")
+                        Icon(Icons.Default.Compare, contentDescription = stringResource(id = R.string.progress_compare))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -61,7 +63,7 @@ fun ProgressScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.AddAPhoto, contentDescription = "Add Skin Photo")
+                Icon(Icons.Default.AddAPhoto, contentDescription = stringResource(id = R.string.progress_add_photo))
             }
         }
     ) { padding ->
@@ -105,7 +107,7 @@ fun ProgressScreen(
 fun SkinPhotoCard(photo: SkinPhoto, onClick: () -> Unit) {
     val date = try {
         val dt = LocalDateTime.parse(photo.takenAt, DateTimeFormatter.ISO_DATE_TIME)
-        dt.format(DateTimeFormatter.ofPattern("MMM d, yyyy"))
+        dt.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
     } catch (e: Exception) {
         photo.takenAt
     }
@@ -148,15 +150,15 @@ fun EmptyProgressState(onAddClick: () -> Unit) {
     ) {
         Text(text = "📸", fontSize = 64.sp)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "No photos yet", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(id = R.string.progress_no_photos), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(
-            text = "Add your first skin photo to begin tracking your journey.",
+            text = stringResource(id = R.string.progress_no_photos_desc),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onAddClick) {
-            Text("Add Photo")
+            Text(stringResource(id = R.string.progress_add_photo))
         }
     }
 }

@@ -10,11 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.presentation.scanner.CameraPreview
 import com.dermaroutine.presentation.scanner.PermissionRequest
 import com.dermaroutine.presentation.scanner.ScannerOverlay
@@ -47,10 +49,10 @@ fun OcrScannerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scan Ingredients", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.scan_ingredients_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -89,7 +91,7 @@ fun OcrScannerScreen(
                                 shape = androidx.compose.foundation.shape.CircleShape,
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                             ) {
-                                Icon(Icons.Default.Camera, contentDescription = "Capture", tint = Color.Black, modifier = Modifier.size(40.dp))
+                                Icon(Icons.Default.Camera, contentDescription = null, tint = Color.Black, modifier = Modifier.size(40.dp))
                             }
                         } else {
                             PermissionRequest(
@@ -103,7 +105,7 @@ fun OcrScannerScreen(
                 is OcrUiState.Processing -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
-                        Text(text = "Analyzing text...", modifier = Modifier.padding(top = 80.dp))
+                        Text(text = stringResource(id = R.string.scan_analyzing), modifier = Modifier.padding(top = 80.dp))
                     }
                 }
                 is OcrUiState.ResultReview -> {
@@ -123,7 +125,7 @@ fun OcrScannerScreen(
                 is OcrUiState.Saving -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
-                        Text(text = "Saving ingredients...", modifier = Modifier.padding(top = 80.dp))
+                        Text(text = stringResource(id = R.string.loading), modifier = Modifier.padding(top = 80.dp))
                     }
                 }
                 is OcrUiState.Error -> {
@@ -132,11 +134,11 @@ fun OcrScannerScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Error", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.error)
+                        Text(text = stringResource(id = R.string.error_unknown), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.error)
                         Text(text = state.message, textAlign = TextAlign.Center)
                         Spacer(modifier = Modifier.height(24.dp))
                         Button(onClick = { viewModel.retry() }) {
-                            Text("Retry")
+                            Text(stringResource(id = R.string.try_again))
                         }
                     }
                 }
@@ -150,21 +152,21 @@ fun OcrScannerScreen(
 fun OcrResultView(rawText: String, onConfirmed: (String) -> Unit, onRetry: () -> Unit) {
     var text by remember { mutableStateOf(rawText) }
     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-        Text(text = "Review Recognized Text", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(id = R.string.scan_review_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
             modifier = Modifier.fillMaxWidth().weight(1f),
-            label = { Text("Ingredients") }
+            label = { Text(stringResource(id = R.string.product_ingredients)) }
         )
         Spacer(modifier = Modifier.height(24.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             OutlinedButton(onClick = onRetry, modifier = Modifier.weight(1f)) {
-                Text("Scan Again")
+                Text(stringResource(id = R.string.scan_again))
             }
             Button(onClick = { onConfirmed(text) }, modifier = Modifier.weight(1f)) {
-                Text("Continue")
+                Text(stringResource(id = R.string.scan_continue))
             }
         }
     }
@@ -178,7 +180,7 @@ fun IngredientPreviewView(
 ) {
     var list by remember { mutableStateOf(ingredients) }
     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-        Text(text = "Confirmed Ingredients (${list.size})", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(id = R.string.scan_confirmed_title, list.size), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
         androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.weight(1f)) {
             items(list.size) { index ->
@@ -187,7 +189,7 @@ fun IngredientPreviewView(
                     headlineContent = { Text(item.name) },
                     trailingContent = {
                         IconButton(onClick = { list = list.filterIndexed { i, _ -> i != index } }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Remove")
+                            Icon(Icons.Default.Delete, contentDescription = null)
                         }
                     }
                 )
@@ -196,10 +198,10 @@ fun IngredientPreviewView(
         Spacer(modifier = Modifier.height(24.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             OutlinedButton(onClick = onRetry, modifier = Modifier.weight(1f)) {
-                Text("Cancel")
+                Text(stringResource(id = R.string.cancel))
             }
             Button(onClick = { onConfirmed(list) }, modifier = Modifier.weight(1f)) {
-                Text("Save All")
+                Text(stringResource(id = R.string.scan_save_all))
             }
         }
     }

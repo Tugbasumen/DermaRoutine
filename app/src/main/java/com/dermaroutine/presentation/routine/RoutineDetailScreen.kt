@@ -20,10 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.PrimaryButton
 import com.dermaroutine.domain.model.RoutineItem
 
@@ -65,15 +67,15 @@ fun RoutineDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = onNavigateToAddProduct) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Product")
+                        Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.product_scan))
                     }
                     IconButton(onClick = { /* Edit action */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More")
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.edit))
                     }
                 }
             )
@@ -95,7 +97,7 @@ fun RoutineDetailScreen(
                             if (detail.items.isEmpty()) {
                                 item {
                                     Box(modifier = Modifier.fillMaxWidth().padding(top = 48.dp), contentAlignment = Alignment.Center) {
-                                        Text(text = "No products in this routine.", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                                        Text(text = stringResource(id = R.string.routine_no_products), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                                     }
                                 }
                             } else {
@@ -110,15 +112,13 @@ fun RoutineDetailScreen(
                             shadowElevation = 8.dp,
                             color = MaterialTheme.colorScheme.surface
                         ) {
-                            PaddingValues(24.dp).let {
-                                Box(modifier = Modifier.padding(24.dp)) {
-                                    PrimaryButton(
-                                        text = if (detail.isCompletedToday) "Completed Today ✅" else "Complete Routine",
-                                        onClick = { viewModel.completeRoutine(detail.id) },
-                                        enabled = !detail.isCompletedToday,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
+                            Box(modifier = Modifier.padding(24.dp)) {
+                                PrimaryButton(
+                                    text = if (detail.isCompletedToday) stringResource(id = R.string.routine_completed_today) else stringResource(id = R.string.routine_complete_btn),
+                                    onClick = { viewModel.completeRoutine(detail.id) },
+                                    enabled = !detail.isCompletedToday,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
                         }
                     }

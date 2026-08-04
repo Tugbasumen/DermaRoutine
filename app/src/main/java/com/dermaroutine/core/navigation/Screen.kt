@@ -3,6 +3,7 @@ package com.dermaroutine.core.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.dermaroutine.R
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -74,13 +75,13 @@ sealed class Screen {
 data class BottomNavItem(
     val route: Screen,
     val icon: ImageVector,
-    val label: String
+    val labelRes: Int
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Screen.Home, Icons.Default.Home, "Home"),
-    BottomNavItem(Screen.Routine, Icons.Default.EventNote, "Routine"),
-    BottomNavItem(Screen.Products, Icons.Default.Inventory2, "Products"),
-    BottomNavItem(Screen.Progress, Icons.Default.BarChart, "Progress"),
-    BottomNavItem(Screen.Profile, Icons.Default.Person, "Profile")
+    BottomNavItem(Screen.Home, Icons.Default.Home, R.string.nav_home),
+    BottomNavItem(Screen.Routine, Icons.Default.EventNote, R.string.nav_routine),
+    BottomNavItem(Screen.Products, Icons.Default.Inventory2, R.string.nav_products),
+    BottomNavItem(Screen.Progress, Icons.Default.BarChart, R.string.nav_progress),
+    BottomNavItem(Screen.Profile, Icons.Default.Person, R.string.nav_profile)
 )

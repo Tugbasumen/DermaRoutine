@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.dermaroutine.R
 import com.dermaroutine.domain.model.SkinPhoto
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -39,8 +41,8 @@ fun SkinPhotoDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Photo?") },
-            text = { Text("This action cannot be undone.") },
+            title = { Text(stringResource(id = R.string.product_delete_confirm)) },
+            text = { Text(stringResource(id = R.string.product_delete_desc)) },
             confirmButton = {
                 TextButton(
                     onClick = { 
@@ -50,12 +52,12 @@ fun SkinPhotoDetailScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(id = R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )
@@ -64,15 +66,15 @@ fun SkinPhotoDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Photo Detail", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.progress_photo_detail), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.delete), tint = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -80,12 +82,12 @@ fun SkinPhotoDetailScreen(
     ) { padding ->
         if (photo == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Photo not found.")
+                Text(stringResource(id = R.string.error_unknown))
             }
         } else {
             val date = try {
                 val dt = LocalDateTime.parse(photo.takenAt, DateTimeFormatter.ISO_DATE_TIME)
-                dt.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"))
+                dt.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy"))
             } catch (e: Exception) {
                 photo.takenAt
             }
@@ -113,12 +115,12 @@ fun SkinPhotoDetailScreen(
                 Text(text = date, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Assessment: ", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(id = R.string.progress_assessment), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     Text(text = "${photo.rating}/5", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 }
 
                 if (!photo.notes.isNullOrEmpty()) {
-                    Text(text = "Notes", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(id = R.string.progress_notes), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     Text(text = photo.notes, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 }
             }

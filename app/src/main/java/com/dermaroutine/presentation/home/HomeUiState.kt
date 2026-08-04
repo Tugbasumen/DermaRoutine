@@ -1,7 +1,7 @@
 package com.dermaroutine.presentation.home
 
 data class HomeUiState(
-    val greeting: String = "",
+    val greetingRes: Int = 0,
     val userName: String = "",
     val date: String = "",
     val morningRoutineStatus: String = "0/0 completed",

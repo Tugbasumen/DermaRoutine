@@ -24,7 +24,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Failed to fetch profile: ${response.message()}"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 
@@ -52,7 +52,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 else Result.failure(Exception("Failed to create profile"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception(ErrorMapper.map(e).message))
+            Result.failure(e)
         }
     }
 }

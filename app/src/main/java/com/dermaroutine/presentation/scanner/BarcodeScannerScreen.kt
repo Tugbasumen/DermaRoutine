@@ -27,12 +27,14 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -61,10 +63,10 @@ fun BarcodeScannerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scan Barcode", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.scan_barcode_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -163,7 +165,7 @@ fun ScannerOverlay() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(300.dp))
             Text(
-                text = "Align barcode within the frame",
+                text = stringResource(id = R.string.scan_barcode_hint),
                 color = Color.White,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
@@ -184,14 +186,14 @@ fun PermissionRequest(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Camera permission is required to scan products. 🌿",
+            text = stringResource(id = R.string.scan_permission_req),
             color = Color.White,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onRequestPermission) {
-            Text(if (isPermanentlyDenied) "Open Settings" else "Grant Permission")
+            Text(if (isPermanentlyDenied) stringResource(id = R.string.scan_open_settings) else stringResource(id = R.string.scan_grant_permission))
         }
     }
 }

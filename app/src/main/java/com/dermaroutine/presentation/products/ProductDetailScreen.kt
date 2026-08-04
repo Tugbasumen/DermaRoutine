@@ -17,10 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
+import com.dermaroutine.core.util.getDisplayName
+import com.dermaroutine.domain.model.ProductCategory
 import com.dermaroutine.domain.model.ProductIngredient
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +39,7 @@ fun ProductDetailScreen(
 ) {
     val state by viewModel.detailState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(productId) {
         viewModel.loadProductDetail(productId)
@@ -43,8 +48,8 @@ fun ProductDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Product?") },
-            text = { Text("This product will be removed from your product library.") },
+            title = { Text(stringResource(id = R.string.product_delete_confirm)) },
+            text = { Text(stringResource(id = R.string.product_delete_desc)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -54,12 +59,12 @@ fun ProductDetailScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(id = R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )
@@ -68,18 +73,18 @@ fun ProductDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Product Details", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.product_details), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { onNavigateToEdit(productId) }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(id = R.string.edit))
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.delete), tint = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -101,7 +106,7 @@ fun ProductDetailScreen(
                             ProductInfoSection(
                                 name = product.name,
                                 brand = product.brand,
-                                category = product.category.name,
+                                category = product.category.getDisplayName(context),
                                 barcode = product.barcode,
                                 notes = product.notes
                             )
@@ -114,12 +119,12 @@ fun ProductDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Ingredients",
+                                    text = stringResource(id = R.string.product_ingredients),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                                 TextButton(onClick = { onNavigateToOcr(productId) }) {
-                                    Text("Scan")
+                                    Text(stringResource(id = R.string.product_scan))
                                 }
                             }
                         }
@@ -127,7 +132,7 @@ fun ProductDetailScreen(
                         if (product.ingredients.isEmpty()) {
                             item {
                                 Text(
-                                    text = "No ingredients added yet.",
+                                    text = stringResource(id = R.string.product_no_ingredients),
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                     modifier = Modifier.padding(vertical = 16.dp)
                                 )
@@ -163,11 +168,11 @@ fun ProductInfoSection(name: String, brand: String, category: String, barcode: S
         
         Spacer(modifier = Modifier.height(8.dp))
         
-        InfoLabel("Category", category)
-        if (!barcode.isNullOrEmpty()) InfoLabel("Barcode", barcode)
+        InfoLabel(stringResource(id = R.string.product_category_label), category)
+        if (!barcode.isNullOrEmpty()) InfoLabel(stringResource(id = R.string.product_barcode_label), barcode)
         if (!notes.isNullOrEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Notes", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text(text = stringResource(id = R.string.product_notes_label), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             Text(text = notes, style = MaterialTheme.typography.bodyMedium)
         }
     }

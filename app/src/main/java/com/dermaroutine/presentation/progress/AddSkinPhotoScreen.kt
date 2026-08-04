@@ -23,11 +23,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.AppTextField
 import com.dermaroutine.core.designsystem.PrimaryButton
 
@@ -60,10 +62,10 @@ fun AddSkinPhotoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Skin Photo", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.progress_add_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -97,7 +99,7 @@ fun AddSkinPhotoScreen(
                         onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).background(Color.White, CircleShape)
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Change")
+                        Icon(Icons.Default.Add, contentDescription = null)
                     }
                 } else {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -107,7 +109,7 @@ fun AddSkinPhotoScreen(
                         ) {
                             Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Choose from Gallery")
+                            Text(stringResource(id = R.string.progress_gallery))
                         }
                     }
                 }
@@ -115,7 +117,7 @@ fun AddSkinPhotoScreen(
 
             // Rating Section
             Column {
-                Text(text = "How does your skin look today?", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(id = R.string.progress_how_is_skin), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -146,7 +148,7 @@ fun AddSkinPhotoScreen(
             AppTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = "Daily notes (Optional)",
+                label = stringResource(id = R.string.progress_notes),
                 modifier = Modifier.height(120.dp)
             )
 
@@ -155,7 +157,7 @@ fun AddSkinPhotoScreen(
             }
 
             PrimaryButton(
-                text = if (uploadState is UploadUiState.Uploading) "Saving..." else "Save Photo",
+                text = if (uploadState is UploadUiState.Uploading) stringResource(id = R.string.progress_saving) else stringResource(id = R.string.save),
                 onClick = { 
                     selectedImageUri?.let { viewModel.uploadPhoto(it, rating, notes) }
                 },

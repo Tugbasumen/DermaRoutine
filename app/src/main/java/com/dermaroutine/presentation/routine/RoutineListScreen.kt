@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.domain.model.Routine
 import com.dermaroutine.domain.model.RoutineType
 
@@ -43,7 +45,7 @@ fun RoutineListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Skincare Routines", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.routine_title), fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
@@ -53,7 +55,7 @@ fun RoutineListScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Routine")
+                Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.routine_add))
             }
         }
     ) { padding ->
@@ -70,12 +72,12 @@ fun RoutineListScreen(
                         Text(text = "🌿", fontSize = 64.sp)
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "No routines yet",
+                            text = stringResource(id = R.string.routine_empty),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Create your morning or evening routine to get started.",
+                            text = stringResource(id = R.string.routine_empty_desc),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
@@ -137,14 +139,14 @@ fun RoutineCard(routine: Routine, onClick: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = routine.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(
-                    text = "${routine.itemCount} products",
+                    text = stringResource(id = R.string.routine_products_count, routine.itemCount),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
 
             if (routine.isCompletedToday) {
-                Icon(Icons.Default.CheckCircle, contentDescription = "Completed", tint = MaterialTheme.colorScheme.primary)
+                Icon(Icons.Default.CheckCircle, contentDescription = stringResource(id = R.string.routine_completed), tint = MaterialTheme.colorScheme.primary)
             } else {
                 Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
             }

@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.dermaroutine.R
 import com.dermaroutine.domain.model.SkinPhoto
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -40,10 +42,10 @@ fun ComparePhotosScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Compare Progress", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.progress_compare_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -63,11 +65,11 @@ fun ComparePhotosScreen(
                     .height(300.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ComparisonHalf("Before", beforePhoto, Modifier.weight(1f))
-                ComparisonHalf("After", afterPhoto, Modifier.weight(1f))
+                ComparisonHalf(stringResource(id = R.string.progress_compare_before), beforePhoto, Modifier.weight(1f))
+                ComparisonHalf(stringResource(id = R.string.progress_compare_after), afterPhoto, Modifier.weight(1f))
             }
 
-            Text(text = "Select photos from your journey", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(id = R.string.progress_select_hint), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
 
             when (val listState = state) {
                 is ProgressListUiState.Success -> {
@@ -111,7 +113,7 @@ fun ComparePhotosScreen(
                     onClick = { /* Could expand view */ },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("View Full Comparison")
+                    Text(stringResource(id = R.string.progress_view_full))
                 }
             }
         }
@@ -148,12 +150,12 @@ fun ComparisonHalf(label: String, photo: SkinPhoto?, modifier: Modifier = Modifi
                 ) {
                     val date = try {
                         val dt = LocalDateTime.parse(photo.takenAt, DateTimeFormatter.ISO_DATE_TIME)
-                        dt.format(DateTimeFormatter.ofPattern("MMM d"))
+                        dt.format(DateTimeFormatter.ofPattern("d MMM"))
                     } catch (e: Exception) { "" }
                     Text(text = date, color = Color.White, fontSize = 10.sp)
                 }
             } else {
-                Text(text = "Select", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = stringResource(id = R.string.progress_select_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

@@ -1,7 +1,13 @@
-# Phase: Launcher Icon Integration - Task List
+# Final Localization & Network Security - Task List
 
-- [x] Manifest Update
-    - [x] Update `android:icon` to `@drawable/app_logo`
-    - [x] Update `android:roundIcon` to `@drawable/app_logo`
-- [x] Build and Verify
-    - [x] Successful `gradlew assembleDebug`
+- [ ] Localization Cleanup
+    - [ ] Update `strings.xml` with Journal and Onboarding strings
+    - [ ] Localize `OnboardingScreen.kt` buttons
+    - [ ] Localize `JournalScreen.kt` text
+- [ ] Network Security Fix
+    - [ ] Create `network_security_config.xml`
+    - [ ] Update `AndroidManifest.xml` to use the config
+- [ ] Build and Verify
+    - [ ] Successful `gradlew assembleDebug`
+    - [ ] Verify Turkish buttons in Onboarding
+    - [ ] Verify API connection (CLEARTEXT error should be gone)

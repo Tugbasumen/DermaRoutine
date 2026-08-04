@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,7 +51,7 @@ fun HomeScreen(
         item {
             Spacer(modifier = Modifier.height(32.dp))
             HomeHeader(
-                greeting = uiState.greeting,
+                greeting = if (uiState.greetingRes != 0) stringResource(id = uiState.greetingRes) else "",
                 userName = uiState.userName,
                 date = uiState.date
             )
@@ -123,20 +124,20 @@ fun RoutineSection(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
-            text = "Today's Routine",
+            text = stringResource(id = R.string.home_today_routine),
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
         )
         
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             RoutineSummaryCard(
-                title = "Morning",
+                title = stringResource(id = R.string.routine_morning),
                 icon = Icons.Default.LightMode,
                 status = morningStatus,
                 modifier = Modifier.weight(1f),
                 onClick = onCreateRoutine
             )
             RoutineSummaryCard(
-                title = "Evening",
+                title = stringResource(id = R.string.routine_evening),
                 icon = Icons.Default.Nightlight,
                 status = eveningStatus,
                 modifier = Modifier.weight(1f),
@@ -208,11 +209,11 @@ fun StreakCard(streak: Int, onViewProgress: () -> Unit) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "Current Streak",
+                        text = stringResource(id = R.string.home_current_streak),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "$streak days",
+                        text = stringResource(id = R.string.home_days, streak),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -234,18 +235,18 @@ fun TodaySkinCard(hasPhoto: Boolean, onAddPhoto: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Today's Skin",
+                text = stringResource(id = R.string.home_today_skin),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = if (hasPhoto) "Photo added! 🌿" else "Keep track of your skin journey.",
+                text = if (hasPhoto) stringResource(id = R.string.home_photo_added) else stringResource(id = R.string.home_keep_track),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
             Spacer(modifier = Modifier.height(16.dp))
             PrimaryButton(
-                text = if (hasPhoto) "View Photo" else "Add Today's Photo",
+                text = if (hasPhoto) stringResource(id = R.string.home_view_photo) else stringResource(id = R.string.home_add_photo),
                 onClick = onAddPhoto
             )
         }
@@ -260,25 +261,25 @@ fun QuickActionsSection(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
-            text = "Quick Actions",
+            text = stringResource(id = R.string.home_quick_actions),
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             QuickActionItem(
                 icon = Icons.Default.Add,
-                label = "Product",
+                label = stringResource(id = R.string.home_action_product),
                 onClick = onAddProduct,
                 modifier = Modifier.weight(1f)
             )
             QuickActionItem(
                 icon = Icons.Default.CameraAlt,
-                label = "Photo",
+                label = stringResource(id = R.string.home_action_photo),
                 onClick = onAddPhoto,
                 modifier = Modifier.weight(1f)
             )
             QuickActionItem(
                 icon = Icons.Default.SmartToy,
-                label = "Ask AI",
+                label = stringResource(id = R.string.home_action_ai),
                 onClick = onAskAI,
                 modifier = Modifier.weight(1f)
             )

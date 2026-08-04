@@ -8,18 +8,20 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
+import com.dermaroutine.core.util.getDisplayName
 import com.dermaroutine.domain.model.Product
 import com.dermaroutine.domain.model.ProductCategory
 
@@ -33,11 +35,12 @@ fun ProductListScreen(
     val state by viewModel.listState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<ProductCategory?>(null) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Product Library", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.product_library), fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
@@ -47,7 +50,7 @@ fun ProductListScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Product")
+                Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.routine_add))
             }
         }
     ) { padding ->
@@ -59,7 +62,7 @@ fun ProductListScreen(
                     searchQuery = it
                     viewModel.onSearchQueryChanged(it)
                 },
-                placeholder = { Text("Search products...") },
+                placeholder = { Text(stringResource(id = R.string.product_search_hint)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,7 +87,7 @@ fun ProductListScreen(
                             selectedCategory = null
                             viewModel.onCategorySelected(null)
                         },
-                        label = { Text("All") }
+                        label = { Text(stringResource(id = R.string.product_category_all)) }
                     )
                 }
                 items(ProductCategory.entries) { category ->
@@ -94,13 +97,12 @@ fun ProductListScreen(
                             selectedCategory = category
                             viewModel.onCategorySelected(category)
                         },
-                        label = { Text(category.name) }
+                        label = { Text(category.getDisplayName(context)) }
                     )
                 }
             }
 
-            // Product List
-            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 when (val listState = state) {
                     is ProductListUiState.Loading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -128,6 +130,7 @@ fun ProductListScreen(
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
+                    else -> {}
                 }
             }
         }
@@ -136,6 +139,7 @@ fun ProductListScreen(
 
 @Composable
 fun ProductCard(product: Product, onClick: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,7 +152,6 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Placeholder for image
             Box(
                 modifier = Modifier
                     .size(64.dp)
@@ -166,7 +169,7 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
                 Text(text = product.brand, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = product.category.name,
+                    text = product.category.getDisplayName(context),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -187,15 +190,15 @@ fun EmptyProductState(onAddClick: () -> Unit) {
     ) {
         Text(text = "🌿", fontSize = 64.sp)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "No products yet", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(id = R.string.product_empty), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(
-            text = "Add your skincare products to keep your routine organized.",
+            text = stringResource(id = R.string.product_empty_desc),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onAddClick) {
-            Text("Add Your First Product")
+            Text(stringResource(id = R.string.product_add_first))
         }
     }
 }

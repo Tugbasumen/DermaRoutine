@@ -7,9 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
+import androidx.compose.ui.res.stringResource
+import com.dermaroutine.R
+
 @Composable
 fun JournalScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Skin Journal Coming Soon 🌿")
+        Text(text = stringResource(id = R.string.journal_coming_soon))
     }
 }

@@ -2,6 +2,7 @@ package com.dermaroutine.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dermaroutine.R
 import com.dermaroutine.domain.model.RoutineType
 import com.dermaroutine.domain.usecase.GetCurrentUserUseCase
 import com.dermaroutine.domain.usecase.GetRoutinesUseCase
@@ -78,17 +79,17 @@ class HomeViewModel @Inject constructor(
         val now = LocalDateTime.now()
         val hour = now.hour
         
-        val greeting = when (hour) {
-            in 5..11 -> "Good morning"
-            in 12..17 -> "Good afternoon"
-            else -> "Good evening"
+        val greetingRes = when (hour) {
+            in 5..11 -> R.string.home_greeting_morning
+            in 12..17 -> R.string.home_greeting_afternoon
+            else -> R.string.home_greeting_evening
         }
 
-        val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault())
+        val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.forLanguageTag("tr-TR"))
         val dateString = now.format(dateFormatter)
 
         _uiState.value = _uiState.value.copy(
-            greeting = greeting,
+            greetingRes = greetingRes,
             date = dateString
         )
     }

@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,10 +42,10 @@ fun IngredientAssistantScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("AI Assistant", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.ai_assistant_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -58,7 +60,7 @@ fun IngredientAssistantScreen(
                     ) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Consulting DermaRoutine AI...", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(id = R.string.ai_consulting), color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 is AssistantUiState.Success -> {
@@ -87,16 +89,16 @@ fun IngredientAssistantScreen(
                         }
 
                         // Summary
-                        InfoCard(title = "What is it?", content = exp.summary, icon = Icons.Default.Info)
+                        InfoCard(title = stringResource(id = R.string.ai_what_is), content = exp.summary, icon = Icons.Default.Info)
 
                         // Common Uses
                         if (exp.commonUses.isNotEmpty()) {
-                            BulletListSection(title = "Common Cosmetic Uses", items = exp.commonUses)
+                            BulletListSection(title = stringResource(id = R.string.ai_common_uses), items = exp.commonUses)
                         }
 
                         // Considerations
                         if (exp.considerations.isNotEmpty()) {
-                            BulletListSection(title = "General Considerations", items = exp.considerations)
+                            BulletListSection(title = stringResource(id = R.string.ai_considerations), items = exp.considerations)
                         }
 
                         // Disclaimer
@@ -133,17 +135,17 @@ fun IngredientAssistantScreen(
                         modifier = Modifier.align(Alignment.Center).padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Oops!", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(id = R.string.ai_oops), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = state.message, textAlign = TextAlign.Center)
                         Spacer(modifier = Modifier.height(24.dp))
                         Button(onClick = { viewModel.loadExplanation(ingredientName) }) {
-                            Text("Try Again")
+                            Text(stringResource(id = R.string.try_again))
                         }
                     }
                 }
                 is AssistantUiState.Empty -> {
-                    Text("No information available.", modifier = Modifier.align(Alignment.Center))
+                    Text(stringResource(id = R.string.ai_no_info), modifier = Modifier.align(Alignment.Center))
                 }
                 else -> {}
             }

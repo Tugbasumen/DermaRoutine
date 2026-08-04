@@ -10,9 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -63,10 +65,10 @@ fun RoutineReminderSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Routine Reminders", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.reminder_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -80,7 +82,7 @@ fun RoutineReminderSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Get reminded when it's time for your skincare routine. 🌿",
+                text = stringResource(id = R.string.reminder_desc),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -89,7 +91,7 @@ fun RoutineReminderSettingsScreen(
 
             // Morning Reminder
             ReminderCard(
-                title = "Morning Reminder",
+                title = stringResource(id = R.string.reminder_morning),
                 enabled = uiState?.morningEnabled ?: false,
                 time = uiState?.morningTime ?: "08:00",
                 onToggle = { 
@@ -103,7 +105,7 @@ fun RoutineReminderSettingsScreen(
 
             // Evening Reminder
             ReminderCard(
-                title = "Evening Reminder",
+                title = stringResource(id = R.string.reminder_evening),
                 enabled = uiState?.eveningEnabled ?: false,
                 time = uiState?.eveningTime ?: "22:00",
                 onToggle = { 
@@ -117,7 +119,7 @@ fun RoutineReminderSettingsScreen(
             
             if (notificationPermissionState != null && !notificationPermissionState.status.isGranted) {
                 Text(
-                    text = "Notification permission is required to receive reminders.",
+                    text = stringResource(id = R.string.reminder_permission_error),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.labelSmall
                 )

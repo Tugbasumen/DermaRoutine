@@ -13,11 +13,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.PrimaryButton
 import com.dermaroutine.core.designsystem.SecondaryButton
 import kotlinx.coroutines.launch
@@ -47,7 +50,7 @@ fun OnboardingScreen(
             horizontalArrangement = Arrangement.End
         ) {
             SecondaryButton(
-                text = "Skip",
+                text = stringResource(id = R.string.onboarding_skip),
                 onClick = {
                     viewModel.completeOnboarding()
                     onFinished()
@@ -84,7 +87,7 @@ fun OnboardingScreen(
         }
 
         PrimaryButton(
-            text = if (pagerState.currentPage == 2) "Get Started" else "Continue",
+            text = if (pagerState.currentPage == 2) stringResource(id = R.string.onboarding_get_started) else stringResource(id = R.string.onboarding_continue),
             onClick = {
                 if (pagerState.currentPage < 2) {
                     scope.launch {
@@ -125,7 +128,7 @@ fun PagerScreen(onboardingPage: OnboardingPage) {
         Spacer(modifier = Modifier.height(40.dp))
 
         Text(
-            text = onboardingPage.title,
+            text = stringResource(id = onboardingPage.titleRes),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
@@ -136,7 +139,7 @@ fun PagerScreen(onboardingPage: OnboardingPage) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = onboardingPage.description,
+            text = stringResource(id = onboardingPage.descriptionRes),
             style = MaterialTheme.typography.bodyLarge.copy(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
