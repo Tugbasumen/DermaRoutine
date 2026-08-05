@@ -3,8 +3,10 @@ package com.dermaroutine.presentation.progress
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dermaroutine.domain.model.ProgressStats
 import com.dermaroutine.domain.model.SkinPhoto
 import com.dermaroutine.domain.usecase.AddSkinPhotoUseCase
+import com.dermaroutine.domain.usecase.GetProgressStatsUseCase
 import com.dermaroutine.domain.usecase.GetSkinPhotosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProgressViewModel @Inject constructor(
     private val getSkinPhotosUseCase: GetSkinPhotosUseCase,
-    private val addSkinPhotoUseCase: AddSkinPhotoUseCase
+    private val addSkinPhotoUseCase: AddSkinPhotoUseCase,
+    private val getProgressStatsUseCase: GetProgressStatsUseCase
 ) : ViewModel() {
 
     private val _listState = MutableStateFlow<ProgressListUiState>(ProgressListUiState.Loading)
@@ -25,6 +28,14 @@ class ProgressViewModel @Inject constructor(
 
     private val _uploadState = MutableStateFlow<UploadUiState>(UploadUiState.Idle)
     val uploadState = _uploadState.asStateFlow()
+
+    private val _statsState = MutableStateFlow<StatsUiState>(StatsUiState.Loading)
+    val statsState = _statsState.asStateFlow()
+
+    fun loadData() {
+        loadPhotos()
+        loadStats()
+    }
 
     fun loadPhotos() {
         viewModelScope.launch {
@@ -34,6 +45,17 @@ class ProgressViewModel @Inject constructor(
                 else _listState.value = ProgressListUiState.Success(photos)
             }.onFailure {
                 _listState.value = ProgressListUiState.Error(it.message ?: "Failed to load photos")
+            }
+        }
+    }
+
+    fun loadStats() {
+        viewModelScope.launch {
+            _statsState.value = StatsUiState.Loading
+            getProgressStatsUseCase().onSuccess { stats ->
+                _statsState.value = StatsUiState.Success(stats)
+            }.onFailure {
+                _statsState.value = StatsUiState.Error(it.message ?: "Could not load stats")
             }
         }
     }
@@ -68,4 +90,10 @@ sealed class UploadUiState {
     data object Uploading : UploadUiState()
     data object Success : UploadUiState()
     data class Error(val message: String) : UploadUiState()
+}
+
+sealed class StatsUiState {
+    data object Loading : StatsUiState()
+    data class Success(val stats: ProgressStats) : StatsUiState()
+    data class Error(val message: String) : StatsUiState()
 }

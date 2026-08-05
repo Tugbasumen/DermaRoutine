@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.dermaroutine.R
+import com.dermaroutine.domain.model.MoodStat
+import com.dermaroutine.domain.model.ProgressStats
 import com.dermaroutine.domain.model.SkinPhoto
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -39,10 +42,11 @@ fun ProgressScreen(
     onNavigateToCompare: () -> Unit,
     viewModel: ProgressViewModel = hiltViewModel()
 ) {
-    val state by viewModel.listState.collectAsState()
+    val listState by viewModel.listState.collectAsState()
+    val statsState by viewModel.statsState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadPhotos()
+        viewModel.loadData()
     }
 
     Scaffold(
@@ -68,35 +72,139 @@ fun ProgressScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when (val listState = state) {
-                is ProgressListUiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // 1. Statistics Section
+                item(span = { GridItemSpan(2) }) {
+                    AnalyticsHeader(statsState)
                 }
-                is ProgressListUiState.Empty -> {
-                    EmptyProgressState(onAddClick = onNavigateToAddPhoto)
+
+                // 2. Photos Title
+                item(span = { GridItemSpan(2) }) {
+                    Text(
+                        text = "Fotoğraf Günlüğü",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
-                is ProgressListUiState.Success -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(24.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(listState.photos) { photo ->
+
+                // 3. Photos Grid
+                when (val state = listState) {
+                    is ProgressListUiState.Loading -> {
+                        item(span = { GridItemSpan(2) }) {
+                            Box(modifier = Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    is ProgressListUiState.Empty -> {
+                        item(span = { GridItemSpan(2) }) {
+                            EmptyProgressState(onAddClick = onNavigateToAddPhoto)
+                        }
+                    }
+                    is ProgressListUiState.Success -> {
+                        items(state.photos) { photo ->
                             SkinPhotoCard(
                                 photo = photo,
                                 onClick = { onNavigateToDetail(photo.id) }
                             )
                         }
                     }
+                    is ProgressListUiState.Error -> {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                        }
+                    }
                 }
-                is ProgressListUiState.Error -> {
-                    Text(
-                        text = listState.message,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
+            }
+        }
+    }
+}
+
+@Composable
+fun AnalyticsHeader(statsState: StatsUiState) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        when (statsState) {
+            is StatsUiState.Loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            is StatsUiState.Error -> Text(text = statsState.message, color = MaterialTheme.colorScheme.error)
+            is StatsUiState.Success -> {
+                val stats = statsState.stats
+                
+                // Routine Consistency Cards
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ConsistencyCard(
+                        label = "Sabah Rutini",
+                        percentage = stats.morningCompletionRate,
+                        modifier = Modifier.weight(1f)
                     )
+                    ConsistencyCard(
+                        label = "Akşam Rutini",
+                        percentage = stats.eveningCompletionRate,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // Mood Summary Card
+                MoodSummaryCard(stats.moodCounts)
+            }
+        }
+    }
+}
+
+@Composable
+fun ConsistencyCard(label: String, percentage: Double, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "%${percentage.toInt()}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = { (percentage / 100).toFloat() },
+                modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun MoodSummaryCard(moodCounts: List<MoodStat>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(text = "Cilt Günlüğü (Son 30 Gün)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            if (moodCounts.isEmpty()) {
+                Text(text = "Henüz günlük girişi yok.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    moodCounts.take(4).forEach { stat ->
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = stat.mood, fontSize = 24.sp)
+                            Text(text = "${stat.count} gün", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
         }
@@ -144,7 +252,7 @@ fun SkinPhotoCard(photo: SkinPhoto, onClick: () -> Unit) {
 @Composable
 fun EmptyProgressState(onAddClick: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

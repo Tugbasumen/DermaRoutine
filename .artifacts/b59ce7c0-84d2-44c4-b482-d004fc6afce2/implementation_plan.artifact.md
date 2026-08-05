@@ -1,46 +1,39 @@
-# Phase 16: Interactive Home Screen Routine Checklist Plan
+# Phase 17: Progress Statistics & Analytics Plan
 
-This phase implements the "Interactive Checklist" on the Home Screen as described in the project vision. Users will be able to check off individual products in their morning and evening routines directly from the dashboard.
+This phase implements the analytical part of the application. Users will be able to visualize their routine consistency and see a breakdown of their skin "mood" over the last 30 days, as described in the project vision.
 
 ## Proposed Changes
 
-### 1. Backend: Granular Completion Tracking
+### 1. Backend: Analytics Engine
 
-#### [NEW] [RoutineItemCompletion.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Entities/RoutineItemCompletion.cs)
-- Entity to track daily completion of specific products within a routine.
-- Fields: `Id`, `RoutineItemId`, `UserId`, `CompletedAt`.
+#### [NEW] [StatisticsController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/StatisticsController.cs)
+- `GET /api/statistics/summary`:
+    - Calculates the percentage of morning and evening routines completed in the last 7 days.
+    - Aggregates mood data from `JournalEntries` for the last 30 days.
 
-#### [MODIFY] [AppDbContext.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Data/AppDbContext.cs)
-- Add `DbSet<RoutineItemCompletion>`.
-- Configure relationship (User -> ItemCompletions).
-
-#### [MODIFY] [RoutineDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/RoutineDto.cs)
-- Update `RoutineItemDto` to include `bool IsCompletedToday`.
-- Update `RoutineDto` to include `int CompletedItemCount`.
-
-#### [MODIFY] [RoutineController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/RoutineController.cs)
-- Add `POST /api/routine/items/{itemId}/toggle`: Toggles completion status for an item today.
-- Update `GetRoutines` and `GetRoutine` to calculate and return item-level completion status.
+#### [NEW] [StatisticsDto.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/StatisticsDto.cs)
+- `ProgressSummaryDto`:
+    - `MorningCompletionRate`: Double (0-100).
+    - `EveningCompletionRate`: Double (0-100).
+    - `CurrentStreak`: Int.
+    - `MoodCounts`: List of `MoodStatDto` (Emoji, Count).
 
 ### 2. Android: Data Layer
 
-#### [MODIFY] [Routine models & DTOs]
-- Add `isCompletedToday` to `RoutineItem`.
-- Add `completedItemCount` to `Routine`.
+#### [NEW] [Statistics Models & Repository]
+- `ProgressStats` domain model.
+- `StatisticsRepository` and `StatisticsApiService`.
+- `GetProgressStatsUseCase`.
 
-#### [MODIFY] [RoutineApiService.kt]
-- Add `toggleItemCompletion(itemId)`.
+### 3. Android: Progress UI Enhancement
 
-### 3. Android: Home Screen UI
+#### [MODIFY] [ProgressScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/ProgressScreen.kt)
+- Add a **Statistics Section** at the top of the timeline.
+- **Routine Analytics**: Circular or linear progress indicators for Morning/Evening consistency.
+- **Mood Analytics**: A grid or list showing mood emoji distribution (e.g., 😊 12 gün, 😐 10 gün).
 
-#### [MODIFY] [HomeViewModel.kt]
-- Fetch full routine details (including items) instead of just summaries.
-- Add `toggleItem(itemId)` function to handle checklist clicks.
-
-#### [MODIFY] [HomeScreen.kt]
-- Replace the summary cards with an **Expanded Checklist View**.
-- **Checklist Items**: Show product name with a clickable checkbox/circle.
-- **Progress Bar**: Visual indicator of completion (e.g., "2 / 5 tamamlandı").
+#### [MODIFY] [ProgressViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/ProgressViewModel.kt)
+- Integrate `GetProgressStatsUseCase` to fetch and expose analytical data to the UI.
 
 ## Verification Plan
 
@@ -48,6 +41,6 @@ This phase implements the "Interactive Checklist" on the Home Screen as describe
 - `dotnet build` & `gradlew assembleDebug`.
 
 ### Manual Verification
-1. **Check Item**: Tap "Temizleyici" on Home Screen. Verify the checkbox fills and the progress updates to "1 / 5".
-2. **Persistence**: Restart the app. Verify the item remains checked.
-3. **Synchronization**: Check an item on Home Screen, navigate to Routine Detail, and verify it's checked there too.
+1. **Consistency Stats**: Complete several routines and verify the percentage increases correctly on the Progress screen.
+2. **Mood Breakdown**: Add multiple journal entries with different moods and verify the counts are accurate.
+3. **Time Window**: Ensure the statistics only reflect the relevant periods (Last 7 days for routines, Last 30 for mood).
