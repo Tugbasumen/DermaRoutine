@@ -7,8 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -87,7 +91,10 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         bottomBar = {
                             if (showBottomBar) {
-                                NavigationBar {
+                                NavigationBar(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    tonalElevation = 8.dp
+                                ) {
                                     bottomNavItems.forEach { item ->
                                         val label = stringResource(id = item.labelRes)
                                         NavigationBarItem(
@@ -96,6 +103,13 @@ class MainActivity : ComponentActivity() {
                                             selected = currentDestination?.hierarchy?.any { 
                                                 it.hasRoute(item.route::class) 
                                             } == true,
+                                            colors = NavigationBarItemDefaults.colors(
+                                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                                indicatorColor = MaterialTheme.colorScheme.secondaryContainer
+                                            ),
                                             onClick = {
                                                 navController.navigate(item.route) {
                                                     popUpTo(navController.graph.findStartDestination().id) {

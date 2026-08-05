@@ -7,9 +7,9 @@ val Primary = Color(0xFF4E8A5E) // Stronger brand green from logo
 val PrimaryContainer = Color(0xFFDCEFE3)
 val OnPrimaryContainer = Color(0xFF00210E)
 
-val Secondary = Color(0xFF8FBFA8) // Softer sage green
-val SecondaryContainer = Color(0xFFEAF5EE)
-val OnSecondaryContainer = Color(0xFF002114)
+val Secondary = Color(0xFF8FBFA8) // Sage green
+val SecondaryContainer = Color(0xFFD2E8D1) // Explicitly soft green for indicators
+val OnSecondaryContainer = Color(0xFF00210E)
 
 val Background = Color(0xFFF8FBF8)
 val Surface = Color(0xFFFFFFFF)
