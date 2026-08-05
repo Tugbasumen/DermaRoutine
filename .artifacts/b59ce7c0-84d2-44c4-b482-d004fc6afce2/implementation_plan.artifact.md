@@ -1,29 +1,45 @@
-# Phase 15: Skin Journal Implementation - Part 1: Backend
+# Phase 15: Skin Journal Implementation - Part 2: Android Domain & Data
 
-This part focuses on creating the backend infrastructure for the Skin Journal, allowing users to save and retrieve their daily mood and notes.
+This part focuses on establishing the Android data layer for the Skin Journal, linking the app to the recently created backend API.
 
 ## Proposed Changes
 
-### 1. Backend: DTOs
+### 1. Domain Layer
 
-#### [NEW] [JournalDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/JournalDtos.cs)
-- `CreateJournalEntryRequest`: Content, Mood (Emoji/String).
-- `JournalEntryResponse`: Id, Content, Mood, CreatedAt.
+#### [NEW] [JournalEntry.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/model/JournalEntry.kt)
+- Domain model for journal records: `id`, `content`, `mood`, `createdAt`.
 
-### 2. Backend: Controller
+#### [NEW] [JournalRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/repository/JournalRepository.kt)
+- Interface with methods: `getJournalEntries()`, `addJournalEntry(content, mood)`, `deleteJournalEntry(id)`.
 
-#### [NEW] [JournalController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/JournalController.cs)
-- `POST /api/journal`: Create a new entry for the authenticated user.
-- `GET /api/journal`: Get all entries for the user (ordered by date).
-- `DELETE /api/journal/{id}`: Delete a specific entry.
+#### [NEW] UseCases
+- `GetJournalEntriesUseCase.kt`
+- `AddJournalEntryUseCase.kt`
+- `DeleteJournalEntryUseCase.kt`
+
+### 2. Data Layer
+
+#### [NEW] [JournalDtos.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/dto/JournalDtos.kt)
+- Retrofit request/response DTOs corresponding to backend models.
+
+#### [NEW] [JournalApiService.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/JournalApiService.kt)
+- Retrofit interface for `/api/journal` endpoints.
+
+#### [NEW] [JournalMapper.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/mapper/JournalMapper.kt)
+- Extension functions to convert DTOs to Domain models.
+
+#### [NEW] [JournalRepositoryImpl.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/JournalRepositoryImpl.kt)
+- Concrete implementation using `JournalApiService`.
+
+### 3. Dependency Injection
+
+#### [NEW] [JournalModule.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/di/JournalModule.kt)
+- Hilt module to provide the API service and Repository.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `dotnet build` to ensure no syntax errors.
+- Run `gradlew assembleDebug` to ensure compilation.
 
 ### Manual Verification
-- Use Swagger/Postman to verify:
-    1. Authenticated user can create an entry.
-    2. User can list only their own entries.
-    3. User can delete an entry.
+- This layer will be verified in Part 3 once the UI is connected.

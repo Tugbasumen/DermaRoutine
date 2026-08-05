@@ -6,10 +6,11 @@
 - [x] Verify with `dotnet build`
 
 ## Part 2: Android Domain & Data
-- [ ] Create `JournalEntry` Domain Model
-- [ ] Create `JournalApiService.kt` and DTOs
-- [ ] Implement `JournalRepository`
-- [ ] Create UseCases (`GetJournalEntries`, `AddJournalEntry`)
+- [x] Create `JournalEntry` Domain Model
+- [x] Create `JournalApiService.kt` and DTOs
+- [x] Implement `JournalRepository`
+- [x] Create UseCases (`GetJournalEntries`, `AddJournalEntry`)
+- [x] Configure `JournalModule.kt` (DI)
 
 ## Part 3: Android UI (Presentation)
 - [ ] Create `JournalViewModel.kt`
