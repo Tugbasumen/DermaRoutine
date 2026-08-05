@@ -13,7 +13,8 @@
 - [x] Configure `JournalModule.kt` (DI)
 
 ## Part 3: Android UI (Presentation)
-- [ ] Create `JournalViewModel.kt`
-- [ ] Design `MoodSelector` component
-- [ ] Implement `JournalScreen.kt` (Entry form + History list)
-- [ ] Integrate with Navigation
+- [x] Create `JournalViewModel.kt`
+- [x] Design `MoodSelector` component
+- [x] Implement `JournalScreen.kt` (Entry form + History list)
+- [x] Integrate with Navigation
+- [x] Update `AppTextField` with `minLines` support

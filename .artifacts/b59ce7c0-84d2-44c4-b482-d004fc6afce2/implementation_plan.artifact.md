@@ -1,45 +1,44 @@
-# Phase 15: Skin Journal Implementation - Part 2: Android Domain & Data
+# Phase 15: Skin Journal Implementation - Part 3: Android UI (Presentation)
 
-This part focuses on establishing the Android data layer for the Skin Journal, linking the app to the recently created backend API.
+This final part brings the Skin Journal to life with a modern, user-friendly interface. Users will be able to select their daily mood, write notes, and view their skincare history.
 
 ## Proposed Changes
 
-### 1. Domain Layer
+### 1. ViewModel
 
-#### [NEW] [JournalEntry.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/model/JournalEntry.kt)
-- Domain model for journal records: `id`, `content`, `mood`, `createdAt`.
+#### [NEW] [JournalViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalViewModel.kt)
+- Manages `JournalUiState` (Loading, Success, Error).
+- Functions to fetch all entries and save a new entry.
+- State for the current input (selected mood and note text).
 
-#### [NEW] [JournalRepository.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/repository/JournalRepository.kt)
-- Interface with methods: `getJournalEntries()`, `addJournalEntry(content, mood)`, `deleteJournalEntry(id)`.
+### 2. UI Components
 
-#### [NEW] UseCases
-- `GetJournalEntriesUseCase.kt`
-- `AddJournalEntryUseCase.kt`
-- `DeleteJournalEntryUseCase.kt`
+#### [NEW] MoodSelector
+- A row of interactive emoji buttons: 😊 (İyi), 😐 (Normal), 😕 (Hassas), 😣 (Kötü).
 
-### 2. Data Layer
+#### [NEW] JournalEntryCard
+- A clean card for the history list showing the mood, date, and truncated content.
 
-#### [NEW] [JournalDtos.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/dto/JournalDtos.kt)
-- Retrofit request/response DTOs corresponding to backend models.
+### 3. Screen Update
 
-#### [NEW] [JournalApiService.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/remote/JournalApiService.kt)
-- Retrofit interface for `/api/journal` endpoints.
-
-#### [NEW] [JournalMapper.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/mapper/JournalMapper.kt)
-- Extension functions to convert DTOs to Domain models.
-
-#### [NEW] [JournalRepositoryImpl.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/JournalRepositoryImpl.kt)
-- Concrete implementation using `JournalApiService`.
-
-### 3. Dependency Injection
-
-#### [NEW] [JournalModule.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/di/JournalModule.kt)
-- Hilt module to provide the API service and Repository.
+#### [MODIFY] [JournalScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalScreen.kt)
+- **Header**: "Günlük Notlarım" title.
+- **Input Section**:
+    - "Bugün cildin nasıl hissediyor?" label.
+    - The `MoodSelector`.
+    - `AppTextField` for notes.
+    - "Kaydet" button.
+- **History Section**:
+    - "Geçmiş Kayıtlar" subtitle.
+    - A `LazyColumn` showing all previous entries using `JournalEntryCard`.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to ensure compilation.
+- Run `gradlew assembleDebug` to ensure no UI or build errors.
 
 ### Manual Verification
-- This layer will be verified in Part 3 once the UI is connected.
+1. **Save Entry**: Select a mood, write a note, and tap "Kaydet". Verify it appears in the list immediately.
+2. **List History**: Scroll through past entries and verify dates are formatted correctly.
+3. **Empty State**: Verify a friendly message is shown when no entries exist.
+4. **Validation**: Ensure "Kaydet" is disabled if the note content is empty.

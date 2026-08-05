@@ -1,29 +1,26 @@
-# Skin Journal Implementation - Android Data Layer Walkthrough
+# Skin Journal Implementation Walkthrough
 
-I have completed the second step of the Skin Journal feature. The Android app now has the necessary data structures and logic to interact with the journal API.
+The Skin Journal feature is now fully implemented and functional. Users can document their skincare journey by recording their daily mood and personal notes, all of which are securely stored and synced with the backend.
 
 ## Changes Made
 
-### 1. Domain Layer
-- **JournalEntry.kt**: Added the domain model to represent skin journal entries in the app.
-- **JournalRepository.kt**: Defined the repository interface for daily notes and mood management.
-- **UseCases**: Implemented clean business logic for:
-    - `GetJournalEntriesUseCase`: Fetching history.
-    - `AddJournalEntryUseCase`: Saving today's feel.
-    - `DeleteJournalEntryUseCase`: Cleaning up entries.
+### 1. Interactive User Interface
+- **JournalScreen**: A modern, two-part interface.
+    - **Today's Input**: A dedicated card where users can select their current skin "mood" using emojis (😊, 😐, 😕, 😣) and write detailed observations.
+    - **Chronological History**: A scrollable list showing all past entries, allowing users to look back at their progress.
+- **MoodSelector**: A custom component for intuitive selection of skin feel.
 
-### 2. Data & Network Layer
-- **JournalApiService.kt**: Created the Retrofit interface to connect to the `/api/journal` backend endpoints.
-- **JournalDtos.kt**: Defined the data transfer objects for serialization.
-- **JournalMapper.kt**: Added mapping functions to bridge the API and Domain layers.
-- **JournalRepositoryImpl.kt**: Implemented the repository using Retrofit and Kotlin Results.
+### 2. Robust Data Management
+- **JournalViewModel**: Handles all business logic, including fetching history, saving new entries with a loading state, and deleting old ones.
+- **Automatic Sync**: New entries are immediately sent to the ASP.NET Core backend and the local list is refreshed to provide instant feedback.
 
-### 3. Dependency Injection
-- **JournalModule.kt**: Configured Hilt to provide the `JournalApiService` and `JournalRepository` instances throughout the application.
+### 3. Design System Enhancements
+- **AppTextField**: Improved to support multiple lines (`minLines`), making it perfect for long journal entries.
 
 ## Verification Results
-- [x] **Build Status**: The project builds successfully (`./gradlew assembleDebug`).
-- [x] **Architecture**: Followed the established Clean Architecture and MVVM patterns.
+- [x] **Build Status**: The project built successfully (`./gradlew assembleDebug`).
+- [x] **Functionality**: Verified saving, listing, and deleting journal entries.
+- [x] **Localization**: All UI elements (labels, buttons, placeholders) are fully in Turkish.
 
 ## Recommended Commit Message
-`feat(journal): implement android domain and data layers for skin journal`
+`feat(journal): complete skin journal implementation with interactive mood selector and history list`

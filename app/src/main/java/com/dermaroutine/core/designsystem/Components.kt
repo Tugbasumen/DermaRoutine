@@ -29,7 +29,9 @@ fun AppTextField(
     isError: Boolean = false,
     errorMessage: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null,
+    minLines: Int = 1,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Column(modifier = modifier) {
         OutlinedTextField(
@@ -40,6 +42,8 @@ fun AppTextField(
             isError = isError,
             visualTransformation = visualTransformation,
             trailingIcon = trailingIcon,
+            minLines = minLines,
+            maxLines = maxLines,
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Primary,

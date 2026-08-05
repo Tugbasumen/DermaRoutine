@@ -52,6 +52,13 @@
     <!-- Journal -->
     <string name="journal_title">Cilt Günlüğü</string>
     <string name="journal_coming_soon">Cilt Günlüğü Yakında Gelecek 🌿</string>
+    <string name="journal_how_is_skin">Bugün cildin nasıl hissediyor?</string>
+    <string name="journal_history_title">Geçmiş Kayıtlar</string>
+    <string name="journal_note_placeholder">Günlük notun...</string>
+    <string name="mood_good">İyi</string>
+    <string name="mood_normal">Normal</string>
+    <string name="mood_sensitive">Hassas</string>
+    <string name="mood_bad">Kötü</string>
 
     <!-- Routine -->
     <string name="routine_title">Cilt Bakım Rutinleri</string>
