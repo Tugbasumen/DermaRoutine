@@ -1,40 +1,29 @@
-# Final Localization & Network Security Fix Plan
+# Phase 15: Skin Journal Implementation - Part 1: Backend
 
-This plan addresses the remaining hardcoded English strings identified in the UI and resolves the "CLEARTEXT communication" network security error preventing connections to the local backend.
-
-## User Review Required
-
-> [!IMPORTANT]
-> **Network Security**: To allow the app to communicate with your local backend (10.0.2.2) via HTTP, I will add a network security configuration. This is necessary for development but will be restricted to the local IP for security.
+This part focuses on creating the backend infrastructure for the Skin Journal, allowing users to save and retrieve their daily mood and notes.
 
 ## Proposed Changes
 
-### 1. Localization Cleanup
+### 1. Backend: DTOs
 
-#### [MODIFY] [strings.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/values/strings.xml)
-- Add missing strings for the Journal placeholder.
-- Ensure onboarding button labels are consistent.
+#### [NEW] [JournalDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/JournalDtos.cs)
+- `CreateJournalEntryRequest`: Content, Mood (Emoji/String).
+- `JournalEntryResponse`: Id, Content, Mood, CreatedAt.
 
-#### [MODIFY] [OnboardingScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/onboarding/OnboardingScreen.kt)
-- Fix "Get Started" and "Continue" hardcoded buttons.
+### 2. Backend: Controller
 
-#### [MODIFY] [JournalScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalScreen.kt)
-- Fix "Skin Journal Coming Soon 🌿" hardcoded text.
-
-### 2. Network Security Fix
-
-#### [NEW] [network_security_config.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/xml/network_security_config.xml)
-- Define a policy to allow cleartext (HTTP) traffic specifically for `10.0.2.2` (the Android emulator loopback).
-
-#### [MODIFY] [AndroidManifest.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/AndroidManifest.xml)
-- Link the new network security configuration in the `<application>` tag.
+#### [NEW] [JournalController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/JournalController.cs)
+- `POST /api/journal`: Create a new entry for the authenticated user.
+- `GET /api/journal`: Get all entries for the user (ordered by date).
+- `DELETE /api/journal/{id}`: Delete a specific entry.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to verify no resource or manifest errors.
+- Run `dotnet build` to ensure no syntax errors.
 
 ### Manual Verification
-1. **Onboarding**: Swipe through the pages and verify buttons are in Turkish ("Başla" / "Devam Et").
-2. **Journal**: Open the Journal tab and verify the message is in Turkish.
-3. **Routine/API**: Navigate to the Routine screen and verify that the red "CLEARTEXT" error is gone and routines are loaded (or shows "Henüz rutin yok").
+- Use Swagger/Postman to verify:
+    1. Authenticated user can create an entry.
+    2. User can list only their own entries.
+    3. User can delete an entry.

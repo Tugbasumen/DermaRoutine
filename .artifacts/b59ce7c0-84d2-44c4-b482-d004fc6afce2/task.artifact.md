@@ -1,13 +1,18 @@
-# Final Localization & Network Security - Task List
+# Phase 15: Skin Journal Implementation - Task List
 
-- [ ] Localization Cleanup
-    - [ ] Update `strings.xml` with Journal and Onboarding strings
-    - [ ] Localize `OnboardingScreen.kt` buttons
-    - [ ] Localize `JournalScreen.kt` text
-- [ ] Network Security Fix
-    - [ ] Create `network_security_config.xml`
-    - [ ] Update `AndroidManifest.xml` to use the config
-- [ ] Build and Verify
-    - [ ] Successful `gradlew assembleDebug`
-    - [ ] Verify Turkish buttons in Onboarding
-    - [ ] Verify API connection (CLEARTEXT error should be gone)
+## Part 1: Backend Infrastructure
+- [x] Create `JournalDtos.cs`
+- [x] Implement `JournalController.cs` (CRUD)
+- [x] Verify with `dotnet build`
+
+## Part 2: Android Domain & Data
+- [ ] Create `JournalEntry` Domain Model
+- [ ] Create `JournalApiService.kt` and DTOs
+- [ ] Implement `JournalRepository`
+- [ ] Create UseCases (`GetJournalEntries`, `AddJournalEntry`)
+
+## Part 3: Android UI (Presentation)
+- [ ] Create `JournalViewModel.kt`
+- [ ] Design `MoodSelector` component
+- [ ] Implement `JournalScreen.kt` (Entry form + History list)
+- [ ] Integrate with Navigation
