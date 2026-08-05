@@ -6,6 +6,7 @@ data class Routine(
     val routineType: RoutineType,
     val isActive: Boolean,
     val itemCount: Int,
+    val completedItemCount: Int,
     val isCompletedToday: Boolean
 )
 
@@ -25,7 +26,8 @@ data class RoutineItem(
     val productBrand: String?,
     val productImageUrl: String?,
     val stepOrder: Int,
-    val notes: String?
+    val notes: String?,
+    val isCompletedToday: Boolean
 )
 
 enum class RoutineType {

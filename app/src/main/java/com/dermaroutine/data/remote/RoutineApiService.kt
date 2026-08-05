@@ -25,4 +25,7 @@ interface RoutineApiService {
 
     @DELETE("api/routine/{id}/items/{itemId}")
     suspend fun removeItemFromRoutine(@Path("id") routineId: Int, @Path("itemId") itemId: Int): Response<Unit>
+
+    @POST("api/routine/items/{itemId}/toggle")
+    suspend fun toggleItemCompletion(@Path("itemId") itemId: Int): Response<Unit>
 }

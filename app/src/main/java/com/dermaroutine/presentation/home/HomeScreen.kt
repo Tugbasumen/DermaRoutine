@@ -26,6 +26,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.dermaroutine.R
 import com.dermaroutine.core.designsystem.PrimaryButton
 import com.dermaroutine.core.designsystem.SecondaryButton
+import com.dermaroutine.domain.model.RoutineDetail
+import com.dermaroutine.domain.model.RoutineItem
+import com.dermaroutine.domain.model.RoutineType
 
 @Composable
 fun HomeScreen(
@@ -59,8 +62,9 @@ fun HomeScreen(
 
         item {
             RoutineSection(
-                morningStatus = uiState.morningRoutineStatus,
-                eveningStatus = uiState.eveningRoutineStatus,
+                morningRoutine = uiState.morningRoutine,
+                eveningRoutine = uiState.eveningRoutine,
+                onToggleItem = { viewModel.toggleItem(it) },
                 onCreateRoutine = onNavigateToRoutine
             )
         }
@@ -118,8 +122,9 @@ fun HomeHeader(greeting: String, userName: String, date: String) {
 
 @Composable
 fun RoutineSection(
-    morningStatus: String,
-    eveningStatus: String,
+    morningRoutine: RoutineDetail?,
+    eveningRoutine: RoutineDetail?,
+    onToggleItem: (Int) -> Unit,
     onCreateRoutine: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -128,65 +133,98 @@ fun RoutineSection(
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
         )
         
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            RoutineSummaryCard(
-                title = stringResource(id = R.string.routine_morning),
-                icon = Icons.Default.LightMode,
-                status = morningStatus,
-                modifier = Modifier.weight(1f),
-                onClick = onCreateRoutine
-            )
-            RoutineSummaryCard(
-                title = stringResource(id = R.string.routine_evening),
-                icon = Icons.Default.Nightlight,
-                status = eveningStatus,
-                modifier = Modifier.weight(1f),
-                onClick = onCreateRoutine
-            )
+        RoutineChecklistCard(
+            routine = morningRoutine,
+            icon = Icons.Default.LightMode,
+            title = stringResource(id = R.string.routine_morning),
+            iconColor = Color(0xFFFFB300),
+            onToggleItem = onToggleItem,
+            onClick = onCreateRoutine
+        )
+
+        RoutineChecklistCard(
+            routine = eveningRoutine,
+            icon = Icons.Default.Nightlight,
+            title = stringResource(id = R.string.routine_evening),
+            iconColor = Color(0xFF5C6BC0),
+            onToggleItem = onToggleItem,
+            onClick = onCreateRoutine
+        )
+    }
+}
+
+@Composable
+fun RoutineChecklistCard(
+    routine: RoutineDetail?,
+    icon: ImageVector,
+    title: String,
+    iconColor: Color,
+    onToggleItem: (Int) -> Unit,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                }
+                
+                if (routine != null) {
+                    val completedCount = routine.items.count { it.isCompletedToday }
+                    Text(
+                        text = "$completedCount / ${routine.items.size}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            if (routine == null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                SecondaryButton(text = stringResource(id = R.string.routine_add), onClick = onClick)
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
+                routine.items.forEach { item ->
+                    ChecklistItem(
+                        item = item,
+                        onToggle = { onToggleItem(item.id) }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun RoutineSummaryCard(
-    title: String,
-    icon: ImageVector,
-    status: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = modifier
-            .height(140.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+fun ChecklistItem(item: RoutineItem, onToggle: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle() }
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                )
-                Text(
-                    text = status,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
-        }
+        val icon = if (item.isCompletedToday) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked
+        val color = if (item.isCompletedToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+        
+        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = item.productName,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (item.isCompletedToday) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

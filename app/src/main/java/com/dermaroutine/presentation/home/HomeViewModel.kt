@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dermaroutine.R
 import com.dermaroutine.domain.model.RoutineType
-import com.dermaroutine.domain.usecase.GetCurrentUserUseCase
-import com.dermaroutine.domain.usecase.GetRoutinesUseCase
-import com.dermaroutine.domain.usecase.GetStreakUseCase
+import com.dermaroutine.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +19,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getRoutinesUseCase: GetRoutinesUseCase,
-    private val getStreakUseCase: GetStreakUseCase
+    private val getRoutineDetailUseCase: GetRoutineDetailUseCase,
+    private val getStreakUseCase: GetStreakUseCase,
+    private val toggleRoutineItemUseCase: ToggleRoutineItemUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -47,31 +47,38 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             
-            // Parallel execution would be better but keeping it simple for now
-            val routinesResult = getRoutinesUseCase()
             val streakResult = getStreakUseCase()
+            streakResult.onSuccess { streak ->
+                _uiState.value = _uiState.value.copy(currentStreak = streak.currentStreak)
+            }
 
+            val routinesResult = getRoutinesUseCase()
             routinesResult.onSuccess { routines ->
                 val morning = routines.find { it.routineType == RoutineType.Morning }
                 val evening = routines.find { it.routineType == RoutineType.Evening }
                 
-                _uiState.value = _uiState.value.copy(
-                    morningRoutineStatus = if (morning != null) 
-                        "${if (morning.isCompletedToday) morning.itemCount else 0}/${morning.itemCount} completed" 
-                        else "No routine",
-                    eveningRoutineStatus = if (evening != null) 
-                        "${if (evening.isCompletedToday) evening.itemCount else 0}/${evening.itemCount} completed" 
-                        else "No routine"
-                )
-            }
-
-            streakResult.onSuccess { streak ->
-                _uiState.value = _uiState.value.copy(
-                    currentStreak = streak.currentStreak
-                )
+                if (morning != null) {
+                    getRoutineDetailUseCase(morning.id).onSuccess { detail ->
+                        _uiState.value = _uiState.value.copy(morningRoutine = detail)
+                    }
+                }
+                
+                if (evening != null) {
+                    getRoutineDetailUseCase(evening.id).onSuccess { detail ->
+                        _uiState.value = _uiState.value.copy(eveningRoutine = detail)
+                    }
+                }
             }
             
             _uiState.value = _uiState.value.copy(isLoading = false)
+        }
+    }
+
+    fun toggleItem(itemId: Int) {
+        viewModelScope.launch {
+            toggleRoutineItemUseCase(itemId).onSuccess {
+                loadDashboardData()
+            }
         }
     }
 

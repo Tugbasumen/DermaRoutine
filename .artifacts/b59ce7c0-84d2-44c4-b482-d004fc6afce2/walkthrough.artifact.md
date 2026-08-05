@@ -1,26 +1,27 @@
-# Skin Journal Implementation Walkthrough
+# Phase 16: Interactive Home Screen Checklist Walkthrough
 
-The Skin Journal feature is now fully implemented and functional. Users can document their skincare journey by recording their daily mood and personal notes, all of which are securely stored and synced with the backend.
+The core "Daily Routine" experience has been transformed. Users can now interact with their skincare routines directly from the Home Screen, checking off products as they use them.
 
 ## Changes Made
 
-### 1. Interactive User Interface
-- **JournalScreen**: A modern, two-part interface.
-    - **Today's Input**: A dedicated card where users can select their current skin "mood" using emojis (😊, 😐, 😕, 😣) and write detailed observations.
-    - **Chronological History**: A scrollable list showing all past entries, allowing users to look back at their progress.
-- **MoodSelector**: A custom component for intuitive selection of skin feel.
+### 1. Granular Progress Tracking (Backend)
+- **RoutineItemCompletion**: Created a new database entity to track when specific products in a routine are completed on a given day.
+- **Toggle API**: Implemented a smart toggle endpoint in `RoutineController.cs` that marks an item as done or undone for today.
+- **Enhanced DTOs**: Routines now return `CompletedItemCount` and items include an `IsCompletedToday` flag.
 
-### 2. Robust Data Management
-- **JournalViewModel**: Handles all business logic, including fetching history, saving new entries with a loading state, and deleting old ones.
-- **Automatic Sync**: New entries are immediately sent to the ASP.NET Core backend and the local list is refreshed to provide instant feedback.
+### 2. Interactive Dashboard (Android UI)
+- **Checklist Cards**: Replaced simple summary boxes with expanded **Interactive Checklist Cards** for Morning and Evening routines.
+- **Real-time Feedback**: Tapping a product name immediately toggles its completion status, updates the progress counter (e.g., "3 / 5"), and dims the text to show it's done.
+- **Automatic Sync**: The `HomeViewModel` now orchestrates fetching detailed routine data and handles checklist interactions seamlessly.
 
-### 3. Design System Enhancements
-- **AppTextField**: Improved to support multiple lines (`minLines`), making it perfect for long journal entries.
+### 3. Data Integrity & Architecture
+- Followed Clean Architecture patterns by updating the Domain models, Repositories, and UseCases (`ToggleRoutineItemUseCase`).
+- Ensure full synchronization between the Home Screen and the Routine Detail screens.
 
 ## Verification Results
-- [x] **Build Status**: The project built successfully (`./gradlew assembleDebug`).
-- [x] **Functionality**: Verified saving, listing, and deleting journal entries.
-- [x] **Localization**: All UI elements (labels, buttons, placeholders) are fully in Turkish.
+- [x] **Backend**: `dotnet build` passed. Verified item toggling logic.
+- [x] **Android**: `gradlew assembleDebug` passed. Tested checklist interactions on the home screen.
+- [x] **UX**: The interface matches your project vision with clear checkboxes and progress indicators.
 
 ## Recommended Commit Message
-`feat(journal): complete skin journal implementation with interactive mood selector and history list`
+`feat(home): implement interactive routine checklist with granular product tracking`

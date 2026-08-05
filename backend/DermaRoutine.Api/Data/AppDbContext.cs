@@ -16,6 +16,7 @@ namespace DermaRoutine.Api.Data
         public DbSet<Routine> Routines { get; set; }
         public DbSet<RoutineItem> RoutineItems { get; set; }
         public DbSet<RoutineCompletion> RoutineCompletions { get; set; }
+        public DbSet<RoutineItemCompletion> RoutineItemCompletions { get; set; }
         public DbSet<SkinPhoto> SkinPhotos { get; set; }
         public DbSet<JournalEntry> JournalEntries { get; set; }
 
@@ -72,6 +73,17 @@ namespace DermaRoutine.Api.Data
                 .HasOne(rc => rc.Routine)
                 .WithMany(r => r.Completions)
                 .HasForeignKey(rc => rc.RoutineId);
+
+            // RoutineItem - Completions (1:N)
+            modelBuilder.Entity<RoutineItemCompletion>()
+                .HasOne(ric => ric.RoutineItem)
+                .WithMany()
+                .HasForeignKey(ric => ric.RoutineItemId);
+
+            modelBuilder.Entity<RoutineItemCompletion>()
+                .HasOne(ric => ric.User)
+                .WithMany()
+                .HasForeignKey(ric => ric.UserId);
 
             // User - SkinPhotos (1:N)
             modelBuilder.Entity<SkinPhoto>()

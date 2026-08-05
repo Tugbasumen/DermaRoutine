@@ -10,6 +10,7 @@ fun RoutineDto.toDomain(): Routine {
         routineType = RoutineType.entries[routineType],
         isActive = isActive,
         itemCount = itemCount,
+        completedItemCount = completedItemCount,
         isCompletedToday = isCompletedToday
     )
 }
@@ -33,7 +34,8 @@ fun RoutineItemDto.toDomain(): RoutineItem {
         productBrand = productBrand,
         productImageUrl = productImageUrl,
         stepOrder = stepOrder,
-        notes = notes
+        notes = notes,
+        isCompletedToday = isCompletedToday
     )
 }
 

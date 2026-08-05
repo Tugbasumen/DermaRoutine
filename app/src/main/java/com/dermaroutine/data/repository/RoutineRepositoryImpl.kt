@@ -99,4 +99,14 @@ class RoutineRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun toggleItemCompletion(itemId: Int): Result<Unit> {
+        return try {
+            val response = apiService.toggleItemCompletion(itemId)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception("Kayıt güncellenemedi."))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

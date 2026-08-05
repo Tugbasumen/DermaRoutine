@@ -9,6 +9,7 @@ namespace DermaRoutine.Api.DTOs
         public RoutineType RoutineType { get; set; }
         public bool IsActive { get; set; }
         public int ItemCount { get; set; }
+        public int CompletedItemCount { get; set; }
         public bool IsCompletedToday { get; set; }
     }
 
@@ -26,6 +27,7 @@ namespace DermaRoutine.Api.DTOs
         public string? ProductImageUrl { get; set; }
         public int StepOrder { get; set; }
         public string? Notes { get; set; }
+        public bool IsCompletedToday { get; set; }
     }
 
     public class CreateRoutineRequest

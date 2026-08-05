@@ -40,6 +40,8 @@ namespace DermaRoutine.Api.Controllers
                     RoutineType = r.RoutineType,
                     IsActive = r.IsActive,
                     ItemCount = r.RoutineItems.Count,
+                    CompletedItemCount = _context.RoutineItemCompletions
+                        .Count(ric => ric.UserId == userId && ric.CompletedAt.Date == today && r.RoutineItems.Any(ri => ri.Id == ric.RoutineItemId)),
                     IsCompletedToday = r.Completions.Any(c => c.CompletedAt.Date == today)
                 })
                 .ToListAsync();
@@ -77,7 +79,9 @@ namespace DermaRoutine.Api.Controllers
                     ProductBrand = ri.Product.Brand,
                     ProductImageUrl = ri.Product.ImageUrl,
                     StepOrder = ri.StepOrder,
-                    Notes = ri.Notes
+                    Notes = ri.Notes,
+                    IsCompletedToday = _context.RoutineItemCompletions
+                        .Any(ric => ric.RoutineItemId == ri.Id && ric.UserId == userId && ric.CompletedAt.Date == today)
                 }).ToList()
             };
 
@@ -193,6 +197,41 @@ namespace DermaRoutine.Api.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpPost("items/{itemId}/toggle")]
+        public async Task<IActionResult> ToggleItemCompletion(int itemId)
+        {
+            var userId = await _userContext.GetUserIdAsync();
+            if (userId == null) return Unauthorized();
+
+            // Verify item exists and belongs to user's routine
+            var item = await _context.RoutineItems
+                .Include(ri => ri.Routine)
+                .FirstOrDefaultAsync(ri => ri.Id == itemId && ri.Routine.UserId == userId);
+
+            if (item == null) return NotFound();
+
+            var today = DateTime.UtcNow.Date;
+            var completion = await _context.RoutineItemCompletions
+                .FirstOrDefaultAsync(ric => ric.RoutineItemId == itemId && ric.UserId == userId && ric.CompletedAt.Date == today);
+
+            if (completion != null)
+            {
+                _context.RoutineItemCompletions.Remove(completion);
+            }
+            else
+            {
+                _context.RoutineItemCompletions.Add(new RoutineItemCompletion
+                {
+                    RoutineItemId = itemId,
+                    UserId = userId.Value,
+                    CompletedAt = DateTime.UtcNow
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }

@@ -1,44 +1,53 @@
-# Phase 15: Skin Journal Implementation - Part 3: Android UI (Presentation)
+# Phase 16: Interactive Home Screen Routine Checklist Plan
 
-This final part brings the Skin Journal to life with a modern, user-friendly interface. Users will be able to select their daily mood, write notes, and view their skincare history.
+This phase implements the "Interactive Checklist" on the Home Screen as described in the project vision. Users will be able to check off individual products in their morning and evening routines directly from the dashboard.
 
 ## Proposed Changes
 
-### 1. ViewModel
+### 1. Backend: Granular Completion Tracking
 
-#### [NEW] [JournalViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalViewModel.kt)
-- Manages `JournalUiState` (Loading, Success, Error).
-- Functions to fetch all entries and save a new entry.
-- State for the current input (selected mood and note text).
+#### [NEW] [RoutineItemCompletion.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Entities/RoutineItemCompletion.cs)
+- Entity to track daily completion of specific products within a routine.
+- Fields: `Id`, `RoutineItemId`, `UserId`, `CompletedAt`.
 
-### 2. UI Components
+#### [MODIFY] [AppDbContext.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Data/AppDbContext.cs)
+- Add `DbSet<RoutineItemCompletion>`.
+- Configure relationship (User -> ItemCompletions).
 
-#### [NEW] MoodSelector
-- A row of interactive emoji buttons: 😊 (İyi), 😐 (Normal), 😕 (Hassas), 😣 (Kötü).
+#### [MODIFY] [RoutineDtos.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/RoutineDto.cs)
+- Update `RoutineItemDto` to include `bool IsCompletedToday`.
+- Update `RoutineDto` to include `int CompletedItemCount`.
 
-#### [NEW] JournalEntryCard
-- A clean card for the history list showing the mood, date, and truncated content.
+#### [MODIFY] [RoutineController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/RoutineController.cs)
+- Add `POST /api/routine/items/{itemId}/toggle`: Toggles completion status for an item today.
+- Update `GetRoutines` and `GetRoutine` to calculate and return item-level completion status.
 
-### 3. Screen Update
+### 2. Android: Data Layer
 
-#### [MODIFY] [JournalScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalScreen.kt)
-- **Header**: "Günlük Notlarım" title.
-- **Input Section**:
-    - "Bugün cildin nasıl hissediyor?" label.
-    - The `MoodSelector`.
-    - `AppTextField` for notes.
-    - "Kaydet" button.
-- **History Section**:
-    - "Geçmiş Kayıtlar" subtitle.
-    - A `LazyColumn` showing all previous entries using `JournalEntryCard`.
+#### [MODIFY] [Routine models & DTOs]
+- Add `isCompletedToday` to `RoutineItem`.
+- Add `completedItemCount` to `Routine`.
+
+#### [MODIFY] [RoutineApiService.kt]
+- Add `toggleItemCompletion(itemId)`.
+
+### 3. Android: Home Screen UI
+
+#### [MODIFY] [HomeViewModel.kt]
+- Fetch full routine details (including items) instead of just summaries.
+- Add `toggleItem(itemId)` function to handle checklist clicks.
+
+#### [MODIFY] [HomeScreen.kt]
+- Replace the summary cards with an **Expanded Checklist View**.
+- **Checklist Items**: Show product name with a clickable checkbox/circle.
+- **Progress Bar**: Visual indicator of completion (e.g., "2 / 5 tamamlandı").
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to ensure no UI or build errors.
+- `dotnet build` & `gradlew assembleDebug`.
 
 ### Manual Verification
-1. **Save Entry**: Select a mood, write a note, and tap "Kaydet". Verify it appears in the list immediately.
-2. **List History**: Scroll through past entries and verify dates are formatted correctly.
-3. **Empty State**: Verify a friendly message is shown when no entries exist.
-4. **Validation**: Ensure "Kaydet" is disabled if the note content is empty.
+1. **Check Item**: Tap "Temizleyici" on Home Screen. Verify the checkbox fills and the progress updates to "1 / 5".
+2. **Persistence**: Restart the app. Verify the item remains checked.
+3. **Synchronization**: Check an item on Home Screen, navigate to Routine Detail, and verify it's checked there too.

@@ -10,4 +10,5 @@ interface RoutineRepository {
     suspend fun getStreak(): Result<StreakInfo>
     suspend fun addItemToRoutine(routineId: Int, productId: Int, stepOrder: Int, notes: String?): Result<Unit>
     suspend fun removeItemFromRoutine(routineId: Int, itemId: Int): Result<Unit>
+    suspend fun toggleItemCompletion(itemId: Int): Result<Unit>
 }

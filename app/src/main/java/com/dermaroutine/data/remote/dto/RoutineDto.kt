@@ -9,6 +9,7 @@ data class RoutineDto(
     val routineType: Int,
     val isActive: Boolean,
     val itemCount: Int = 0,
+    val completedItemCount: Int = 0,
     val isCompletedToday: Boolean = false
 )
 
@@ -30,7 +31,8 @@ data class RoutineItemDto(
     val productBrand: String? = null,
     val productImageUrl: String? = null,
     val stepOrder: Int,
-    val notes: String? = null
+    val notes: String? = null,
+    val isCompletedToday: Boolean = false
 )
 
 @Serializable
