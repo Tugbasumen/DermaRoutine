@@ -1,46 +1,37 @@
-# Phase 17: Progress Statistics & Analytics Plan
+# Final Visual & Language Polish Plan
 
-This phase implements the analytical part of the application. Users will be able to visualize their routine consistency and see a breakdown of their skin "mood" over the last 30 days, as described in the project vision.
+This plan addresses the "lila" (lavender) color mismatch by enforcing a consistent green-based palette and cleans up the remaining hardcoded English strings in the Onboarding and Journal sections.
 
 ## Proposed Changes
 
-### 1. Backend: Analytics Engine
+### 1. Design System: Green Theme Enforcement
 
-#### [NEW] [StatisticsController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/StatisticsController.cs)
-- `GET /api/statistics/summary`:
-    - Calculates the percentage of morning and evening routines completed in the last 7 days.
-    - Aggregates mood data from `JournalEntries` for the last 30 days.
+#### [MODIFY] [Color.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Color.kt)
+- Define a professional green palette:
+    - `Primary`: #4E8A5E (Main Brand Green)
+    - `PrimaryContainer`: #DCEFE3 (Light background for cards)
+    - `SecondaryContainer`: #EAF5EE (Used for selected menu items to replace lavender)
 
-#### [NEW] [StatisticsDto.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/StatisticsDto.cs)
-- `ProgressSummaryDto`:
-    - `MorningCompletionRate`: Double (0-100).
-    - `EveningCompletionRate`: Double (0-100).
-    - `CurrentStreak`: Int.
-    - `MoodCounts`: List of `MoodStatDto` (Emoji, Count).
+#### [MODIFY] [Theme.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Theme.kt)
+- Explicitly map all Material 3 color slots (especially `secondaryContainer`) to the green palette to override default lavender/purple behavior.
 
-### 2. Android: Data Layer
+### 2. Localization: 100% Turkish Coverage
 
-#### [NEW] [Statistics Models & Repository]
-- `ProgressStats` domain model.
-- `StatisticsRepository` and `StatisticsApiService`.
-- `GetProgressStatsUseCase`.
+#### [MODIFY] [OnboardingScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/onboarding/OnboardingScreen.kt)
+- Replace hardcoded "Get Started" and "Continue" with `R.string.onboarding_get_started` and `R.string.onboarding_continue`.
 
-### 3. Android: Progress UI Enhancement
+#### [MODIFY] [JournalScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalScreen.kt)
+- Ensure the localized version is used and no "Coming Soon" placeholder remains.
 
-#### [MODIFY] [ProgressScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/ProgressScreen.kt)
-- Add a **Statistics Section** at the top of the timeline.
-- **Routine Analytics**: Circular or linear progress indicators for Morning/Evening consistency.
-- **Mood Analytics**: A grid or list showing mood emoji distribution (e.g., 😊 12 gün, 😐 10 gün).
-
-#### [MODIFY] [ProgressViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/progress/ProgressViewModel.kt)
-- Integrate `GetProgressStatsUseCase` to fetch and expose analytical data to the UI.
+#### [MODIFY] [strings.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/values/strings.xml)
+- Verify and add any missing translations for buttons and status indicators.
 
 ## Verification Plan
 
 ### Automated Tests
-- `dotnet build` & `gradlew assembleDebug`.
+- Run `gradlew assembleDebug` to ensure all resource IDs are correct.
 
 ### Manual Verification
-1. **Consistency Stats**: Complete several routines and verify the percentage increases correctly on the Progress screen.
-2. **Mood Breakdown**: Add multiple journal entries with different moods and verify the counts are accurate.
-3. **Time Window**: Ensure the statistics only reflect the relevant periods (Last 7 days for routines, Last 30 for mood).
+1. **Visual Sweep**: Check the Bottom Navigation. The selected item indicator should now be a soft green/mint color instead of purple.
+2. **Onboarding Sweep**: Verify all 3 pages and the action buttons are in Turkish.
+3. **Journal Sweep**: Ensure the daily entry form and history list are fully localized.

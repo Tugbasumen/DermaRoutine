@@ -86,7 +86,7 @@ fun JournalScreen(
                     item {
                         Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                             Text(
-                                text = stringResource(id = R.string.progress_no_photos_desc), // Reusing similar string
+                                text = stringResource(id = R.string.progress_no_photos_desc),
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         }

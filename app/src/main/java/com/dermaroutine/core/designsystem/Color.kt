@@ -2,19 +2,27 @@ package com.dermaroutine.core.designsystem
 
 import androidx.compose.ui.graphics.Color
 
-val Primary = Color(0xFF8FBFA8)
+// Brand Colors (Green Theme)
+val Primary = Color(0xFF4E8A5E) // Stronger brand green from logo
 val PrimaryContainer = Color(0xFFDCEFE3)
+val OnPrimaryContainer = Color(0xFF00210E)
+
+val Secondary = Color(0xFF8FBFA8) // Softer sage green
+val SecondaryContainer = Color(0xFFEAF5EE)
+val OnSecondaryContainer = Color(0xFF002114)
+
 val Background = Color(0xFFF8FBF8)
 val Surface = Color(0xFFFFFFFF)
+val SurfaceVariant = Color(0xFFE0E5DD)
+val OnSurfaceVariant = Color(0xFF434940)
+
 val SoftMint = Color(0xFFEAF5EE)
 val Cream = Color(0xFFF6F1E8)
-val MainText = Color(0xFF26332D)
+
+val MainText = Color(0xFF191C1A)
 val SecondaryText = Color(0xFF6F7C75)
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Functional Colors
+val Error = Color(0xFFBA1A1A)
+val OnError = Color(0xFFFFFFFF)
+val Success = Color(0xFF4E8A5E)

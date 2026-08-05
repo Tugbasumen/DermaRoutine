@@ -1,18 +1,11 @@
-# Phase 17: Progress Statistics & Analytics - Task List
+# Final Visual & Language Polish - Task List
 
-- [x] Backend: Analytics Engine
-    - [x] Create `StatisticsDto.cs`
-    - [x] Implement `StatisticsController.cs`
-    - [x] Verify with `dotnet build`
-- [x] Android: Data Layer
-    - [x] Create `ProgressStats` Domain Model
-    - [x] Create `StatisticsApiService.kt` and DTOs
-    - [x] Implement `StatisticsRepository`
-    - [x] Create `GetProgressStatsUseCase.kt`
-    - [x] Configure `StatisticsModule.kt` (DI)
-- [x] Android: UI Enhancement
-    - [x] Update `ProgressViewModel.kt` to fetch analytics
-    - [x] Implement Analytics Header in `ProgressScreen.kt` (Completion rates & Mood summary)
-- [x] Build and Verify
-    - [x] Successful `gradlew assembleDebug`
-    - [x] Verify percentages and mood counts match user activity
+- [x] Design System: Green Theme
+    - [x] Update `Color.kt` with premium green palette
+    - [x] Update `Theme.kt` to enforce green indicators (secondaryContainer)
+- [ ] Localization Cleanup
+    - [ ] Localize Onboarding buttons in `OnboardingScreen.kt`
+    - [ ] Remove "Coming Soon" from `JournalScreen.kt` and use full UI
+- [ ] Build and Verify
+    - [ ] Successful `gradlew assembleDebug`
+    - [ ] Final visual check of navigation colors
