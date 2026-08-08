@@ -29,6 +29,8 @@ class StatisticsRepositoryImpl @Inject constructor(
             morningCompletionRate = morningCompletionRate,
             eveningCompletionRate = eveningCompletionRate,
             currentStreak = currentStreak,
+            skinScore = skinScore,
+            weeklyActivity = weeklyActivity,
             moodCounts = moodCounts.map { MoodStat(it.mood, it.count) }
         )
     }

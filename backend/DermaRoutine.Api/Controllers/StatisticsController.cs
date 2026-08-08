@@ -73,11 +73,30 @@ namespace DermaRoutine.Api.Controllers
                 .OrderByDescending(x => x.Count)
                 .ToListAsync();
 
+            // 4. Calculate Weekly Activity (Last 7 Days Trend)
+            var weeklyActivity = new List<int>();
+            for (int i = 6; i >= 0; i--)
+            {
+                var date = now.Date.AddDays(-i);
+                var count = await _context.RoutineItemCompletions
+                    .CountAsync(ric => ric.UserId == userId && ric.CompletedAt.Date == date);
+                weeklyActivity.Add(count);
+            }
+
+            // 5. Calculate Skin Score (Simplified version: consistency + mood)
+            int skinScore = 0;
+            if (streak.CurrentStreak > 0) skinScore += 40;
+            skinScore += (int)(morningRate * 0.3);
+            skinScore += (int)(eveningRate * 0.3);
+            skinScore = Math.Min(100, skinScore);
+
             return Ok(new ProgressSummaryDto
             {
                 MorningCompletionRate = Math.Round(morningRate, 1),
                 EveningCompletionRate = Math.Round(eveningRate, 1),
                 CurrentStreak = streak.CurrentStreak,
+                SkinScore = skinScore,
+                WeeklyActivity = weeklyActivity,
                 MoodCounts = moodStats
             });
         }

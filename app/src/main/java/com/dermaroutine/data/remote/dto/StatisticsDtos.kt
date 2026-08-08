@@ -7,6 +7,8 @@ data class ProgressSummaryDto(
     val morningCompletionRate: Double,
     val eveningCompletionRate: Double,
     val currentStreak: Int,
+    val skinScore: Int,
+    val weeklyActivity: List<Int>,
     val moodCounts: List<MoodStatDto>
 )
 

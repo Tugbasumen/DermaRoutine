@@ -14,9 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,11 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dermaroutine.R
-import com.dermaroutine.core.designsystem.PrimaryButton
-import com.dermaroutine.core.designsystem.SecondaryButton
+import com.dermaroutine.core.designsystem.Primary
+import com.dermaroutine.presentation.home.components.CircularRoutineProgress
+import com.dermaroutine.presentation.home.components.StatCard
+import com.dermaroutine.presentation.home.components.WeeklyBarChart
 import com.dermaroutine.domain.model.RoutineDetail
 import com.dermaroutine.domain.model.RoutineItem
 import com.dermaroutine.domain.model.RoutineType
+import java.time.LocalTime
 
 @Composable
 fun HomeScreen(
@@ -44,307 +47,280 @@ fun HomeScreen(
         viewModel.loadDashboardData()
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(32.dp))
-            HomeHeader(
-                greeting = if (uiState.greetingRes != 0) stringResource(id = uiState.greetingRes) else "",
-                userName = uiState.userName,
-                date = uiState.date
-            )
-        }
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                HomeHeader(
+                    greeting = if (uiState.greetingRes != 0) stringResource(id = uiState.greetingRes) else "",
+                    userName = uiState.userName
+                )
+            }
 
-        item {
-            RoutineSection(
-                morningRoutine = uiState.morningRoutine,
-                eveningRoutine = uiState.eveningRoutine,
-                onToggleItem = { viewModel.toggleItem(it) },
-                onCreateRoutine = onNavigateToRoutine
-            )
-        }
+            // Featured Routine Card (Time-aware selection)
+            item {
+                val now = LocalTime.now()
+                val featuredRoutine = if (now.hour < 15) {
+                    uiState.morningRoutine ?: uiState.eveningRoutine
+                } else {
+                    uiState.eveningRoutine ?: uiState.morningRoutine
+                }
+                
+                FeaturedRoutineCard(
+                    routine = featuredRoutine,
+                    onToggleItem = { viewModel.toggleItem(it) },
+                    onNavigateToRoutines = onNavigateToRoutine
+                )
+            }
 
-        item {
-            StreakCard(
-                streak = uiState.currentStreak,
-                onViewProgress = {} // Placeholder
-            )
-        }
+            // Stats Row
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    StatCard(
+                        label = "Seri",
+                        value = "${uiState.currentStreak} gün",
+                        subValue = "Seri devam ediyor",
+                        icon = "🔥",
+                        containerColor = Color(0xFFFFF3E0),
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatCard(
+                        label = "Cilt Skoru",
+                        value = "${uiState.skinScore} puan",
+                        subValue = "Cilt skoru",
+                        icon = "🌿",
+                        containerColor = Color(0xFFE8F5E9),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
 
-        item {
-            TodaySkinCard(
-                hasPhoto = uiState.hasTodayPhoto,
-                onAddPhoto = onNavigateToJournal
-            )
-        }
+            // Weekly Progress
+            item {
+                WeeklyProgressSection(uiState.weeklyActivity)
+            }
 
-        item {
-            QuickActionsSection(
-                onAddProduct = onNavigateToProducts,
-                onAddPhoto = onNavigateToJournal,
-                onAskAI = onNavigateToAssistant
-            )
-            Spacer(modifier = Modifier.height(32.dp))
+            // Next Reminder
+            if (uiState.nextReminderTitleRes != null && uiState.nextReminderTime != null) {
+                item {
+                    NextReminderCard(
+                        titleRes = uiState.nextReminderTitleRes!!,
+                        time = uiState.nextReminderTime!!
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+            }
         }
     }
 }
 
 @Composable
-fun HomeHeader(greeting: String, userName: String, date: String) {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+fun HomeHeader(greeting: String, userName: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
             Text(
-                text = "$greeting${if (userName.isNotEmpty()) ", $userName" else ""}",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                text = greeting,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+            Text(
+                text = "$userName 👋",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp
                 )
             )
-            Spacer(modifier = Modifier.width(8.dp))
+        }
+        Row {
+            IconButton(
+                onClick = { /* Notification */ },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface, CircleShape)
+            ) {
+                Icon(Icons.Default.Notifications, contentDescription = null, tint = Color(0xFFFFB300))
+            }
+            Spacer(modifier = Modifier.width(12.dp))
             Image(
                 painter = painterResource(id = R.drawable.app_logo),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp).clip(CircleShape)
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface)
             )
         }
-        Text(
-            text = date,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
     }
 }
 
 @Composable
-fun RoutineSection(
-    morningRoutine: RoutineDetail?,
-    eveningRoutine: RoutineDetail?,
-    onToggleItem: (Int) -> Unit,
-    onCreateRoutine: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(
-            text = stringResource(id = R.string.home_today_routine),
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        
-        RoutineChecklistCard(
-            routine = morningRoutine,
-            icon = Icons.Default.LightMode,
-            title = stringResource(id = R.string.routine_morning),
-            iconColor = Color(0xFFFFB300),
-            onToggleItem = onToggleItem,
-            onClick = onCreateRoutine
-        )
-
-        RoutineChecklistCard(
-            routine = eveningRoutine,
-            icon = Icons.Default.Nightlight,
-            title = stringResource(id = R.string.routine_evening),
-            iconColor = Color(0xFF5C6BC0),
-            onToggleItem = onToggleItem,
-            onClick = onCreateRoutine
-        )
-    }
-}
-
-@Composable
-fun RoutineChecklistCard(
+fun FeaturedRoutineCard(
     routine: RoutineDetail?,
-    icon: ImageVector,
-    title: String,
-    iconColor: Color,
     onToggleItem: (Int) -> Unit,
-    onClick: () -> Unit
+    onNavigateToRoutines: () -> Unit
 ) {
+    val routineTitle = if (routine?.routineType == RoutineType.Morning) 
+        stringResource(id = R.string.routine_morning).uppercase() 
+    else 
+        stringResource(id = R.string.routine_evening).uppercase()
+        
+    val completedCount = routine?.items?.count { it.isCompletedToday } ?: 0
+    val totalCount = routine?.items?.size ?: 0
+    val progress = if (totalCount > 0) completedCount.toFloat() / totalCount else 0f
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                }
-                
-                if (routine != null) {
-                    val completedCount = routine.items.count { it.isCompletedToday }
-                    Text(
-                        text = "$completedCount / ${routine.items.size}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-
-            if (routine == null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                SecondaryButton(text = stringResource(id = R.string.routine_add), onClick = onClick)
-            } else {
-                Spacer(modifier = Modifier.height(16.dp))
-                routine.items.forEach { item ->
-                    ChecklistItem(
-                        item = item,
-                        onToggle = { onToggleItem(item.id) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ChecklistItem(item: RoutineItem, onToggle: () -> Unit) {
-    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onToggle() }
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val icon = if (item.isCompletedToday) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked
-        val color = if (item.isCompletedToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-        
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = item.productName,
-            style = MaterialTheme.typography.bodyMedium,
-            color = if (item.isCompletedToday) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-@Composable
-fun StreakCard(streak: Int, onViewProgress: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "🔥", fontSize = 32.sp)
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.home_current_streak),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.home_days, streak),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-            IconButton(onClick = onViewProgress) {
-                Icon(Icons.Default.ChevronRight, contentDescription = null)
-            }
-        }
-    }
-}
-
-@Composable
-fun TodaySkinCard(hasPhoto: Boolean, onAddPhoto: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                text = stringResource(id = R.string.home_today_skin),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = if (hasPhoto) stringResource(id = R.string.home_photo_added) else stringResource(id = R.string.home_keep_track),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            PrimaryButton(
-                text = if (hasPhoto) stringResource(id = R.string.home_view_photo) else stringResource(id = R.string.home_add_photo),
-                onClick = onAddPhoto
-            )
-        }
-    }
-}
-
-@Composable
-fun QuickActionsSection(
-    onAddProduct: () -> Unit,
-    onAddPhoto: () -> Unit,
-    onAskAI: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(
-            text = stringResource(id = R.string.home_quick_actions),
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            QuickActionItem(
-                icon = Icons.Default.Add,
-                label = stringResource(id = R.string.home_action_product),
-                onClick = onAddProduct,
-                modifier = Modifier.weight(1f)
-            )
-            QuickActionItem(
-                icon = Icons.Default.CameraAlt,
-                label = stringResource(id = R.string.home_action_photo),
-                onClick = onAddPhoto,
-                modifier = Modifier.weight(1f)
-            )
-            QuickActionItem(
-                icon = Icons.Default.SmartToy,
-                label = stringResource(id = R.string.home_action_ai),
-                onClick = onAskAI,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-fun QuickActionItem(icon: ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable { onClick() }
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .clickable { onNavigateToRoutines() },
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-            contentAlignment = Alignment.Center
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Primary, Primary.copy(alpha = 0.7f))
+                    )
+                )
+                .padding(24.dp)
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column {
+                        Text(
+                            text = routineTitle,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (routine != null) "$completedCount/$totalCount tamamlandı" else stringResource(id = R.string.routine_empty),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    CircularRoutineProgress(percentage = progress)
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (routine != null) {
+                    routine.items.take(3).forEach { item ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(vertical = 4.dp)
+                                .clickable { onToggleItem(item.id) }
+                        ) {
+                            Icon(
+                                imageVector = if (item.isCompletedToday) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+                                contentDescription = null,
+                                tint = if (item.isCompletedToday) Color.White else Color.White.copy(alpha = 0.4f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = item.productName,
+                                color = if (item.isCompletedToday) Color.White else Color.White.copy(alpha = 0.8f),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.routine_empty_desc),
+                        color = Color.White.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Button(
+                    onClick = onNavigateToRoutines,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.routine_title), color = Primary, fontWeight = FontWeight.Bold)
+                }
+            }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = label, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+fun WeeklyProgressSection(activity: List<Int>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Haftalık İlerleme", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(text = "Tümü", style = MaterialTheme.typography.labelMedium, color = Primary)
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            WeeklyBarChart(activity = if (activity.isNotEmpty()) activity else listOf(0, 0, 0, 0, 0, 0, 0))
+        }
+    }
+}
+
+@Composable
+fun NextReminderCard(titleRes: Int, time: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F4))
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color.White, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "⏰", fontSize = 24.sp)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = "${stringResource(id = titleRes)} hatırlatması",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "${stringResource(id = R.string.home_days, 0).replace("0 Gün", "Bugün")}, $time",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
+        }
     }
 }

@@ -5,6 +5,8 @@ namespace DermaRoutine.Api.DTOs
         public double MorningCompletionRate { get; set; }
         public double EveningCompletionRate { get; set; }
         public int CurrentStreak { get; set; }
+        public int SkinScore { get; set; }
+        public List<int> WeeklyActivity { get; set; } = new();
         public List<MoodStatDto> MoodCounts { get; set; } = new();
     }
 

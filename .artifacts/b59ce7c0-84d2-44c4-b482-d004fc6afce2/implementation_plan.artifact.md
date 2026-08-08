@@ -1,37 +1,40 @@
-# Final Visual & Language Polish Plan
+# Dynamic Home Screen Data Integration Plan
 
-This plan addresses the "lila" (lavender) color mismatch by enforcing a consistent green-based palette and cleans up the remaining hardcoded English strings in the Onboarding and Journal sections.
+This plan focuses on replacing all remaining static/dummy data on the Home Screen with real, dynamic data from the backend and local storage (DataStore). Specifically, we will make the "Next Reminder" card and "Featured Routine" logic reflect the user's actual settings and current time.
 
 ## Proposed Changes
 
-### 1. Design System: Green Theme Enforcement
+### 1. Presentation Layer (Android)
 
-#### [MODIFY] [Color.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Color.kt)
-- Define a professional green palette:
-    - `Primary`: #4E8A5E (Main Brand Green)
-    - `PrimaryContainer`: #DCEFE3 (Light background for cards)
-    - `SecondaryContainer`: #EAF5EE (Used for selected menu items to replace lavender)
+#### [MODIFY] [HomeUiState.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeUiState.kt)
+- Add `nextReminderTitle: Int?` (Resource ID for localized titles like "Sabah Rutini").
+- Add `nextReminderTime: String?` (The actual formatted time, e.g., "08:30").
 
-#### [MODIFY] [Theme.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/designsystem/Theme.kt)
-- Explicitly map all Material 3 color slots (especially `secondaryContainer`) to the green palette to override default lavender/purple behavior.
+#### [MODIFY] [HomeViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeViewModel.kt)
+- Inject `GetReminderSettingsUseCase` from `domain.notifications`.
+- Implement `calculateNextReminder()`:
+    - Observe the reminder settings from DataStore.
+    - Compare the current time with the configured Morning/Evening reminder times.
+    - Determine which one is "next" and update the state.
+- Refine `loadDashboardData()`:
+    - Ensure `featuredRoutine` selection is intelligent (showing the routine the user should be doing *now*).
 
-### 2. Localization: 100% Turkish Coverage
-
-#### [MODIFY] [OnboardingScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/onboarding/OnboardingScreen.kt)
-- Replace hardcoded "Get Started" and "Continue" with `R.string.onboarding_get_started` and `R.string.onboarding_continue`.
-
-#### [MODIFY] [JournalScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/journal/JournalScreen.kt)
-- Ensure the localized version is used and no "Coming Soon" placeholder remains.
-
-#### [MODIFY] [strings.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/values/strings.xml)
-- Verify and add any missing translations for buttons and status indicators.
+#### [MODIFY] [HomeScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeScreen.kt)
+- Update `NextReminderCard`:
+    - Accept dynamic parameters for title and time.
+    - If no reminders are enabled, hide the card or show a "No reminders set" prompt.
+- Update `WeeklyProgressSection`:
+    - Ensure it handles an empty activity list gracefully (using the new backend data).
+- Update `FeaturedRoutineCard`:
+    - Fix the "Complete All" button logic or hide it if not yet implemented to avoid confusion.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `gradlew assembleDebug` to ensure all resource IDs are correct.
+- `gradlew assembleDebug` to verify compilation.
 
 ### Manual Verification
-1. **Visual Sweep**: Check the Bottom Navigation. The selected item indicator should now be a soft green/mint color instead of purple.
-2. **Onboarding Sweep**: Verify all 3 pages and the action buttons are in Turkish.
-3. **Journal Sweep**: Ensure the daily entry form and history list are fully localized.
+1. **Reminder Change**: Go to Profile -> Reminders, change the Morning time to 10 minutes in the future. Return Home and verify the `NextReminderCard` shows the new time.
+2. **Routine Priority**: Set your system clock to 09:00 AM. Verify the Morning routine is featured. Set it to 09:00 PM. Verify the Evening routine takes priority.
+3. **Weekly Progress**: Check a routine item today. Verify the last bar in the "Haftalık İlerleme" chart increases immediately.
+4. **Skin Score**: Verify the score reflects the current streak and completion rates calculated by the backend.
