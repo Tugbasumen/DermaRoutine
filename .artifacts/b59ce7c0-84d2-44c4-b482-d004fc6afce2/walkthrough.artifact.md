@@ -1,31 +1,23 @@
-# Dynamic Premium Home Screen Walkthrough
+# Network Connectivity Fix Walkthrough
 
-The "Premium Dashboard" is now fully alive. Every element on the Home Screen is now powered by real user data, settings, and time-aware logic.
+I have updated the project configuration to allow your physical Android device to connect to the backend server running on your computer.
 
 ## Changes Made
 
-### 1. Dynamic Reminder System
-- **Next Reminder Logic**: The app now calculates the next upcoming reminder by comparing the current device time with your Morning and Evening reminder settings.
-- **Real Data Integration**: The "⏰ Hatırlatıcı" card at the bottom now displays your actual scheduled time (e.g., "Sabah Rutini hatırlatması - Bugün, 08:30") instead of dummy text.
+### 1. Backend: External Listening
+- Updated `launchSettings.json` to use **`http://0.0.0.0:5222`**. This allows the .NET server to accept incoming connections from other devices on your Wi-Fi network.
 
-### 2. Time-Aware Routine Spotlight
-- **Smart Selection**: The Home Screen now automatically features the most relevant routine based on the hour.
-    - Before 3:00 PM: Shows the **Morning Routine**.
-    - After 3:00 PM: Shows the **Evening Routine**.
-- **Live Progress**: The circular indicator and "3/5 tamamlandı" text now reflect your actual completion status for the current day.
+### 2. Android: Real IP Integration
+- Changed the `BASE_URL` in `NetworkModule.kt` from the emulator loopback (`10.0.2.2`) to your computer's actual network IP: **`192.168.1.103`**.
+- Updated `network_security_config.xml` to grant permission for HTTP traffic to this new IP address.
 
-### 3. Data-Driven Analytics
-- **Real Weekly Chart**: The "Haftalık İlerleme" bar chart now pulls real activity counts from the backend for the last 7 days. Every time you check an item, the chart updates.
-- **Dynamic Skin Score**: Your "Cilt Skoru" is now calculated by the backend based on your current streak and routine consistency.
+## Final Steps to Test
 
-### 4. Localization & Polish
-- **100% Turkish**: Replaced all remaining English strings in the dashboard components with standard string resources.
-- **Visual Refinement**: Fine-tuned the gradient routine card and circular progress to match the "Emma" reference image perfectly while using live data.
+> [!IMPORTANT]
+> **Restart Required**:
+> 1. Stop your running backend server in the terminal.
+> 2. Start it again (e.g., `dotnet run`).
+> 3. Ensure your phone is connected to the same Wi-Fi as the computer.
+> 4. Run the Android app again.
 
-## Verification Results
-- [x] **Build Status**: Successful (`./gradlew assembleDebug`).
-- [x] **Data Integrity**: Verified that changing a reminder time in settings immediately updates the Home Screen card.
-- [x] **Time Logic**: Confirmed the dashboard correctly switches featured routines based on system time.
-
-## Recommended Commit Message
-`feat(home): dynamize premium dashboard with real reminders, stats, and time-aware logic`
+The `Connection timed out` error should now be resolved, and your data should load correctly on your physical phone.

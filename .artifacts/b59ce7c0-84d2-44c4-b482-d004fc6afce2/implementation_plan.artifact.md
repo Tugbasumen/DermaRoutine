@@ -1,40 +1,31 @@
-# Dynamic Home Screen Data Integration Plan
+# Network Connectivity Fix for Physical Devices
 
-This plan focuses on replacing all remaining static/dummy data on the Home Screen with real, dynamic data from the backend and local storage (DataStore). Specifically, we will make the "Next Reminder" card and "Featured Routine" logic reflect the user's actual settings and current time.
+This plan addresses the `Connection timed out` error shown in your screenshot. The issue occurs because `10.0.2.2` only works for emulators; physical devices must use your computer's actual network IP address.
+
+## User Action Required
+
+> [!WARNING]
+> **Local IP Address**: I detected your computer's IP as **`192.168.1.103`**. If you move to a different Wi-Fi network, this IP might change, and you will need to update the `BASE_URL` again.
 
 ## Proposed Changes
 
-### 1. Presentation Layer (Android)
+### 1. Backend: Allow External Connections
 
-#### [MODIFY] [HomeUiState.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeUiState.kt)
-- Add `nextReminderTitle: Int?` (Resource ID for localized titles like "Sabah Rutini").
-- Add `nextReminderTime: String?` (The actual formatted time, e.g., "08:30").
+#### [MODIFY] [launchSettings.json](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Properties/launchSettings.json)
+- Change `applicationUrl` from `http://localhost:5222` to **`http://0.0.0.0:5222`**.
+- This tells the server to listen to requests from any device on your Wi-Fi, not just the computer itself.
 
-#### [MODIFY] [HomeViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeViewModel.kt)
-- Inject `GetReminderSettingsUseCase` from `domain.notifications`.
-- Implement `calculateNextReminder()`:
-    - Observe the reminder settings from DataStore.
-    - Compare the current time with the configured Morning/Evening reminder times.
-    - Determine which one is "next" and update the state.
-- Refine `loadDashboardData()`:
-    - Ensure `featuredRoutine` selection is intelligent (showing the routine the user should be doing *now*).
+### 2. Android: Update API Base URL
 
-#### [MODIFY] [HomeScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/home/HomeScreen.kt)
-- Update `NextReminderCard`:
-    - Accept dynamic parameters for title and time.
-    - If no reminders are enabled, hide the card or show a "No reminders set" prompt.
-- Update `WeeklyProgressSection`:
-    - Ensure it handles an empty activity list gracefully (using the new backend data).
-- Update `FeaturedRoutineCard`:
-    - Fix the "Complete All" button logic or hide it if not yet implemented to avoid confusion.
+#### [MODIFY] [NetworkModule.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/di/NetworkModule.kt)
+- Change `BASE_URL` to **`http://192.168.1.103:5222/`**.
+
+#### [MODIFY] [network_security_config.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/xml/network_security_config.xml)
+- Add **`192.168.1.103`** to the permitted cleartext domains.
 
 ## Verification Plan
 
-### Automated Tests
-- `gradlew assembleDebug` to verify compilation.
-
 ### Manual Verification
-1. **Reminder Change**: Go to Profile -> Reminders, change the Morning time to 10 minutes in the future. Return Home and verify the `NextReminderCard` shows the new time.
-2. **Routine Priority**: Set your system clock to 09:00 AM. Verify the Morning routine is featured. Set it to 09:00 PM. Verify the Evening routine takes priority.
-3. **Weekly Progress**: Check a routine item today. Verify the last bar in the "Haftalık İlerleme" chart increases immediately.
-4. **Skin Score**: Verify the score reflects the current streak and completion rates calculated by the backend.
+1. **Restart Backend**: Stop and start your .NET backend server.
+2. **Connect Phone**: Ensure your phone is on the same Wi-Fi as your computer.
+3. **Run App**: Open the app and check the "Rutin" page. The connection error should disappear, and data should load.
