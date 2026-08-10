@@ -1,23 +1,26 @@
-# Network Connectivity Fix Walkthrough
+# AI Assistant Chat Implementation - Backend Walkthrough
 
-I have updated the project configuration to allow your physical Android device to connect to the backend server running on your computer.
+The backend infrastructure for the general AI Skin Assistant chat is now ready. This step enables the mobile app to send any skincare question and receive a personalized, educational response in Turkish.
 
 ## Changes Made
 
-### 1. Backend: External Listening
-- Updated `launchSettings.json` to use **`http://0.0.0.0:5222`**. This allows the .NET server to accept incoming connections from other devices on your Wi-Fi network.
+### 1. Enhanced API DTOs
+- Updated `AssistantDtos.cs` to include:
+    - `GeneralChatRequest`: Captures the user's plain text question.
+    - `GeneralChatResponse`: Delivers the AI-generated answer.
 
-### 2. Android: Real IP Integration
-- Changed the `BASE_URL` in `NetworkModule.kt` from the emulator loopback (`10.0.2.2`) to your computer's actual network IP: **`192.168.1.103`**.
-- Updated `network_security_config.xml` to grant permission for HTTP traffic to this new IP address.
+### 2. Personalized Chat Endpoint
+- Implemented `POST /api/assistant/chat` in the `AssistantController`.
+- **User Recognition**: The endpoint now fetches the user's name and skin profile (if available) to provide a more tailored conversational experience.
+- **Safety First**: Integrated a robust system prompt that instructs Gemini to:
+    - Respond strictly in **Turkish**.
+    - Stay educational and supportive.
+    - Avoid medical diagnoses or prescriptions.
+    - Include a standard medical advice disclaimer.
 
-## Final Steps to Test
+## Verification Results
+- [x] **Build Status**: Successful (`dotnet build`).
+- [x] **Personalization**: Verified that the prompt correctly includes user-specific context from the database.
 
-> [!IMPORTANT]
-> **Restart Required**:
-> 1. Stop your running backend server in the terminal.
-> 2. Start it again (e.g., `dotnet run`).
-> 3. Ensure your phone is connected to the same Wi-Fi as the computer.
-> 4. Run the Android app again.
-
-The `Connection timed out` error should now be resolved, and your data should load correctly on your physical phone.
+## Recommended Commit Message
+`feat(backend): implement personalized general chat endpoint for AI assistant`

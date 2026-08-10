@@ -19,7 +19,8 @@ class ProductViewModel @Inject constructor(
     private val createProductUseCase: CreateProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
     private val deleteProductUseCase: DeleteProductUseCase,
-    private val barcodeLookupUseCase: BarcodeLookupUseCase
+    private val barcodeLookupUseCase: BarcodeLookupUseCase,
+    private val analyzeProductUseCase: AnalyzeProductUseCase
 ) : ViewModel() {
 
     private val _listState = MutableStateFlow<ProductListUiState>(ProductListUiState.Loading)
@@ -30,6 +31,9 @@ class ProductViewModel @Inject constructor(
 
     private val _saveState = MutableStateFlow<SaveProductUiState>(SaveProductUiState.Idle)
     val saveState = _saveState.asStateFlow()
+
+    private val _analysisState = MutableStateFlow<ProductAnalysisUiState>(ProductAnalysisUiState.Idle)
+    val analysisState = _analysisState.asStateFlow()
 
     // Form State
     var formName = mutableStateOf("")
@@ -137,6 +141,23 @@ class ProductViewModel @Inject constructor(
     fun resetSaveState() {
         _saveState.value = SaveProductUiState.Idle
     }
+
+    fun analyzeProduct(ingredients: List<String>) {
+        if (ingredients.isEmpty()) return
+        
+        viewModelScope.launch {
+            _analysisState.value = ProductAnalysisUiState.Loading
+            analyzeProductUseCase(ingredients).onSuccess {
+                _analysisState.value = ProductAnalysisUiState.Success(it)
+            }.onFailure {
+                _analysisState.value = ProductAnalysisUiState.Error(it.message ?: "Analysis failed")
+            }
+        }
+    }
+
+    fun resetAnalysisState() {
+        _analysisState.value = ProductAnalysisUiState.Idle
+    }
 }
 
 sealed class ProductListUiState {
@@ -159,4 +180,11 @@ sealed class SaveProductUiState {
     data object Success : SaveProductUiState()
     data class DuplicateFound(val product: Product) : SaveProductUiState()
     data class Error(val message: String) : SaveProductUiState()
+}
+
+sealed class ProductAnalysisUiState {
+    data object Idle : ProductAnalysisUiState()
+    data object Loading : ProductAnalysisUiState()
+    data class Success(val analysis: ProductAnalysis) : ProductAnalysisUiState()
+    data class Error(val message: String) : ProductAnalysisUiState()
 }

@@ -218,6 +218,32 @@ namespace DermaRoutine.Api.Migrations
                     b.ToTable("RoutineItems");
                 });
 
+            modelBuilder.Entity("DermaRoutine.Api.Entities.RoutineItemCompletion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RoutineItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoutineItemId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RoutineItemCompletions");
+                });
+
             modelBuilder.Entity("DermaRoutine.Api.Entities.SkinPhoto", b =>
                 {
                     b.Property<int>("Id")
@@ -399,6 +425,25 @@ namespace DermaRoutine.Api.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Routine");
+                });
+
+            modelBuilder.Entity("DermaRoutine.Api.Entities.RoutineItemCompletion", b =>
+                {
+                    b.HasOne("DermaRoutine.Api.Entities.RoutineItem", "RoutineItem")
+                        .WithMany()
+                        .HasForeignKey("RoutineItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DermaRoutine.Api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RoutineItem");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DermaRoutine.Api.Entities.SkinPhoto", b =>

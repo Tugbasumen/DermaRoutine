@@ -15,3 +15,16 @@ data class IngredientExplanationResponse(
     val considerations: List<String>,
     val disclaimer: String
 )
+
+@Serializable
+data class ProductAnalysisRequest(
+    val ingredients: List<String>
+)
+
+@Serializable
+data class ProductAnalysisResponse(
+    val suitabilityScore: Int,
+    val summary: String,
+    val keyBenefits: List<String>,
+    val potentialRisks: List<String>
+)

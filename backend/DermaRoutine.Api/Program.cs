@@ -43,6 +43,13 @@ builder.Services
 
 var app = builder.Build();
 
+// Automatically apply migrations on startup (Step 1 fix)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

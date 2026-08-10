@@ -1,31 +1,51 @@
-# Network Connectivity Fix for Physical Devices
+# Phase 19: AI Skin Assistant Chat Implementation Plan
 
-This plan addresses the `Connection timed out` error shown in your screenshot. The issue occurs because `10.0.2.2` only works for emulators; physical devices must use your computer's actual network IP address.
-
-## User Action Required
-
-> [!WARNING]
-> **Local IP Address**: I detected your computer's IP as **`192.168.1.103`**. If you move to a different Wi-Fi network, this IP might change, and you will need to update the `BASE_URL` again.
+This phase implements a real-time AI messaging interface where users can ask general skincare questions and receive educational guidance from Gemini, matching the provided design.
 
 ## Proposed Changes
 
-### 1. Backend: Allow External Connections
+### 1. Backend: General Chat Engine
 
-#### [MODIFY] [launchSettings.json](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Properties/launchSettings.json)
-- Change `applicationUrl` from `http://localhost:5222` to **`http://0.0.0.0:5222`**.
-- This tells the server to listen to requests from any device on your Wi-Fi, not just the computer itself.
+#### [NEW] [AssistantDtos.cs Update](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/AssistantDtos.cs)
+- `GeneralChatRequest`: User's message.
+- `GeneralChatResponse`: AI's text response.
 
-### 2. Android: Update API Base URL
+#### [MODIFY] [AssistantController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/AssistantController.cs)
+- Implement `POST /api/assistant/chat`:
+    - Handles general skincare inquiries.
+    - Uses a system prompt focused on education, safety, and neutral guidance.
+    - Personalizes the greeting if the user's name is available in the token/profile.
 
-#### [MODIFY] [NetworkModule.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/di/NetworkModule.kt)
-- Change `BASE_URL` to **`http://192.168.1.103:5222/`**.
+### 2. Android: Data Layer
 
-#### [MODIFY] [network_security_config.xml](file:///C:/kotlinproje/DermaRoutine/app/src/main/res/xml/network_security_config.xml)
-- Add **`192.168.1.103`** to the permitted cleartext domains.
+#### [NEW] [ChatMessage.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/model/ChatMessage.kt)
+- Model representing a message in the chat UI: `text`, `isFromUser`, `timestamp`.
+
+#### [MODIFY] [AssistantApiService.kt] & [AssistantRepository.kt]
+- Add methods to send a message and receive a response.
+
+### 3. Android: UI Implementation (Matching Reference)
+
+#### [NEW] [AssistantViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/assistant/AssistantViewModel.kt)
+- Manages a list of `ChatMessage`.
+- Handles the "typing..." state indicator.
+- Provides "Quick Suggestion" prompts (e.g., "Yağlı cilt için rutin nedir?").
+
+#### [MODIFY] [AssistantScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/assistant/AssistantScreen.kt)
+- **Message List**: A `LazyColumn` with bubble-style messages.
+    - User messages: Brand green background, right-aligned.
+    - AI messages: Soft mint background, left-aligned.
+- **Typing Indicator**: Animated "..." when AI is processing.
+- **Input Field**: Bottom sticky bar with a text field and a circular send button.
+- **Quick Actions**: Scrollable chips above the input field for common questions.
 
 ## Verification Plan
 
+### Automated Tests
+- `dotnet build` & `gradlew assembleDebug`.
+
 ### Manual Verification
-1. **Restart Backend**: Stop and start your .NET backend server.
-2. **Connect Phone**: Ensure your phone is on the same Wi-Fi as your computer.
-3. **Run App**: Open the app and check the "Rutin" page. The connection error should disappear, and data should load.
+1. **Chat Flow**: Send "Retinol ile C vitamini kullanılır mı?". Verify the user bubble appears instantly and the AI response follows.
+2. **Branding**: Verify bubbles use the established green palette.
+3. **Quick Prompts**: Tap "Niacinamide'i açıkla". Verify the message is sent automatically.
+4. **Safety**: Verify the AI includes the educational disclaimer in its response.

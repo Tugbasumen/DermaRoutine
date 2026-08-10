@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DermaRoutine.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+81deb2f8efc4c39f6de00c1907e474f25ca289fb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c0c00f23adb37add971fc64b3455e029f80fbc3f")]
 [assembly: System.Reflection.AssemblyProductAttribute("DermaRoutine.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DermaRoutine.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
