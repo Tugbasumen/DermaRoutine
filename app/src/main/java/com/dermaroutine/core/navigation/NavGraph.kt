@@ -56,7 +56,7 @@ fun NavGraph(
                 onNavigateToRoutine = { navController.navigate(Screen.Routine) },
                 onNavigateToProducts = { navController.navigate(Screen.Products) },
                 onNavigateToJournal = { navController.navigate(Screen.Journal) },
-                onNavigateToAssistant = { navController.navigate(Screen.Assistant("Skin Analysis")) }
+                onNavigateToAssistant = { navController.navigate(Screen.AIAssistant) }
             )
         }
 
@@ -203,6 +203,12 @@ fun NavGraph(
 
         composable<Screen.Journal> {
             JournalScreen()
+        }
+
+        composable<Screen.AIAssistant> {
+            AssistantScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable<Screen.Assistant> { backStackEntry ->

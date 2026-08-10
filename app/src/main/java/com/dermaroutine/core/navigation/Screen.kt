@@ -69,6 +69,9 @@ sealed class Screen {
     data object Journal : Screen()
 
     @Serializable
+    data object AIAssistant : Screen()
+
+    @Serializable
     data class Assistant(val ingredientName: String) : Screen()
 }
 

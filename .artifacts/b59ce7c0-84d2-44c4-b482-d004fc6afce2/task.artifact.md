@@ -12,11 +12,12 @@
 - [x] Create `GetChatResponseUseCase.kt`
 
 ## Step 3: Android UI (Presentation)
-- [ ] Create `AssistantViewModel.kt` (State & Message list) [/]
-- [ ] Redesign `AssistantScreen.kt` (Chat bubbles & animations) [/]
-- [ ] Implement Quick Suggestion chips
-- [ ] Connect with Navigation
+- [x] Create `AssistantViewModel.kt` (State & Message list)
+- [x] Redesign `AssistantScreen.kt` (Chat bubbles & animations)
+- [x] Implement Quick Suggestion chips
+- [x] Connect with Navigation (Added `AIAssistant` route)
 
 ## Step 4: Final Integration & Polish
-- [ ] Add "Yazıyor..." indicator
-- [ ] Final visual alignment with reference image
+- [x] Add "Yazıyor..." indicator
+- [x] Personalized greeting in Chat
+- [x] Final visual alignment with reference image
