@@ -1,27 +1,27 @@
-# AI Skin Assistant Chat Walkthrough
+# Phase 20: Mandatory Profile Setup Flow Walkthrough
 
-I have completed the implementation of the general AI Skin Assistant Chat. Users can now engage in real-time conversations with the AI to ask any skincare-related questions, perfectly matching the project's interactive vision.
+I have implemented the mandatory profile setup flow to ensure that every user has a personalized skincare experience starting from their very first session. This aligns perfectly with the project's goal of data-driven personalization.
 
 ## Changes Made
 
-### 1. Modern Chat Interface
-- **AssistantScreen**: Transformed the placeholder into a full-featured messaging UI.
-    - **Branded Bubbles**: User messages appear in a dark green bubble (Primary), and AI responses use a soft mint background (SecondaryContainer).
-    - **Personalized Greeting**: The AI greets the user by name (e.g., "Merhaba Tuğba! ✨") right when the screen opens.
-    - **Animations**: Added an animated "..." typing indicator that appears while the AI is processing a request.
+### 1. Smart Startup Routing
+- **MainActivity Logic**: The app now intelligently checks the user's profile status immediately after authentication.
+- **Auto-Redirection**: If a user is logged in but hasn't completed their skin profile, they are automatically sent to the **Profile** screen instead of the Home dashboard.
+- **Smooth Transition**: The Splash screen is held slightly longer until the profile status is confirmed, preventing "flicker" between screens.
 
-### 2. Quick Interaction Tools
-- **Suggestion Chips**: Implemented the quick-action chips seen in your reference image (e.g., "Yağlı cilt için en iyi rutin nedir?"). Tapping them sends the question immediately.
-- **Smart Scrolling**: The chat automatically scrolls to the latest message whenever a new one arrives.
+### 2. Tailored Setup Experience
+- **First-Time UI**: When entering the profile screen for the first time:
+    - The top back button is hidden to ensure completion.
+    - A welcoming header ("Cilt Yolculuğuna Başlayalım 🌿") and supportive subtitle are displayed.
+    - The "Reminders" icon is removed to keep the focus on the initial setup.
 
-### 3. Business Logic & Flow
-- **AssistantViewModel**: Manages the message history, loading states, and user interactions.
-- **Unified Routing**: Integrated the new `AIAssistant` route into the `NavGraph`, ensuring it's accessible from the Home screen's "Hızlı Aksiyonlar" section.
+### 3. Automated Navigation
+- **One-Way Path**: Once the user saves their profile for the first time, the app automatically navigates to the **Home** screen and clears the setup screen from the history. This ensures a seamless "Welcome" to "Dashboard" flow.
 
 ## Verification Results
 - [x] **Build Status**: Successful (`./gradlew assembleDebug`).
-- [x] **Conversation Flow**: Verified that the app sends messages to the backend and displays the Gemini response correctly.
-- [x] **UI Accuracy**: The layout, colors, and components closely match the provided reference image.
+- [x] **New User Path**: Verified that unprofiled users land on the mandatory setup screen.
+- [x] **Returning User Path**: Confirmed that users with profiles continue straight to the Home dashboard.
 
 ## Recommended Commit Message
-`feat(assistant): implement full AI skincare chat with personalized greetings and quick suggestions`
+`feat(onboarding): implement mandatory profile setup flow for new users`

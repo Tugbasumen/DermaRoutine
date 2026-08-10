@@ -1,51 +1,47 @@
-# Phase 19: AI Skin Assistant Chat Implementation Plan
+# Phase 20: Mandatory Profile Setup Flow Plan
 
-This phase implements a real-time AI messaging interface where users can ask general skincare questions and receive educational guidance from Gemini, matching the provided design.
+This phase ensures a "Google-First" personalized experience by requiring all new users to complete their Skin Profile before accessing the main dashboard. This aligns with the project vision: "Kullanıcı uygulamaya ilk girdiğinde kısa bir cilt profili oluşturur."
 
 ## Proposed Changes
 
-### 1. Backend: General Chat Engine
+### 1. Navigation & Routing (Android Core)
 
-#### [NEW] [AssistantDtos.cs Update](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/DTOs/AssistantDtos.cs)
-- `GeneralChatRequest`: User's message.
-- `GeneralChatResponse`: AI's text response.
+#### [MODIFY] [MainActivity.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/MainActivity.kt)
+- Observe the user's profile status alongside their authentication state.
+- Update `startDestination` logic:
+    - If `currentUser != null` AND `profile == null` -> **`Screen.Profile`**
+    - If `currentUser != null` AND `profile != null` -> **`Screen.Home`**
 
-#### [MODIFY] [AssistantController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/AssistantController.cs)
-- Implement `POST /api/assistant/chat`:
-    - Handles general skincare inquiries.
-    - Uses a system prompt focused on education, safety, and neutral guidance.
-    - Personalizes the greeting if the user's name is available in the token/profile.
+#### [MODIFY] [NavGraph.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/core/navigation/NavGraph.kt)
+- Pass the profile status to the `ProfileScreen` to determine if the back button should be shown.
 
-### 2. Android: Data Layer
+### 2. Presentation Layer (Android UI)
 
-#### [NEW] [ChatMessage.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/domain/model/ChatMessage.kt)
-- Model representing a message in the chat UI: `text`, `isFromUser`, `timestamp`.
+#### [MODIFY] [ProfileScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/profile/ProfileScreen.kt)
+- **Conditional UI**: If it's the user's first time (no profile exists):
+    - Hide the Top Bar's back button and the "Reminders" icon.
+    - Show a welcoming title: "Cilt Yolculuğuna Başlayalım 🌿".
+    - Add a subtitle explaining why the profile is important.
+- **Auto-Navigation**: Once the profile is saved successfully for the first time, navigate automatically to the Home screen and clear the navigation stack.
 
-#### [MODIFY] [AssistantApiService.kt] & [AssistantRepository.kt]
-- Add methods to send a message and receive a response.
+#### [MODIFY] [ProfileViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/profile/ProfileViewModel.kt)
+- Add a state or event to notify the UI when the initial setup is complete.
 
-### 3. Android: UI Implementation (Matching Reference)
+### 3. Backend (Optional Cleanup)
 
-#### [NEW] [AssistantViewModel.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/assistant/AssistantViewModel.kt)
-- Manages a list of `ChatMessage`.
-- Handles the "typing..." state indicator.
-- Provides "Quick Suggestion" prompts (e.g., "Yağlı cilt için rutin nedir?").
-
-#### [MODIFY] [AssistantScreen.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/presentation/assistant/AssistantScreen.kt)
-- **Message List**: A `LazyColumn` with bubble-style messages.
-    - User messages: Brand green background, right-aligned.
-    - AI messages: Soft mint background, left-aligned.
-- **Typing Indicator**: Animated "..." when AI is processing.
-- **Input Field**: Bottom sticky bar with a text field and a circular send button.
-- **Quick Actions**: Scrollable chips above the input field for common questions.
+#### [MODIFY] [ProfileController.cs](file:///C:/kotlinproje/DermaRoutine/backend/DermaRoutine.Api/Controllers/ProfileController.cs)
+- Ensure the `GET /api/profile` endpoint returns a clean 404 when no profile exists, which the app will interpret as "Setup Required".
 
 ## Verification Plan
 
-### Automated Tests
-- `dotnet build` & `gradlew assembleDebug`.
-
 ### Manual Verification
-1. **Chat Flow**: Send "Retinol ile C vitamini kullanılır mı?". Verify the user bubble appears instantly and the AI response follows.
-2. **Branding**: Verify bubbles use the established green palette.
-3. **Quick Prompts**: Tap "Niacinamide'i açıkla". Verify the message is sent automatically.
-4. **Safety**: Verify the AI includes the educational disclaimer in its response.
+1. **New User Path**:
+    - Log in with a new Google account that has no profile.
+    - Verify the app lands on the Profile screen immediately after the Auth screen.
+    - Try to go back (system back or UI). Verify it's disabled or correctly handled.
+2. **Setup Completion**:
+    - Fill out the profile and tap "Kaydet".
+    - Verify the app navigates to the Home dashboard automatically.
+3. **Returning User Path**:
+    - Close and reopen the app.
+    - Verify the app lands directly on the Home dashboard.

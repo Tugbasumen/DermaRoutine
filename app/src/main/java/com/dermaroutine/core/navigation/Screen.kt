@@ -18,7 +18,7 @@ sealed class Screen {
     data object Home : Screen()
     
     @Serializable
-    data object Profile : Screen()
+    data class Profile(val isFirstTime: Boolean = false) : Screen()
 
     @Serializable
     data object ReminderSettings : Screen()
@@ -86,5 +86,5 @@ val bottomNavItems = listOf(
     BottomNavItem(Screen.Routine, Icons.Default.EventNote, R.string.nav_routine),
     BottomNavItem(Screen.Products, Icons.Default.Inventory2, R.string.nav_products),
     BottomNavItem(Screen.Progress, Icons.Default.BarChart, R.string.nav_progress),
-    BottomNavItem(Screen.Profile, Icons.Default.Person, R.string.nav_profile)
+    BottomNavItem(Screen.Profile(), Icons.Default.Person, R.string.nav_profile)
 )

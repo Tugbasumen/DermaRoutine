@@ -1,23 +1,12 @@
-# Phase 19: AI Skin Assistant Chat - Task List
+# Mandatory Profile Setup - Task List
 
-## Step 1: Backend Infrastructure
-- [x] Update `AssistantDtos.cs` (Add GeneralChat request/response)
-- [x] Implement `chat` endpoint in `AssistantController.cs`
-- [x] Verify with `dotnet build`
-
-## Step 2: Android Data Layer
-- [x] Create `ChatMessage` domain model
-- [x] Update `AssistantApiService.kt` and DTOs
-- [x] Update `AssistantRepositoryImpl.kt`
-- [x] Create `GetChatResponseUseCase.kt`
-
-## Step 3: Android UI (Presentation)
-- [x] Create `AssistantViewModel.kt` (State & Message list)
-- [x] Redesign `AssistantScreen.kt` (Chat bubbles & animations)
-- [x] Implement Quick Suggestion chips
-- [x] Connect with Navigation (Added `AIAssistant` route)
-
-## Step 4: Final Integration & Polish
-- [x] Add "Yazıyor..." indicator
-- [x] Personalized greeting in Chat
-- [x] Final visual alignment with reference image
+- [x] Core Setup & Navigation
+    - [x] Update `MainActivity.kt` to check profile status
+    - [x] Update `NavGraph.kt` to handle `isFirstTime` flag
+- [x] UI Implementation
+    - [x] Redesign `ProfileScreen.kt` header for first-time users
+    - [x] Hide back/reminder buttons during initial setup
+    - [x] Implement automatic navigation to Home after setup
+- [x] Build and Verify
+    - [x] Successful `gradlew assembleDebug`
+    - [x] Verify automatic redirection for new users

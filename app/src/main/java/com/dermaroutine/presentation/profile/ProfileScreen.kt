@@ -31,6 +31,8 @@ import com.dermaroutine.domain.model.SkinType
 @Composable
 fun ProfileScreen(
     onNavigateToReminders: () -> Unit,
+    onNavigateToHome: () -> Unit = {},
+    isFirstTime: Boolean = false,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -55,6 +57,8 @@ fun ProfileScreen(
             selectedSensitivity = profile.sensitivityLevel
             selectedConcerns = profile.concerns.toSet()
             notes = profile.notes ?: ""
+        } else if (uiState is ProfileUiState.Saved && isFirstTime) {
+            onNavigateToHome()
         }
     }
 
@@ -63,8 +67,10 @@ fun ProfileScreen(
             TopAppBar(
                 title = { Text(stringResource(id = R.string.profile_title), fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = onNavigateToReminders) {
-                        Icon(Icons.Default.Notifications, contentDescription = stringResource(id = R.string.profile_reminders))
+                    if (!isFirstTime) {
+                        IconButton(onClick = onNavigateToReminders) {
+                            Icon(Icons.Default.Notifications, contentDescription = stringResource(id = R.string.profile_reminders))
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -86,10 +92,19 @@ fun ProfileScreen(
                     .verticalScroll(scrollState)
             ) {
                 Text(
-                    text = stringResource(id = R.string.profile_title),
+                    text = if (isFirstTime) "Cilt Yolculuğuna Başlayalım 🌿" else stringResource(id = R.string.profile_title),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
+                
+                if (isFirstTime) {
+                    Text(
+                        text = "Sana özel bir deneyim hazırlayabilmemiz için cildini biraz tanıyalım.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+                }
 
                 SectionTitle(stringResource(id = R.string.profile_skin_type))
                 FlowRow(
@@ -130,11 +145,12 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     allConcerns.forEach { concern ->
+                        val isSelected = selectedConcerns.contains(concern)
                         SelectableChip(
                             label = concern,
-                            selected = selectedConcerns.contains(concern),
+                            selected = isSelected,
                             onClick = {
-                                selectedConcerns = if (selectedConcerns.contains(concern)) {
+                                selectedConcerns = if (isSelected) {
                                     selectedConcerns - concern
                                 } else {
                                     selectedConcerns + concern
@@ -164,7 +180,7 @@ fun ProfileScreen(
                     )
                 }
 
-                if (uiState is ProfileUiState.Saved) {
+                if (uiState is ProfileUiState.Saved && !isFirstTime) {
                     Text(
                         text = stringResource(id = R.string.profile_saved),
                         color = MaterialTheme.colorScheme.primary,

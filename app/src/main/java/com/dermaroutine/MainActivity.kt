@@ -14,11 +14,9 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.res.stringResource
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -32,6 +30,7 @@ import com.dermaroutine.core.navigation.Screen
 import com.dermaroutine.core.navigation.bottomNavItems
 import com.dermaroutine.core.util.OnboardingDataStore
 import com.dermaroutine.domain.usecase.GetCurrentUserUseCase
+import com.dermaroutine.domain.usecase.GetProfileUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -44,6 +43,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var getCurrentUserUseCase: GetCurrentUserUseCase
 
+    @Inject
+    lateinit var getProfileUseCase: GetProfileUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -55,10 +57,25 @@ class MainActivity : ComponentActivity() {
                 .collectAsState(initial = null)
             val currentUser by getCurrentUserUseCase()
                 .collectAsState(initial = null)
+            
+            var hasProfile by remember { mutableStateOf<Boolean?>(null) }
 
-            // Keep splash screen until we know both states
+            // Fetch profile status once user is logged in
+            LaunchedEffect(currentUser) {
+                if (currentUser != null) {
+                    getProfileUseCase().onSuccess {
+                        hasProfile = it != null
+                    }.onFailure {
+                        hasProfile = false // Assume no profile on error for safety
+                    }
+                } else {
+                    hasProfile = null
+                }
+            }
+
+            // Keep splash screen until we know the essential states
             splashScreen.setKeepOnScreenCondition { 
-                isOnboardingCompleted == null 
+                isOnboardingCompleted == null || (currentUser != null && hasProfile == null)
             }
 
             DermaRoutineTheme {
@@ -66,6 +83,8 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
+
+                    // ... existing deep link handling ...
 
                     // Deep Link Handling from Notifications
                     LaunchedEffect(intent) {
@@ -127,10 +146,11 @@ class MainActivity : ComponentActivity() {
                     ) { padding ->
                         Box(modifier = Modifier.padding(padding)) {
                             val startDestination = when {
-                            currentUser != null -> Screen.Home
-                            onboardingDone -> Screen.Auth
-                            else -> Screen.Onboarding
-                        }
+                                currentUser != null && hasProfile == true -> Screen.Home
+                                currentUser != null && hasProfile == false -> Screen.Profile(isFirstTime = true)
+                                onboardingDone -> Screen.Auth
+                                else -> Screen.Onboarding
+                            }
 
                             NavGraph(
                                 navController = navController,

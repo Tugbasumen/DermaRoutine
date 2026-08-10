@@ -189,9 +189,16 @@ fun NavGraph(
             )
         }
         
-        composable<Screen.Profile> {
+        composable<Screen.Profile> { backStackEntry ->
+            val profileRoute: Screen.Profile = backStackEntry.toRoute()
             ProfileScreen(
-                onNavigateToReminders = { navController.navigate(Screen.ReminderSettings) }
+                onNavigateToReminders = { navController.navigate(Screen.ReminderSettings) },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home) {
+                        popUpTo(Screen.Profile(true)) { inclusive = true }
+                    }
+                },
+                isFirstTime = profileRoute.isFirstTime
             )
         }
 
