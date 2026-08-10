@@ -10,6 +10,9 @@ namespace DermaRoutine.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Manual fix for Postgres type casting
+            migrationBuilder.Sql("ALTER TABLE \"Products\" ALTER COLUMN \"Category\" TYPE integer USING (CASE WHEN \"Category\" IS NULL OR \"Category\" = '' THEN '0' ELSE \"Category\" END)::integer;");
+
             migrationBuilder.AlterColumn<int>(
                 name: "Category",
                 table: "Products",
