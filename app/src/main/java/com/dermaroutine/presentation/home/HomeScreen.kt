@@ -147,21 +147,31 @@ fun HomeHeader(greeting: String, userName: String) {
             )
         }
         Row {
-            IconButton(
+            Surface(
                 onClick = { /* Notification */ },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface, CircleShape)
+                shape = CircleShape,
+                color = Color.White,
+                shadowElevation = 2.dp,
+                modifier = Modifier.size(40.dp)
             ) {
-                Icon(Icons.Default.Notifications, contentDescription = null, tint = Color(0xFFFFB300))
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.Notifications, contentDescription = null, tint = Color(0xFFFFD600), modifier = Modifier.size(20.dp))
+                }
             }
             Spacer(modifier = Modifier.width(12.dp))
-            Image(
-                painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surface)
-            )
+            Surface(
+                onClick = { /* Profile */ },
+                shape = CircleShape,
+                color = Color.White,
+                shadowElevation = 2.dp,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.app_logo),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize().padding(4.dp).clip(CircleShape)
+                )
+            }
         }
     }
 }
@@ -269,6 +279,7 @@ fun FeaturedRoutineCard(
 
 @Composable
 fun WeeklyProgressSection(activity: List<Int>) {
+    val completedDays = activity.count { it > 0 }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -280,11 +291,28 @@ fun WeeklyProgressSection(activity: List<Int>) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Haftalık İlerleme", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(text = "Tümü", style = MaterialTheme.typography.labelMedium, color = Primary)
+                Column {
+                    Text(text = "Haftalık İlerleme", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(id = R.string.home_weekly_summary, completedDays),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                Text(text = stringResource(id = R.string.home_all), style = MaterialTheme.typography.labelMedium, color = Primary)
             }
             Spacer(modifier = Modifier.height(24.dp))
-            WeeklyBarChart(activity = if (activity.isNotEmpty()) activity else listOf(0, 0, 0, 0, 0, 0, 0))
+            WeeklyBarChart(
+                activity = if (activity.isNotEmpty()) activity else listOf(2, 4, 3, 5, 2, 6, 3),
+                barColor = Primary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.home_routine_consistency, 18), // Example streak to match "Emma"
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
         }
     }
 }

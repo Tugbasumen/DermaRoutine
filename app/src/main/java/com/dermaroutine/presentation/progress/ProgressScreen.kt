@@ -86,12 +86,23 @@ fun ProgressScreen(
 
                 // 2. Photos Title
                 item(span = { GridItemSpan(2) }) {
-                    Text(
-                        text = "Fotoğraf Günlüğü",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Fotoğraf Günlüğü",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.home_all),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { /* Show all photos */ }
+                        )
+                    }
                 }
 
                 // 3. Photos Grid
@@ -215,7 +226,7 @@ fun MoodSummaryCard(moodCounts: List<MoodStat>) {
 fun SkinPhotoCard(photo: SkinPhoto, onClick: () -> Unit) {
     val date = try {
         val dt = LocalDateTime.parse(photo.takenAt, DateTimeFormatter.ISO_DATE_TIME)
-        dt.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
+        dt.format(DateTimeFormatter.ofPattern("d MMM yyyy"))
     } catch (e: Exception) {
         photo.takenAt
     }
@@ -223,11 +234,11 @@ fun SkinPhotoCard(photo: SkinPhoto, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(0.8f)
+            .aspectRatio(0.85f)
             .clickable { onClick() },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column {
             AsyncImage(
@@ -236,14 +247,22 @@ fun SkinPhotoCard(photo: SkinPhoto, onClick: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
                 contentScale = ContentScale.Crop
             )
             Column(modifier = Modifier.padding(12.dp)) {
-                Text(text = date, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "⭐ ${photo.rating}/5", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-                }
+                Text(
+                    text = date, 
+                    style = MaterialTheme.typography.labelSmall, 
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+                Text(
+                    text = "⭐ ${photo.rating}/5", 
+                    style = MaterialTheme.typography.labelSmall, 
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

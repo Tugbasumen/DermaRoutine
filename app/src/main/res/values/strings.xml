@@ -48,6 +48,9 @@
     <string name="home_action_product">Ürün</string>
     <string name="home_action_photo">Fotoğraf</string>
     <string name="home_action_ai">Yapay Zeka</string>
+    <string name="home_weekly_summary">%1$d / 7 gün</string>
+    <string name="home_routine_consistency">Rutin devamlılığın: %1$d günlük seri</string>
+    <string name="home_all">Tümü</string>
 
     <!-- Journal -->
     <string name="journal_title">Cilt Günlüğü</string>

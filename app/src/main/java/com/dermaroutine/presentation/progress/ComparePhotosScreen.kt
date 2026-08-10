@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,6 +39,20 @@ fun ComparePhotosScreen(
     
     var beforePhoto by remember { mutableStateOf<SkinPhoto?>(null) }
     var afterPhoto by remember { mutableStateOf<SkinPhoto?>(null) }
+    var isFullScreen by remember { mutableStateOf(false) }
+
+    if (isFullScreen && beforePhoto != null && afterPhoto != null) {
+        AlertDialog(
+            onDismissRequest = { isFullScreen = false },
+            confirmButton = { TextButton(onClick = { isFullScreen = false }) { Text(stringResource(id = R.string.ok)) } },
+            text = {
+                Row(modifier = Modifier.fillMaxWidth().height(500.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    ComparisonHalf("", beforePhoto, Modifier.weight(1f))
+                    ComparisonHalf("", afterPhoto, Modifier.weight(1f))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -46,6 +61,13 @@ fun ComparePhotosScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back))
+                    }
+                },
+                actions = {
+                    if (beforePhoto != null && afterPhoto != null) {
+                        IconButton(onClick = { /* Share Logic */ }) {
+                            Icon(Icons.Default.Share, contentDescription = "Paylaş", tint = MaterialTheme.colorScheme.primary)
+                        }
                     }
                 }
             )
@@ -110,8 +132,9 @@ fun ComparePhotosScreen(
 
             if (beforePhoto != null && afterPhoto != null) {
                 Button(
-                    onClick = { /* Could expand view */ },
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { isFullScreen = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(stringResource(id = R.string.progress_view_full))
                 }

@@ -80,20 +80,21 @@ fun WeeklyBarChart(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
-                        .width(40.dp)
-                        .height(100.dp * (value.toFloat() / maxVal).coerceAtLeast(0.1f))
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomStart = 4.dp, bottomEnd = 4.dp))
+                        .width(32.dp) // Adjusted width for better spacing
+                        .height(100.dp * (value.toFloat() / maxVal).coerceAtLeast(0.15f))
+                        .clip(RoundedCornerShape(8.dp)) // Fully rounded bars
                         .background(
                             brush = Brush.verticalGradient(
-                                colors = listOf(barColor, barColor.copy(alpha = 0.3f))
+                                colors = listOf(barColor, barColor.copy(alpha = 0.2f))
                             )
                         )
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = days[index],
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                    fontWeight = FontWeight.Bold
                 )
             }
         }

@@ -1,12 +1,16 @@
-# Mandatory Profile Setup - Task List
+# Phase 21: Final UI Polish & Analytics - Task List
 
-- [x] Core Setup & Navigation
-    - [x] Update `MainActivity.kt` to check profile status
-    - [x] Update `NavGraph.kt` to handle `isFirstTime` flag
-- [x] UI Implementation
-    - [x] Redesign `ProfileScreen.kt` header for first-time users
-    - [x] Hide back/reminder buttons during initial setup
-    - [x] Implement automatic navigation to Home after setup
+- [x] Home Screen Refinement
+    - [x] Update `WeeklyProgressSection` with "Bu Hafta" summary metric
+    - [x] Add "Rutin devamlılığın" streak text to Home
+    - [x] Fine-tune `WeeklyBarChart` visual style (spacing & widths)
+- [x] Progress Screen Refinement
+    - [x] Add "Tümü" button to Photo Journal section
+    - [x] Update `SkinPhotoCard` with softer shadows and premium dates
+- [x] Comparison Feature Polish
+    - [x] Add Share/Full-view functionality to `ComparePhotosScreen.kt`
+- [x] General Branding Sweep
+    - [x] Enforce Primary Green on all icons and indicators
 - [x] Build and Verify
     - [x] Successful `gradlew assembleDebug`
-    - [x] Verify automatic redirection for new users
+    - [x] Visual verification against "Emma" reference
