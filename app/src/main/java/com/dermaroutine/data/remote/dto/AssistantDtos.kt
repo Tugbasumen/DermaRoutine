@@ -28,3 +28,13 @@ data class ProductAnalysisResponse(
     val keyBenefits: List<String>,
     val potentialRisks: List<String>
 )
+
+@Serializable
+data class GeneralChatRequest(
+    val message: String
+)
+
+@Serializable
+data class GeneralChatResponse(
+    val response: String
+)

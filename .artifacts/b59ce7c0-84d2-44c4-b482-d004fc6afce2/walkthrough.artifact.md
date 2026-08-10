@@ -1,26 +1,23 @@
-# AI Assistant Chat Implementation - Backend Walkthrough
+# AI Assistant Chat Implementation - Android Data Layer Walkthrough
 
-The backend infrastructure for the general AI Skin Assistant chat is now ready. This step enables the mobile app to send any skincare question and receive a personalized, educational response in Turkish.
+I have established the data infrastructure on the Android app to support the real-time AI skincare chat feature.
 
 ## Changes Made
 
-### 1. Enhanced API DTOs
-- Updated `AssistantDtos.cs` to include:
-    - `GeneralChatRequest`: Captures the user's plain text question.
-    - `GeneralChatResponse`: Delivers the AI-generated answer.
+### 1. New Chat Domain Model
+- **ChatMessage.kt**: Defined a clean model to manage chat history within the app. It includes text, a sender flag (User vs. AI), and unique IDs for efficient UI rendering.
 
-### 2. Personalized Chat Endpoint
-- Implemented `POST /api/assistant/chat` in the `AssistantController`.
-- **User Recognition**: The endpoint now fetches the user's name and skin profile (if available) to provide a more tailored conversational experience.
-- **Safety First**: Integrated a robust system prompt that instructs Gemini to:
-    - Respond strictly in **Turkish**.
-    - Stay educational and supportive.
-    - Avoid medical diagnoses or prescriptions.
-    - Include a standard medical advice disclaimer.
+### 2. Network Integration
+- **Enhanced DTOs**: Added `GeneralChatRequest` and `GeneralChatResponse` to the version catalog to match the backend API.
+- **Service Update**: Updated `AssistantApiService.kt` with the new Retrofit call for generic skincare questions.
+
+### 3. Repository & Business Logic
+- **Repository Implementation**: Added `getChatResponse` to `AssistantRepositoryImpl`, allowing the app to communicate with Gemini securely.
+- **New UseCase**: Created `GetChatResponseUseCase.kt` to follow Clean Architecture principles, decoupling the UI from the network details.
 
 ## Verification Results
-- [x] **Build Status**: Successful (`dotnet build`).
-- [x] **Personalization**: Verified that the prompt correctly includes user-specific context from the database.
+- [x] **Build Status**: Successful (`./gradlew assembleDebug`).
+- [x] **Architecture**: Successfully separated message handling from UI logic.
 
 ## Recommended Commit Message
-`feat(backend): implement personalized general chat endpoint for AI assistant`
+`feat(android): implement data layer and usecases for AI assistant chat`

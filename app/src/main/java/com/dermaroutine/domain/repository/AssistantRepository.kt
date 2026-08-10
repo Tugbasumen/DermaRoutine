@@ -6,4 +6,5 @@ import com.dermaroutine.domain.model.ProductAnalysis
 interface AssistantRepository {
     suspend fun getIngredientExplanation(name: String): Result<IngredientExplanation>
     suspend fun analyzeProduct(ingredients: List<String>): Result<ProductAnalysis>
+    suspend fun getChatResponse(message: String): Result<String>
 }

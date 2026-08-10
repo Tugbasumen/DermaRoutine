@@ -6,13 +6,14 @@
 - [x] Verify with `dotnet build`
 
 ## Step 2: Android Data Layer
-- [ ] Create `ChatMessage` domain model [/]
-- [ ] Update `AssistantApiService.kt` and DTOs [/]
-- [ ] Update `AssistantRepositoryImpl.kt` [/]
+- [x] Create `ChatMessage` domain model
+- [x] Update `AssistantApiService.kt` and DTOs
+- [x] Update `AssistantRepositoryImpl.kt`
+- [x] Create `GetChatResponseUseCase.kt`
 
 ## Step 3: Android UI (Presentation)
-- [ ] Create `AssistantViewModel.kt` (State & Message list)
-- [ ] Redesign `AssistantScreen.kt` (Chat bubbles & animations)
+- [ ] Create `AssistantViewModel.kt` (State & Message list) [/]
+- [ ] Redesign `AssistantScreen.kt` (Chat bubbles & animations) [/]
 - [ ] Implement Quick Suggestion chips
 - [ ] Connect with Navigation
 

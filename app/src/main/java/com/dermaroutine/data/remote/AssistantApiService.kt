@@ -11,4 +11,7 @@ interface AssistantApiService {
 
     @POST("api/assistant/analyze-product")
     suspend fun analyzeProduct(@Body request: ProductAnalysisRequest): Response<ProductAnalysisResponse>
+
+    @POST("api/assistant/chat")
+    suspend fun chat(@Body request: GeneralChatRequest): Response<GeneralChatResponse>
 }

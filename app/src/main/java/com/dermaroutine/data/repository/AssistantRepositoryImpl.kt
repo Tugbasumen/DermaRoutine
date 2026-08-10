@@ -46,4 +46,18 @@ class AssistantRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getChatResponse(message: String): Result<String> {
+        return try {
+            val request = com.dermaroutine.data.remote.dto.GeneralChatRequest(message)
+            val response = apiService.chat(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!.response)
+            } else {
+                Result.failure(Exception("AI yanıtı alınamadı."))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
