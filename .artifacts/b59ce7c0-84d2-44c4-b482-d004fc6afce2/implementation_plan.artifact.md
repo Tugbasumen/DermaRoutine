@@ -1,40 +1,55 @@
-# Phase 21: Final UI Polish & Analytics Alignment Plan
+# Phase 22: Offline Support with Room Persistence
 
-This phase focuses on the "final 10%" of the UI/UX, ensuring every screen perfectly matches the project vision and the premium "Emma" design reference. We will enhance the analytics reporting and polish the visual transitions.
+This phase aligns the application with the "Kullanılacak Teknolojiler" list by implementing **Room Database**. We will move towards an "Offline-First" architecture, allowing users to view their routines and products even without an active internet connection.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Single Source of Truth**: I will refactor the Repositories to use Room as the primary data source. The app will fetch from the API and update the local database, while the UI always observes the local database.
 
 ## Proposed Changes
 
-### 1. Home Screen: Weekly Summary & Polish
-- **Goal**: Show "Bu Hafta: 4 / 7 gün" and match the typography of the reference.
-- **Changes**:
-    - Update `WeeklyProgressSection` to include a summary text: "Rutin devamlılığın: {streak} günlük seri".
-    - Add the completion ratio (e.g., "4 / 7 gün") next to the weekly chart title.
-    - Fine-tune bar widths and spacing in `WeeklyBarChart` to match the reference.
+### 1. Build Configuration
 
-### 2. Progress Screen: Enhanced Activity View
-- **Goal**: Make the "Fotoğraf Günlüğü" and "Analizler" feel more integrated.
-- **Changes**:
-    - Add a "Tümü" action next to the "Fotoğraf Günlüğü" title.
-    - Polish the `SkinPhotoCard` to have a slightly softer shadow and better date formatting.
+#### [MODIFY] [libs.versions.toml](file:///C:/kotlinproje/DermaRoutine/gradle/libs.versions.toml)
+- Add Room version and library definitions.
 
-### 3. Comparison Feature: Interaction Polish
-- **Goal**: Improve the "Önce / Sonra" experience.
-- **Changes**:
-    - Update `ComparePhotosScreen.kt` to allow a "Full Screen" view of the selected pair.
-    - Add a "Paylaş" (Share) option to the comparison result.
+#### [MODIFY] [build.gradle.kts (app)](file:///C:/kotlinproje/DermaRoutine/app/build.gradle.kts)
+- Add Room dependencies (`room-runtime`, `room-ktx`, `room-compiler`).
 
-### 4. General Branding Consistency
-- **Goal**: Ensure the "DermaRoutine Green" is used correctly everywhere.
-- **Changes**:
-    - Review all screens for any lingering default purple or grey tones.
-    - Ensure all icons (Bell, Profile, Back) use the consistent brand primary color.
+### 2. Local Data Layer (Room)
+
+#### [NEW] Entities
+- `ProductEntity.kt`: Local representation of skincare products.
+- `RoutineEntity.kt`: Local representation of routines.
+- `RoutineItemEntity.kt`: Local representation of products within a routine.
+
+#### [NEW] DAOs
+- `ProductDao.kt`
+- `RoutineDao.kt`
+
+#### [NEW] [DermaRoutineDatabase.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/local/DermaRoutineDatabase.kt)
+- The main Room database class.
+
+### 3. Repository Refactoring
+
+#### [MODIFY] [ProductRepositoryImpl.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/ProductRepositoryImpl.kt)
+- Update to save fetched products into Room and provide a Flow of products from the local DB.
+
+#### [MODIFY] [RoutineRepositoryImpl.kt](file:///C:/kotlinproje/DermaRoutine/app/src/main/java/com/dermaroutine/data/repository/RoutineRepositoryImpl.kt)
+- Implement caching for routines and their completion status.
+
+### 4. UI/UX Polish
+
+#### [MODIFY] State Management
+- Ensure ViewModels use `collectAsStateWithLifecycle()` to observe the Flow from Room, providing instant UI updates even when offline.
 
 ## Verification Plan
 
 ### Automated Tests
-- `gradlew assembleDebug` to ensure no resource errors.
+- `gradlew assembleDebug` to verify Room annotation processing.
 
 ### Manual Verification
-1. **Side-by-Side Comparison**: Open the app and the reference image. Verify the alignment, font weights, and colors match.
-2. **Data Consistency**: Verify the "4 / 7 gün" summary matches the bars in the chart.
-3. **Smooth Navigation**: Verify that moving between Home and Progress feels native and premium.
+1. **Offline Mode**: Turn off Wi-Fi/Mobile Data. Open the app. Verify that your products and routines are still visible.
+2. **Syncing**: Turn Wi-Fi back on. Add a product. Verify it is sent to the API and then updated in the local database.
+3. **Data Integrity**: Verify that checklist states (Morning/Evening) are persisted correctly across app restarts while offline.
